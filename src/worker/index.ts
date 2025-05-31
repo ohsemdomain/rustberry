@@ -1,3 +1,4 @@
+/// <reference types="@cloudflare/workers-types" />
 import { app } from './hono/api'
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
 import { appRouter } from './trpc/router'
