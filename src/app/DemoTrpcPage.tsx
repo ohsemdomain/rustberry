@@ -28,7 +28,7 @@ function DemoTrpcPage() {
 					aria-label="get name"
 					type="button"
 				>
-					Name from tRPC is: {name}
+					Namewww from tRPC is: {name}
 				</button>
 				<p>
 					Edit <code>src/worker/trpc/routes/demo.ts</code> to change the name
