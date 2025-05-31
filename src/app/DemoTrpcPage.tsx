@@ -6,24 +6,28 @@ import './styles.css'
 
 function DemoTrpcPage() {
 	const [name, setName] = useState('unknown')
+	const [shouldFetch, setShouldFetch] = useState(false)
 
-	// Create the tRPC mutation (for on-demand fetching like the Hono demo)
-	const helloQuery = trpc.demo.hello.useQuery(undefined, {
-		enabled: false, // Don't fetch automatically
-		onSuccess: (data) => {
-			setName(data.name)
-		},
+	// Use tRPC query
+	const { data } = trpc.demo.hello.useQuery(undefined, {
+		enabled: shouldFetch,
 	})
+
+	// Update name when data arrives
+	if (data?.name && name === 'unknown') {
+		setName(data.name)
+		setShouldFetch(false) // Reset to prevent re-fetching
+	}
 
 	return (
 		<>
-			<div>
-				<a href="https://react.dev" target="_blank">
-					<img src={reactLogo} className="logo react" alt="React logo" />
-				</a>
-			</div>
+			<img src={reactLogo} className="logo react" alt="React logo" />
 			<div className="card">
-				<button onClick={() => helloQuery.refetch()} aria-label="get name">
+				<button
+					onClick={() => setShouldFetch(true)}
+					aria-label="get name"
+					type="button"
+				>
 					Name from tRPC is: {name}
 				</button>
 				<p>

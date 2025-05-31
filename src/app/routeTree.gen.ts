@@ -12,6 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as TrpcDemoImport } from './routes/trpc-demo'
+import { Route as HonoDemoImport } from './routes/hono-demo'
 import { Route as ContactImport } from './routes/contact'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
@@ -21,6 +22,12 @@ import { Route as IndexImport } from './routes/index'
 const TrpcDemoRoute = TrpcDemoImport.update({
   id: '/trpc-demo',
   path: '/trpc-demo',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const HonoDemoRoute = HonoDemoImport.update({
+  id: '/hono-demo',
+  path: '/hono-demo',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -67,6 +74,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactImport
       parentRoute: typeof rootRoute
     }
+    '/hono-demo': {
+      id: '/hono-demo'
+      path: '/hono-demo'
+      fullPath: '/hono-demo'
+      preLoaderRoute: typeof HonoDemoImport
+      parentRoute: typeof rootRoute
+    }
     '/trpc-demo': {
       id: '/trpc-demo'
       path: '/trpc-demo'
@@ -83,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/hono-demo': typeof HonoDemoRoute
   '/trpc-demo': typeof TrpcDemoRoute
 }
 
@@ -90,6 +105,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/hono-demo': typeof HonoDemoRoute
   '/trpc-demo': typeof TrpcDemoRoute
 }
 
@@ -98,15 +114,16 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/hono-demo': typeof HonoDemoRoute
   '/trpc-demo': typeof TrpcDemoRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/contact' | '/trpc-demo'
+  fullPaths: '/' | '/about' | '/contact' | '/hono-demo' | '/trpc-demo'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/contact' | '/trpc-demo'
-  id: '__root__' | '/' | '/about' | '/contact' | '/trpc-demo'
+  to: '/' | '/about' | '/contact' | '/hono-demo' | '/trpc-demo'
+  id: '__root__' | '/' | '/about' | '/contact' | '/hono-demo' | '/trpc-demo'
   fileRoutesById: FileRoutesById
 }
 
@@ -114,6 +131,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
+  HonoDemoRoute: typeof HonoDemoRoute
   TrpcDemoRoute: typeof TrpcDemoRoute
 }
 
@@ -121,6 +139,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
+  HonoDemoRoute: HonoDemoRoute,
   TrpcDemoRoute: TrpcDemoRoute,
 }
 
@@ -137,6 +156,7 @@ export const routeTree = rootRoute
         "/",
         "/about",
         "/contact",
+        "/hono-demo",
         "/trpc-demo"
       ]
     },
@@ -148,6 +168,9 @@ export const routeTree = rootRoute
     },
     "/contact": {
       "filePath": "contact.tsx"
+    },
+    "/hono-demo": {
+      "filePath": "hono-demo.tsx"
     },
     "/trpc-demo": {
       "filePath": "trpc-demo.tsx"

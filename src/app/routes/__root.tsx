@@ -18,6 +18,9 @@ export const Route = createRootRoute({
 					<Link to="/trpc-demo" activeProps={{ style: { fontWeight: 'bold' } }}>
 						tRPC Demo
 					</Link>
+					<Link to="/hono-demo" activeProps={{ style: { fontWeight: 'bold' } }}>
+						Hono Demo
+					</Link>
 				</nav>
 				<hr />
 			</div>

@@ -7,11 +7,7 @@ function DemoPage() {
 
 	return (
 		<>
-			<div>
-				<a href="https://react.dev" target="_blank">
-					<img src={reactLogo} className="logo react" alt="React logo" />
-				</a>
-			</div>
+			<img src={reactLogo} className="logo react" alt="React logo" />
 			<div className="card">
 				<button
 					onClick={() => {
@@ -20,6 +16,7 @@ function DemoPage() {
 							.then((data) => setName(data.name))
 					}}
 					aria-label="get name"
+					type="button"
 				>
 					Name from API is: {name}
 				</button>
