@@ -15,6 +15,9 @@ export const Route = createRootRoute({
 					<Link to="/contact" activeProps={{ style: { fontWeight: 'bold' } }}>
 						Contact
 					</Link>
+					<Link to="/trpc-demo" activeProps={{ style: { fontWeight: 'bold' } }}>
+						tRPC Demo
+					</Link>
 				</nav>
 				<hr />
 			</div>

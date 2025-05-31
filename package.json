@@ -16,6 +16,7 @@
 		"@tanstack/react-router": "^1.120.13",
 		"@tanstack/router-devtools": "^1.120.13",
 		"@trpc/client": "^11.1.4",
+		"@trpc/react-query": "^11.1.4",
 		"@trpc/server": "^11.1.4",
 		"hono": "^4.7.10",
 		"react": "^19.1.0",

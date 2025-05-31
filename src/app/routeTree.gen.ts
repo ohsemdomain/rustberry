@@ -11,11 +11,18 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as TrpcDemoImport } from './routes/trpc-demo'
 import { Route as ContactImport } from './routes/contact'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
+
+const TrpcDemoRoute = TrpcDemoImport.update({
+  id: '/trpc-demo',
+  path: '/trpc-demo',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const ContactRoute = ContactImport.update({
   id: '/contact',
@@ -60,6 +67,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactImport
       parentRoute: typeof rootRoute
     }
+    '/trpc-demo': {
+      id: '/trpc-demo'
+      path: '/trpc-demo'
+      fullPath: '/trpc-demo'
+      preLoaderRoute: typeof TrpcDemoImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -69,12 +83,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/trpc-demo': typeof TrpcDemoRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/trpc-demo': typeof TrpcDemoRoute
 }
 
 export interface FileRoutesById {
@@ -82,14 +98,15 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/trpc-demo': typeof TrpcDemoRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/contact'
+  fullPaths: '/' | '/about' | '/contact' | '/trpc-demo'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/contact'
-  id: '__root__' | '/' | '/about' | '/contact'
+  to: '/' | '/about' | '/contact' | '/trpc-demo'
+  id: '__root__' | '/' | '/about' | '/contact' | '/trpc-demo'
   fileRoutesById: FileRoutesById
 }
 
@@ -97,12 +114,14 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
+  TrpcDemoRoute: typeof TrpcDemoRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
+  TrpcDemoRoute: TrpcDemoRoute,
 }
 
 export const routeTree = rootRoute
@@ -117,7 +136,8 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/about",
-        "/contact"
+        "/contact",
+        "/trpc-demo"
       ]
     },
     "/": {
@@ -128,6 +148,9 @@ export const routeTree = rootRoute
     },
     "/contact": {
       "filePath": "contact.tsx"
+    },
+    "/trpc-demo": {
+      "filePath": "trpc-demo.tsx"
     }
   }
 }
