@@ -4,8 +4,9 @@ import { appRouter } from './trpc/router'
 import { createContext } from './trpc/context'
 
 export interface Env {
-  MY_KV_NAMESPACE: KVNamespace
-  MY_SECRET: string
+  DB: D1Database
+  rustyberry_kv: KVNamespace
+  rustyberry_r2: R2Bucket
 }
 
 export default {

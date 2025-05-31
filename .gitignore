@@ -24,5 +24,8 @@ dist-ssr
 *.sw?
 
 # wrangler files
+.wrangler/
 .wrangler
 .dev.vars*
+wrangler.jsonc
+.wrangler.jsonc
