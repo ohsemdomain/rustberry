@@ -27,3 +27,4 @@ dist-ssr
 wrangler.jsonc
 .wrangler.jsonc
 src/worker/auth/users.ts
+.guide.md
