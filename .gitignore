@@ -29,3 +29,6 @@ dist-ssr
 .dev.vars*
 wrangler.jsonc
 .wrangler.jsonc
+
+# Auth - contains sensitive user data and password hashes
+src/worker/auth/users.ts

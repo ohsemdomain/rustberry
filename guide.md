@@ -1,5 +1,10 @@
 # User Management Guide
 
+## Initial Setup (First Time Only)
+```bash
+cp src/worker/auth/users.ts.example src/worker/auth/users.ts
+```
+
 ## How to Add a New User
 
 ### Step 1: Generate Password Hash
