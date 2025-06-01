@@ -1,8 +1,8 @@
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
+import { canPerformAction } from '~/trpc/auth/auth-registry'
 import { departmentProcedure } from '~/trpc/middleware/auth'
 import { router } from '~/trpc/trpc-instance'
-import { canPerformAction } from '~/trpc/auth/auth-registry'
 import { generateFallbackId, generateUniqueId } from '~/trpc/utils/id-generator'
 import { addPriceDisplay, addPriceDisplayToList } from '~/trpc/utils/price'
 import {
@@ -314,7 +314,9 @@ export const itemsRouter = router({
 			}
 
 			// Return updated item
-			const updatedItem = await ctx.env.DB.prepare('SELECT * FROM items WHERE id = ?')
+			const updatedItem = await ctx.env.DB.prepare(
+				'SELECT * FROM items WHERE id = ?',
+			)
 				.bind(id)
 				.first<Item>()
 

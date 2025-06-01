@@ -13,7 +13,7 @@ interface IdCounterData {
 export async function generateUniqueId(
 	env: Env,
 	prefix: string,
-	resourceType: string
+	resourceType: string,
 ): Promise<string> {
 	const currentYear = new Date().getFullYear()
 	const yearSuffix = currentYear.toString().slice(-2) // Get last 2 digits of year
@@ -21,7 +21,7 @@ export async function generateUniqueId(
 
 	// Get current counter from KV
 	const counterData = await env.rustyberry_kv.get<IdCounterData>(kvKey, 'json')
-	
+
 	let nextCount = 1
 	if (counterData && counterData.year === currentYear) {
 		nextCount = counterData.count + 1
@@ -33,8 +33,8 @@ export async function generateUniqueId(
 		JSON.stringify({ year: currentYear, count: nextCount }),
 		{
 			// Set expiration to end of next year to ensure data persists through the year
-			expirationTtl: 60 * 60 * 24 * 400 // ~400 days
-		}
+			expirationTtl: 60 * 60 * 24 * 400, // ~400 days
+		},
 	)
 
 	// Format the ID with zero padding

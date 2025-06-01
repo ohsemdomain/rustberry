@@ -45,30 +45,28 @@ export const permissionRegistry: Record<ResourceType, ResourcePermissions> = {
 export function canPerformAction(
 	department: Department,
 	resource: ResourceType,
-	action: keyof ResourcePermissions
+	action: keyof ResourcePermissions,
 ): boolean {
 	const permissions = permissionRegistry[resource]
 	if (!permissions) return false
-	
+
 	return permissions[action].includes(department)
 }
 
 export function getDepartmentsWithAccess(
 	resource: ResourceType,
-	action: keyof ResourcePermissions
+	action: keyof ResourcePermissions,
 ): Department[] {
 	const permissions = permissionRegistry[resource]
 	if (!permissions) return []
-	
+
 	return permissions[action]
 }
 
 // Get all resources a department can access
-export function getAccessibleResources(
-	department: Department
-): ResourceType[] {
+export function getAccessibleResources(department: Department): ResourceType[] {
 	const resources: ResourceType[] = []
-	
+
 	for (const [resource, permissions] of Object.entries(permissionRegistry)) {
 		// If department can perform any action on the resource, include it
 		if (
@@ -80,18 +78,18 @@ export function getAccessibleResources(
 			resources.push(resource as ResourceType)
 		}
 	}
-	
+
 	return resources
 }
 
 // Check if department has any access to a resource
 export function hasResourceAccess(
 	department: Department,
-	resource: ResourceType
+	resource: ResourceType,
 ): boolean {
 	const permissions = permissionRegistry[resource]
 	if (!permissions) return false
-	
+
 	return (
 		permissions.create.includes(department) ||
 		permissions.read.includes(department) ||

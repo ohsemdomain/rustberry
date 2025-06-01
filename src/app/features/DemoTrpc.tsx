@@ -1,7 +1,7 @@
-// src/app/DemoTrpcPage.tsx
-import { useState } from 'react'
 import reactLogo from '@/assets/react.svg'
 import { trpc } from '@/trpc'
+// src/app/DemoTrpcPage.tsx
+import { useState } from 'react'
 import '@/styles.css'
 
 function DemoTrpcPage() {

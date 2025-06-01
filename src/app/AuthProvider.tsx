@@ -1,3 +1,4 @@
+import { trpc } from '@/trpc'
 import {
 	type ReactNode,
 	createContext,
@@ -6,7 +7,6 @@ import {
 	useState,
 } from 'react'
 import type { User } from '~/auth/types'
-import { trpc } from '@/trpc'
 
 interface AuthContextType {
 	user: User | null

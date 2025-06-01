@@ -19,6 +19,9 @@ import { Route as AuthenticatedDemoTrpcImport } from './routes/_authenticated/de
 import { Route as AuthenticatedDemoHonoImport } from './routes/_authenticated/demo-hono'
 import { Route as AuthenticatedContactImport } from './routes/_authenticated/contact'
 import { Route as AuthenticatedAboutImport } from './routes/_authenticated/about'
+import { Route as AuthenticatedItemsIndexImport } from './routes/_authenticated/items/index'
+import { Route as AuthenticatedItemsCreateImport } from './routes/_authenticated/items/create'
+import { Route as AuthenticatedItemsItemIdEditImport } from './routes/_authenticated/items/$itemId.edit'
 
 // Create/Update Routes
 
@@ -67,6 +70,25 @@ const AuthenticatedAboutRoute = AuthenticatedAboutImport.update({
   path: '/about',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+
+const AuthenticatedItemsIndexRoute = AuthenticatedItemsIndexImport.update({
+  id: '/items/',
+  path: '/items/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+
+const AuthenticatedItemsCreateRoute = AuthenticatedItemsCreateImport.update({
+  id: '/items/create',
+  path: '/items/create',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+
+const AuthenticatedItemsItemIdEditRoute =
+  AuthenticatedItemsItemIdEditImport.update({
+    id: '/items/$itemId/edit',
+    path: '/items/$itemId/edit',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -128,6 +150,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexImport
       parentRoute: typeof AuthenticatedImport
     }
+    '/_authenticated/items/create': {
+      id: '/_authenticated/items/create'
+      path: '/items/create'
+      fullPath: '/items/create'
+      preLoaderRoute: typeof AuthenticatedItemsCreateImport
+      parentRoute: typeof AuthenticatedImport
+    }
+    '/_authenticated/items/': {
+      id: '/_authenticated/items/'
+      path: '/items'
+      fullPath: '/items'
+      preLoaderRoute: typeof AuthenticatedItemsIndexImport
+      parentRoute: typeof AuthenticatedImport
+    }
+    '/_authenticated/items/$itemId/edit': {
+      id: '/_authenticated/items/$itemId/edit'
+      path: '/items/$itemId/edit'
+      fullPath: '/items/$itemId/edit'
+      preLoaderRoute: typeof AuthenticatedItemsItemIdEditImport
+      parentRoute: typeof AuthenticatedImport
+    }
   }
 }
 
@@ -139,6 +182,9 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDemoHonoRoute: typeof AuthenticatedDemoHonoRoute
   AuthenticatedDemoTrpcRoute: typeof AuthenticatedDemoTrpcRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedItemsCreateRoute: typeof AuthenticatedItemsCreateRoute
+  AuthenticatedItemsIndexRoute: typeof AuthenticatedItemsIndexRoute
+  AuthenticatedItemsItemIdEditRoute: typeof AuthenticatedItemsItemIdEditRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -147,6 +193,9 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDemoHonoRoute: AuthenticatedDemoHonoRoute,
   AuthenticatedDemoTrpcRoute: AuthenticatedDemoTrpcRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedItemsCreateRoute: AuthenticatedItemsCreateRoute,
+  AuthenticatedItemsIndexRoute: AuthenticatedItemsIndexRoute,
+  AuthenticatedItemsItemIdEditRoute: AuthenticatedItemsItemIdEditRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -172,6 +221,9 @@ export interface FileRoutesByFullPath {
   '/demo-trpc': typeof AuthenticatedDemoTrpcRoute
   '/login': typeof PublicLoginRoute
   '/': typeof AuthenticatedIndexRoute
+  '/items/create': typeof AuthenticatedItemsCreateRoute
+  '/items': typeof AuthenticatedItemsIndexRoute
+  '/items/$itemId/edit': typeof AuthenticatedItemsItemIdEditRoute
 }
 
 export interface FileRoutesByTo {
@@ -182,6 +234,9 @@ export interface FileRoutesByTo {
   '/demo-trpc': typeof AuthenticatedDemoTrpcRoute
   '/login': typeof PublicLoginRoute
   '/': typeof AuthenticatedIndexRoute
+  '/items/create': typeof AuthenticatedItemsCreateRoute
+  '/items': typeof AuthenticatedItemsIndexRoute
+  '/items/$itemId/edit': typeof AuthenticatedItemsItemIdEditRoute
 }
 
 export interface FileRoutesById {
@@ -194,6 +249,9 @@ export interface FileRoutesById {
   '/_authenticated/demo-trpc': typeof AuthenticatedDemoTrpcRoute
   '/_public/login': typeof PublicLoginRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/items/create': typeof AuthenticatedItemsCreateRoute
+  '/_authenticated/items/': typeof AuthenticatedItemsIndexRoute
+  '/_authenticated/items/$itemId/edit': typeof AuthenticatedItemsItemIdEditRoute
 }
 
 export interface FileRouteTypes {
@@ -206,8 +264,21 @@ export interface FileRouteTypes {
     | '/demo-trpc'
     | '/login'
     | '/'
+    | '/items/create'
+    | '/items'
+    | '/items/$itemId/edit'
   fileRoutesByTo: FileRoutesByTo
-  to: '' | '/about' | '/contact' | '/demo-hono' | '/demo-trpc' | '/login' | '/'
+  to:
+    | ''
+    | '/about'
+    | '/contact'
+    | '/demo-hono'
+    | '/demo-trpc'
+    | '/login'
+    | '/'
+    | '/items/create'
+    | '/items'
+    | '/items/$itemId/edit'
   id:
     | '__root__'
     | '/_authenticated'
@@ -218,6 +289,9 @@ export interface FileRouteTypes {
     | '/_authenticated/demo-trpc'
     | '/_public/login'
     | '/_authenticated/'
+    | '/_authenticated/items/create'
+    | '/_authenticated/items/'
+    | '/_authenticated/items/$itemId/edit'
   fileRoutesById: FileRoutesById
 }
 
@@ -252,7 +326,10 @@ export const routeTree = rootRoute
         "/_authenticated/contact",
         "/_authenticated/demo-hono",
         "/_authenticated/demo-trpc",
-        "/_authenticated/"
+        "/_authenticated/",
+        "/_authenticated/items/create",
+        "/_authenticated/items/",
+        "/_authenticated/items/$itemId/edit"
       ]
     },
     "/_public": {
@@ -283,6 +360,18 @@ export const routeTree = rootRoute
     },
     "/_authenticated/": {
       "filePath": "_authenticated/index.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/items/create": {
+      "filePath": "_authenticated/items/create.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/items/": {
+      "filePath": "_authenticated/items/index.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/items/$itemId/edit": {
+      "filePath": "_authenticated/items/$itemId.edit.tsx",
       "parent": "/_authenticated"
     }
   }

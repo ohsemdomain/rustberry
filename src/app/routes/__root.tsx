@@ -1,6 +1,6 @@
+import { useAuth } from '@/AuthProvider'
 import { Link, Outlet, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
-import { useAuth } from '@/AuthProvider'
 
 export const Route = createRootRoute({
 	component: RootComponent,
@@ -41,7 +41,12 @@ function RootComponent() {
 							activeProps={{ style: { fontWeight: 'bold' } }}
 						>
 							HONO
-						</Link>
+						</Link>{' '}
+						{user && (
+							<Link to="/items" activeProps={{ style: { fontWeight: 'bold' } }}>
+								Items
+							</Link>
+						)}
 					</div>
 
 					<div>
