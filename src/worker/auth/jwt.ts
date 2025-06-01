@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify } from 'jose'
 import type { JWTPayload } from '~/auth/types'
+import type { Env } from '~/worker-env'
 
 export async function createJWT(
 	payload: JWTPayload,
@@ -37,7 +38,7 @@ export async function verifyJWT(
 	}
 }
 
-export function getJWTSecret(env: { JWT_SECRET?: string }): string {
+export function getJWTSecret(env: Env): string {
 	if (!env.JWT_SECRET) {
 		throw new Error('JWT_SECRET is not configured')
 	}

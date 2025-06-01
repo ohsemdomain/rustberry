@@ -1,5 +1,5 @@
 import type { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
-import type { Env } from '~/index'
+import type { Env } from '~/worker-env'
 import type { User } from '~/auth/types'
 
 export interface Context {

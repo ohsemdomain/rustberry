@@ -1,15 +1,8 @@
-/// <reference types="@cloudflare/workers-types" />
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
 import { app } from '~/hono/api'
 import { createContext } from '~/trpc/context'
 import { appRouter } from '~/trpc/router'
-
-export interface Env {
-	DB: D1Database
-	rustyberry_kv: KVNamespace
-	rustyberry_r2: R2Bucket
-	JWT_SECRET: string
-}
+import type { Env } from '~/worker-env'
 
 export default {
 	async fetch(
