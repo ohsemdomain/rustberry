@@ -1,4 +1,4 @@
-import { EditItem } from '@/app/features/items/EditItem'
+import { ItemForm } from '@/app/features/items/ItemForm'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/items/$itemId/edit')({
@@ -7,5 +7,5 @@ export const Route = createFileRoute('/_authenticated/items/$itemId/edit')({
 
 function EditItemPage() {
 	const { itemId } = Route.useParams()
-	return <EditItem itemId={itemId} />
+	return <ItemForm itemId={itemId} />
 }

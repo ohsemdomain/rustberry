@@ -1,4 +1,4 @@
-import { CreateItem } from '@/app/features/items/CreateItem'
+import { ItemForm } from '@/app/features/items/ItemForm'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/items/create')({
@@ -6,5 +6,5 @@ export const Route = createFileRoute('/_authenticated/items/create')({
 })
 
 function CreateItemPage() {
-	return <CreateItem />
+	return <ItemForm />
 }

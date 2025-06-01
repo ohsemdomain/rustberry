@@ -1,10 +1,15 @@
 import { trpc } from '@/app/trpc'
-import { displayToCents, sanitizePriceInput } from '@/app/utils/price'
+import { centsToDisplay, displayToCents, sanitizePriceInput } from '@/app/utils/price'
 import { ItemCategory, ItemStatus } from '@/shared/items'
 import { useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
-export function CreateItem() {
+interface ItemFormProps {
+	itemId?: string
+}
+
+export function ItemForm({ itemId }: ItemFormProps) {
+	const isEditMode = !!itemId
 	const navigate = useNavigate()
 	const [formData, setFormData] = useState({
 		item_name: '',
@@ -14,7 +19,34 @@ export function CreateItem() {
 		item_status: ItemStatus.ACTIVE,
 	})
 
+	// Fetch existing item if in edit mode
+	const { data: item, isLoading } = trpc.items.getById.useQuery(itemId!, {
+		enabled: isEditMode,
+	})
+
+	// Populate form when item loads
+	useEffect(() => {
+		if (item && isEditMode) {
+			setFormData({
+				item_name: item.item_name,
+				item_category: item.item_category,
+				item_price_display: centsToDisplay(item.item_price_cents),
+				item_description: item.item_description || '',
+				item_status: item.item_status,
+			})
+		}
+	}, [item, isEditMode])
+
 	const createMutation = trpc.items.create.useMutation({
+		onSuccess: () => {
+			navigate({ to: '/items' })
+		},
+		onError: (error) => {
+			alert(`Error: ${error.message}`)
+		},
+	})
+
+	const updateMutation = trpc.items.update.useMutation({
 		onSuccess: () => {
 			navigate({ to: '/items' })
 		},
@@ -29,13 +61,24 @@ export function CreateItem() {
 		// Convert display price to cents
 		const item_price_cents = displayToCents(formData.item_price_display)
 
-		createMutation.mutate({
-			item_name: formData.item_name,
-			item_category: formData.item_category,
-			item_price_cents,
-			item_description: formData.item_description || undefined,
-			item_status: formData.item_status,
-		})
+		if (isEditMode) {
+			updateMutation.mutate({
+				id: itemId,
+				item_name: formData.item_name,
+				item_category: formData.item_category,
+				item_price_cents,
+				item_description: formData.item_description || null,
+				item_status: formData.item_status,
+			})
+		} else {
+			createMutation.mutate({
+				item_name: formData.item_name,
+				item_category: formData.item_category,
+				item_price_cents,
+				item_description: formData.item_description || undefined,
+				item_status: formData.item_status,
+			})
+		}
 	}
 
 	const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,9 +86,13 @@ export function CreateItem() {
 		setFormData((prev) => ({ ...prev, item_price_display: sanitized }))
 	}
 
+	if (isEditMode && isLoading) return <div style={{ padding: '1rem' }}>Loading...</div>
+
+	const isPending = createMutation.isPending || updateMutation.isPending
+
 	return (
 		<div style={{ padding: '1rem', maxWidth: '600px' }}>
-			<h1>Create New Item</h1>
+			<h1>{isEditMode ? 'Edit Item' : 'Create New Item'}</h1>
 
 			<form onSubmit={handleSubmit}>
 				<div style={{ marginBottom: '1rem' }}>
@@ -186,17 +233,17 @@ export function CreateItem() {
 				<div style={{ display: 'flex', gap: '1rem' }}>
 					<button
 						type="submit"
-						disabled={createMutation.isPending}
+						disabled={isPending}
 						style={{
 							backgroundColor: '#007bff',
 							color: 'white',
 							padding: '0.75rem 1.5rem',
 							border: 'none',
 							borderRadius: '4px',
-							cursor: createMutation.isPending ? 'not-allowed' : 'pointer',
+							cursor: isPending ? 'not-allowed' : 'pointer',
 						}}
 					>
-						{createMutation.isPending ? 'Creating...' : 'Create Item'}
+						{isPending ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update Item' : 'Create Item')}
 					</button>
 
 					<button
