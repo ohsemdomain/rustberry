@@ -1,9 +1,9 @@
 import { TRPCError } from '@trpc/server'
-import { getJWTSecret, verifyJWT } from '../../auth/jwt'
-import type { Department, ResourceType, User } from '../../auth/types'
-import { departmentPermissions } from '../../auth/types'
-import { getUserById } from '../../auth/users'
-import { middleware, publicProcedure } from '../trpc-instance'
+import { getJWTSecret, verifyJWT } from '~/auth/jwt'
+import type { ResourceType, User } from '~/auth/types'
+import { departmentPermissions } from '~/auth/types'
+import { getUserById } from '~/auth/users'
+import { middleware, publicProcedure } from '~/trpc/trpc-instance'
 
 // Extend context with user info
 export interface AuthContext {
@@ -40,7 +40,7 @@ export const isAuthenticated = middleware(async ({ ctx, next }) => {
 		})
 	}
 
-	const { passwordHash, ...user } = storedUser
+	const { passwordHash: _, ...user } = storedUser
 
 	return next({
 		ctx: {

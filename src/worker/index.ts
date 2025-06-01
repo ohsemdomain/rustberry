@@ -1,8 +1,8 @@
-import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
 /// <reference types="@cloudflare/workers-types" />
-import { app } from './hono/api'
-import { createContext } from './trpc/context'
-import { appRouter } from './trpc/router'
+import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
+import { app } from '~/hono/api'
+import { createContext } from '~/trpc/context'
+import { appRouter } from '~/trpc/router'
 
 export interface Env {
 	DB: D1Database

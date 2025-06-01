@@ -12,6 +12,11 @@
 		}
 	],
 	"compilerOptions": {
-		"types": ["./worker-configuration.d.ts"]
+		"baseUrl": ".",
+		"paths": {
+			"@/*": ["./src/app/*"],
+			"~/*": ["./src/worker/*"]
+		},
+		"types": ["@cloudflare/workers-types"]
 	}
 }

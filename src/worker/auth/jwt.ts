@@ -1,5 +1,5 @@
 import { SignJWT, jwtVerify } from 'jose'
-import type { JWTPayload } from './types'
+import type { JWTPayload } from '~/auth/types'
 
 export async function createJWT(
 	payload: JWTPayload,
@@ -7,7 +7,7 @@ export async function createJWT(
 ): Promise<string> {
 	const secretKey = new TextEncoder().encode(secret)
 
-	const token = await new SignJWT(payload)
+	const token = await new SignJWT({ ...payload })
 		.setProtectedHeader({ alg: 'HS256' })
 		.setExpirationTime('30d')
 		.setIssuedAt()
@@ -24,7 +24,14 @@ export async function verifyJWT(
 		const secretKey = new TextEncoder().encode(secret)
 		const { payload } = await jwtVerify(token, secretKey)
 
-		return payload as JWTPayload
+		if (!payload.userId || !payload.email || !payload.department) {
+			return null
+		}
+		return {
+			userId: payload.userId as string,
+			email: payload.email as string,
+			department: payload.department as JWTPayload['department'],
+		}
 	} catch {
 		return null
 	}

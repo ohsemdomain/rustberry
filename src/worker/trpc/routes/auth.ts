@@ -1,10 +1,9 @@
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { createJWT, getJWTSecret, verifyJWT } from '../../auth/jwt'
-import { verifyPassword } from '../../auth/password'
-import type { User } from '../../auth/types'
-import { getUserByEmail, getUserById } from '../../auth/users'
-import { publicProcedure, router } from '../trpc-instance'
+import { createJWT, getJWTSecret, verifyJWT } from '~/auth/jwt'
+import { verifyPassword } from '~/auth/password'
+import { getUserByEmail, getUserById } from '~/auth/users'
+import { publicProcedure, router } from '~/trpc/trpc-instance'
 
 const loginSchema = z.object({
 	email: z.string().email(),
