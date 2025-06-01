@@ -1,16 +1,22 @@
-import { TRPCError } from '@trpc/server'
-import { z } from 'zod'
-import { hasPermission, permissionProcedure } from '~/trpc/middleware/auth'
-import { router } from '~/trpc/trpc-instance'
-import { generateUniqueId } from '~/trpc/utils/id-generator'
-import { addPriceDisplay, addPriceDisplayToList } from '~/trpc/utils/price'
+import {
+	hasPermission,
+	permissionProcedure,
+} from '@/server/trpc/middleware/auth'
+import { router } from '@/server/trpc/trpc-instance'
+import { generateUniqueId } from '@/server/trpc/utils/id-generator'
+import {
+	addPriceDisplay,
+	addPriceDisplayToList,
+} from '@/server/trpc/utils/price'
 import {
 	ID_PREFIX,
 	ITEMS_PER_PAGE,
 	type Item,
 	ItemCategory,
 	ItemStatus,
-} from './types'
+} from '@/shared/items'
+import { TRPCError } from '@trpc/server'
+import { z } from 'zod'
 
 // Zod schemas for validation
 const createItemSchema = z.object({

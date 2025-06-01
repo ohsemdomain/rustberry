@@ -19,8 +19,7 @@
 		"noUncheckedSideEffectImports": true,
 		"baseUrl": ".",
 		"paths": {
-			"@/*": ["./src/app/*"],
-			"~/*": ["./src/worker/*"]
+			"@/*": ["./src/*"]
 		}
 	},
 	"include": ["src/app"]

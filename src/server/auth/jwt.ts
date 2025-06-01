@@ -1,6 +1,6 @@
+import type { Env } from '@/server/worker-env'
+import type { JWTPayload } from '@/shared/types'
 import { SignJWT, jwtVerify } from 'jose'
-import type { JWTPayload } from '~/auth/types'
-import type { Env } from '~/worker-env'
 
 export async function createJWT(
 	payload: JWTPayload,
@@ -25,13 +25,13 @@ export async function verifyJWT(
 		const secretKey = new TextEncoder().encode(secret)
 		const { payload } = await jwtVerify(token, secretKey)
 
-		if (!payload.userId || !payload.email || !payload.department) {
+		if (!payload.userId || !payload.email || !payload.role) {
 			return null
 		}
 		return {
 			userId: payload.userId as string,
 			email: payload.email as string,
-			department: payload.department as JWTPayload['department'],
+			role: payload.role as JWTPayload['role'],
 		}
 	} catch {
 		return null

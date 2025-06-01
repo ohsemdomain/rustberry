@@ -5,9 +5,9 @@
 		"types": ["@cloudflare/workers-types", "vite/client"],
 		"baseUrl": ".",
 		"paths": {
-			"~/*": ["./src/worker/*"]
+			"@/*": ["./src/*"]
 		}
 	},
-	"include": ["./src/worker"],
-	"exclude": ["./src/worker/auth/hash-password.ts"]
+	"include": ["./src/server"],
+	"exclude": ["./src/server/auth/hash-password.ts"]
 }

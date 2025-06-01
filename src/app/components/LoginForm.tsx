@@ -1,5 +1,5 @@
-import { useAuth } from '@/AuthProvider'
-import { trpc } from '@/trpc'
+import { useAuth } from '@/app/AuthProvider'
+import { trpc } from '@/app/trpc'
 import { useState } from 'react'
 
 interface LoginFormProps {

@@ -1,5 +1,6 @@
-import { trpc } from '@/trpc'
-import { displayToCents, sanitizePriceInput } from '@/utils/price'
+import { trpc } from '@/app/trpc'
+import { displayToCents, sanitizePriceInput } from '@/app/utils/price'
+import { ItemCategory, ItemStatus } from '@/shared/items'
 import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 
@@ -7,10 +8,10 @@ export function CreateItem() {
 	const navigate = useNavigate()
 	const [formData, setFormData] = useState({
 		item_name: '',
-		item_category: 1,
+		item_category: ItemCategory.PACKAGING,
 		item_price_display: '', // Display value for price input
 		item_description: '',
-		item_status: 1,
+		item_status: ItemStatus.ACTIVE,
 	})
 
 	const createMutation = trpc.items.create.useMutation({
@@ -30,10 +31,10 @@ export function CreateItem() {
 
 		createMutation.mutate({
 			item_name: formData.item_name,
-			item_category: formData.item_category as 1 | 2 | 3,
+			item_category: formData.item_category,
 			item_price_cents,
 			item_description: formData.item_description || undefined,
-			item_status: formData.item_status as 0 | 1,
+			item_status: formData.item_status,
 		})
 	}
 
@@ -84,7 +85,7 @@ export function CreateItem() {
 						onChange={(e) =>
 							setFormData((prev) => ({
 								...prev,
-								item_category: Number(e.target.value),
+								item_category: Number(e.target.value) as ItemCategory,
 							}))
 						}
 						required
@@ -95,9 +96,9 @@ export function CreateItem() {
 							borderRadius: '4px',
 						}}
 					>
-						<option value={1}>Packaging</option>
-						<option value={2}>Label</option>
-						<option value={3}>Other</option>
+						<option value={ItemCategory.PACKAGING}>Packaging</option>
+						<option value={ItemCategory.LABEL}>Label</option>
+						<option value={ItemCategory.OTHER}>Other</option>
 					</select>
 				</div>
 
@@ -167,7 +168,7 @@ export function CreateItem() {
 						onChange={(e) =>
 							setFormData((prev) => ({
 								...prev,
-								item_status: Number(e.target.value),
+								item_status: Number(e.target.value) as ItemStatus,
 							}))
 						}
 						style={{
@@ -177,8 +178,8 @@ export function CreateItem() {
 							borderRadius: '4px',
 						}}
 					>
-						<option value={1}>Active</option>
-						<option value={0}>Inactive</option>
+						<option value={ItemStatus.ACTIVE}>Active</option>
+						<option value={ItemStatus.INACTIVE}>Inactive</option>
 					</select>
 				</div>
 

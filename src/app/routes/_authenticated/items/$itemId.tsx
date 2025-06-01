@@ -1,4 +1,4 @@
-import { ShowItem } from '@/features/items/ShowItem'
+import { ShowItem } from '@/app/features/items/ShowItem'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/items/$itemId')({

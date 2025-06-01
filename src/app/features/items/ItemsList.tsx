@@ -1,6 +1,6 @@
-import { useAuth } from '@/AuthProvider'
-import { trpc } from '@/trpc'
-import { formatPrice } from '@/utils/price'
+import { useAuth } from '@/app/AuthProvider'
+import { trpc } from '@/app/trpc'
+import { formatPrice } from '@/app/utils/price'
 import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
 

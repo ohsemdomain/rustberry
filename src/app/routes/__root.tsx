@@ -1,4 +1,4 @@
-import { useAuth } from '@/AuthProvider'
+import { useAuth } from '@/app/AuthProvider'
 import { Link, Outlet, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 
@@ -59,7 +59,7 @@ function RootComponent() {
 						{user ? (
 							<>
 								<span style={{ marginRight: '1rem' }}>
-									{user.name} ({user.department})
+									{user.name} ({user.role})
 								</span>
 								<button
 									type="button"

@@ -1,6 +1,6 @@
-import reactLogo from '@/assets/react.svg'
+import reactLogo from '@/app/assets/react.svg'
 import { useState } from 'react'
-import '@/styles.css'
+import '@/app/styles.css'
 
 function DemoPage() {
 	const [name, setName] = useState('unknown')

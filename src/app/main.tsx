@@ -1,12 +1,12 @@
-import { AuthProvider } from '@/AuthProvider'
-import { trpc, trpcClient } from '@/trpc'
+import { AuthProvider } from '@/app/AuthProvider'
+import { trpc, trpcClient } from '@/app/trpc'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import '@/styles.css'
+import '@/app/styles.css'
 
-import { routeTree } from '@/routeTree.gen'
+import { routeTree } from '@/app/routeTree.gen'
 
 const router = createRouter({ routeTree })
 

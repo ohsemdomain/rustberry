@@ -1,8 +1,8 @@
+import { app } from '@/server/hono/api'
+import { createContext } from '@/server/trpc/context'
+import { appRouter } from '@/server/trpc/router'
+import type { Env } from '@/server/worker-env'
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
-import { app } from '~/hono/api'
-import { createContext } from '~/trpc/context'
-import { appRouter } from '~/trpc/router'
-import type { Env } from '~/worker-env'
 
 export default {
 	async fetch(

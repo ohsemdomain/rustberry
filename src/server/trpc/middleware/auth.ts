@@ -1,13 +1,9 @@
+import { getJWTSecret, verifyJWT } from '@/server/auth/jwt'
+import { getUserById } from '@/server/db/users'
+import { hasPermission as checkPermission } from '@/server/lib/permissions'
+import { middleware, publicProcedure } from '@/server/trpc/trpc-instance'
+import type { PermissionAction, ResourceType, User } from '@/shared/types'
 import { TRPCError } from '@trpc/server'
-import { getJWTSecret, verifyJWT } from '~/auth/jwt'
-import type {
-	OwnedResource,
-	PermissionAction,
-	ResourceType,
-	User,
-} from '~/auth/types'
-import { getUserById } from '~/auth/users'
-import { middleware, publicProcedure } from '~/trpc/trpc-instance'
 
 // Extend context with user info
 export interface AuthContext {
@@ -36,7 +32,7 @@ export const isAuthenticated = middleware(async ({ ctx, next }) => {
 		})
 	}
 
-	const storedUser = getUserById(payload.userId)
+	const storedUser = await getUserById(ctx.env.DB, payload.userId)
 	if (!storedUser) {
 		throw new TRPCError({
 			code: 'UNAUTHORIZED',
@@ -57,34 +53,8 @@ export const isAuthenticated = middleware(async ({ ctx, next }) => {
 // Protected procedure that requires authentication
 export const protectedProcedure = publicProcedure.use(isAuthenticated)
 
-// Helper to check if user has permission
-export function hasPermission(
-	user: User,
-	resource: ResourceType,
-	action: PermissionAction,
-	item?: OwnedResource,
-): boolean {
-	const resourcePermissions = user.permissions[resource]
-	if (!resourcePermissions) return false
-
-	// Check for any-level permissions first
-	if (action === 'create' || action === 'read') {
-		return resourcePermissions.includes(action)
-	}
-
-	// For update/delete, check both any and own permissions
-	if (action === 'update-any' || action === 'delete-any') {
-		return resourcePermissions.includes(action)
-	}
-
-	// Check ownership-based permissions
-	if (action === 'update-own' || action === 'delete-own') {
-		if (!item) return false
-		return resourcePermissions.includes(action) && item.created_by === user.id
-	}
-
-	return false
-}
+// Re-export permission helper from lib
+export { hasPermission } from '@/server/lib/permissions'
 
 // Middleware to check permission for an action
 export const requirePermission = (
@@ -101,7 +71,7 @@ export const requirePermission = (
 
 		// For create/read, we can check immediately
 		if (action === 'create' || action === 'read') {
-			if (!hasPermission(ctx.user, resource, action)) {
+			if (!checkPermission(ctx.user, resource, action)) {
 				throw new TRPCError({
 					code: 'FORBIDDEN',
 					message: `You don't have permission to ${action} ${resource}`,

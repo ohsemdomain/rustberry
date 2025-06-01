@@ -1,8 +1,8 @@
-import reactLogo from '@/assets/react.svg'
-import { trpc } from '@/trpc'
+import reactLogo from '@/app/assets/react.svg'
+import { trpc } from '@/app/trpc'
 // src/app/DemoTrpcPage.tsx
 import { useState } from 'react'
-import '@/styles.css'
+import '@/app/styles.css'
 
 function DemoTrpcPage() {
 	const [name, setName] = useState('unknown')

@@ -1,4 +1,4 @@
-import { useAuth } from '@/AuthProvider'
+import { useAuth } from '@/app/AuthProvider'
 import { Navigate, Outlet, createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_public')({

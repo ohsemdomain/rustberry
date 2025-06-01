@@ -1,9 +1,9 @@
-import { trpc } from '@/trpc'
+import { trpc } from '@/app/trpc'
 import {
 	centsToDisplay,
 	displayToCents,
 	sanitizePriceInput,
-} from '@/utils/price'
+} from '@/app/utils/price'
 import { useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
@@ -34,7 +34,6 @@ export function EditItem({ itemId }: EditItemProps) {
 		},
 	})
 
-
 	// Populate form when item loads
 	useEffect(() => {
 		if (item) {
@@ -63,7 +62,6 @@ export function EditItem({ itemId }: EditItemProps) {
 			item_status: formData.item_status as 0 | 1,
 		})
 	}
-
 
 	const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const sanitized = sanitizePriceInput(e.target.value)

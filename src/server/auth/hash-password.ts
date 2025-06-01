@@ -3,7 +3,7 @@
 // Utility script to generate password hashes for new users
 // Usage: bun run src/worker/auth/hash-password.ts
 
-import { hashPassword } from '~/auth/password'
+import { hashPassword } from '@/server/auth/password'
 
 async function main() {
 	const password = process.argv[2]

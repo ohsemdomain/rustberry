@@ -1,9 +1,9 @@
+import { createJWT, getJWTSecret, verifyJWT } from '@/server/auth/jwt'
+import { verifyPassword } from '@/server/auth/password'
+import { getUserByEmail, getUserById } from '@/server/db/users'
+import { publicProcedure, router } from '@/server/trpc/trpc-instance'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { createJWT, getJWTSecret, verifyJWT } from '~/auth/jwt'
-import { verifyPassword } from '~/auth/password'
-import { getUserByEmail, getUserById } from '~/auth/users'
-import { publicProcedure, router } from '~/trpc/trpc-instance'
 
 const loginSchema = z.object({
 	email: z.string().email(),
@@ -15,7 +15,7 @@ export const authRouter = router({
 		const { email, password } = input
 
 		// Find user by email
-		const storedUser = getUserByEmail(email)
+		const storedUser = await getUserByEmail(ctx.env.DB, email)
 		if (!storedUser) {
 			throw new TRPCError({
 				code: 'UNAUTHORIZED',
@@ -38,7 +38,7 @@ export const authRouter = router({
 			{
 				userId: storedUser.id,
 				email: storedUser.email,
-				department: storedUser.department,
+				role: storedUser.role,
 			},
 			jwtSecret,
 		)
@@ -69,7 +69,7 @@ export const authRouter = router({
 		}
 
 		// Get user data
-		const storedUser = getUserById(payload.userId)
+		const storedUser = await getUserById(ctx.env.DB, payload.userId)
 		if (!storedUser) {
 			return null
 		}

@@ -1,5 +1,5 @@
-import { useAuth } from '@/AuthProvider'
-import { LoginForm } from '@/components/LoginForm'
+import { useAuth } from '@/app/AuthProvider'
+import { LoginForm } from '@/app/components/LoginForm'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect } from 'react'
 

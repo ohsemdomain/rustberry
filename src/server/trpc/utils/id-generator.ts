@@ -1,4 +1,4 @@
-import type { Env } from '~/worker-env'
+import type { Env } from '@/server/worker-env'
 
 interface IdCounterData {
 	year: number

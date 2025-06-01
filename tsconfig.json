@@ -14,8 +14,7 @@
 	"compilerOptions": {
 		"baseUrl": ".",
 		"paths": {
-			"@/*": ["./src/app/*"],
-			"~/*": ["./src/worker/*"]
+			"@/*": ["./src/*"]
 		},
 		"types": ["@cloudflare/workers-types"]
 	}

@@ -1,4 +1,6 @@
-import { trpc } from '@/trpc'
+import { trpc } from '@/app/trpc'
+import type { PermissionAction, ResourceType, User } from '@/shared/types'
+import { rolePermissions } from '@/shared/types'
 import {
 	type ReactNode,
 	createContext,
@@ -6,7 +8,6 @@ import {
 	useEffect,
 	useState,
 } from 'react'
-import type { PermissionAction, ResourceType, User } from '~/auth/types'
 
 interface AuthContextType {
 	user: User | null
@@ -67,8 +68,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		action: PermissionAction,
 	): boolean => {
 		if (!user) return false
-		const permissions = user.permissions[resource]
-		return permissions ? permissions.includes(action) : false
+		const userPermissions = rolePermissions[user.role]?.[resource] || []
+		return userPermissions.includes(action)
 	}
 
 	const canRead = (resource: ResourceType): boolean => {
