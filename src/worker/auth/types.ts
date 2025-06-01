@@ -1,6 +1,6 @@
 export type Department = 'wildcard' | 'sales' | 'marketing' | 'creative' | 'hr'
 
-export type ResourceType = 'note' | 'task' | 'invoice'
+export type ResourceType = 'note' | 'task' | 'invoice' | 'items'
 
 export interface User {
 	id: string
@@ -33,8 +33,8 @@ export interface RegisterData {
 }
 
 export const departmentPermissions: Record<Department, ResourceType[]> = {
-	wildcard: ['note', 'task', 'invoice'], // Admin has access to everything
-	sales: ['note', 'task', 'invoice'],
+	wildcard: ['note', 'task', 'invoice', 'items'], // Admin has access to everything
+	sales: ['note', 'task', 'invoice', 'items'],
 	marketing: ['note', 'task'],
 	creative: ['note', 'task'],
 	hr: ['note', 'invoice'],
