@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useAuth } from '../AuthProvider'
-import { trpc } from '../trpc'
+import { useAuth } from '@/AuthProvider'
+import { trpc } from '@/trpc'
 
 interface LoginFormProps {
 	onSuccess?: () => void

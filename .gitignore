@@ -28,3 +28,4 @@ wrangler.jsonc
 .wrangler.jsonc
 src/worker/auth/users.ts
 guide.md
+src/worker/worker-env.d.ts

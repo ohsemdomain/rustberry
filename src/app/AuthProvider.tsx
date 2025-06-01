@@ -5,8 +5,8 @@ import {
 	useEffect,
 	useState,
 } from 'react'
-import type { User } from '../worker/auth/types'
-import { trpc } from './trpc'
+import type { User } from '~/auth/types'
+import { trpc } from '@/trpc'
 
 interface AuthContextType {
 	user: User | null

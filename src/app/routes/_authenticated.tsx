@@ -1,5 +1,5 @@
 import { Navigate, Outlet, createFileRoute } from '@tanstack/react-router'
-import { useAuth } from '../AuthProvider'
+import { useAuth } from '@/AuthProvider'
 
 export const Route = createFileRoute('/_authenticated')({
 	component: AuthenticatedLayout,
