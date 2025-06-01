@@ -2,12 +2,27 @@ export type Department = 'wildcard' | 'sales' | 'marketing' | 'creative' | 'hr'
 
 export type ResourceType = 'note' | 'task' | 'invoice' | 'items'
 
+// Permission actions for each resource
+export type PermissionAction =
+	| 'create'
+	| 'read'
+	| 'update-own'
+	| 'update-any'
+	| 'delete-own'
+	| 'delete-any'
+
+// User permissions structure
+export type UserPermissions = {
+	[K in ResourceType]?: PermissionAction[]
+}
+
 export interface User {
 	id: string
 	email: string
 	name: string
 	department: Department
 	createdAt: string
+	permissions: UserPermissions
 }
 
 export interface StoredUser extends User {
@@ -32,10 +47,7 @@ export interface RegisterData {
 	department: Department
 }
 
-export const departmentPermissions: Record<Department, ResourceType[]> = {
-	wildcard: ['note', 'task', 'invoice', 'items'], // Admin has access to everything
-	sales: ['note', 'task', 'invoice', 'items'],
-	marketing: ['note', 'task'],
-	creative: ['note', 'task'],
-	hr: ['note', 'invoice'],
+// Helper type for owned resources
+export interface OwnedResource {
+	created_by: string
 }

@@ -7,7 +7,7 @@ export const Route = createRootRoute({
 })
 
 function RootComponent() {
-	const { user, logout } = useAuth()
+	const { user, logout, canRead } = useAuth()
 
 	return (
 		<>
@@ -42,10 +42,16 @@ function RootComponent() {
 						>
 							HONO
 						</Link>{' '}
-						{user && (
-							<Link to="/items" activeProps={{ style: { fontWeight: 'bold' } }}>
-								Items
-							</Link>
+						{user && canRead('items') && (
+							<>
+								{' '}
+								<Link
+									to="/items"
+									activeProps={{ style: { fontWeight: 'bold' } }}
+								>
+									Items
+								</Link>
+							</>
 						)}
 					</div>
 

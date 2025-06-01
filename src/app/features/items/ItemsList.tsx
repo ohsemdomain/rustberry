@@ -1,9 +1,11 @@
+import { useAuth } from '@/AuthProvider'
 import { trpc } from '@/trpc'
 import { formatPrice } from '@/utils/price'
 import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
 
 export function ItemsList() {
+	const { hasPermission } = useAuth()
 	const [search, setSearch] = useState('')
 	const [status, setStatus] = useState<0 | 1 | undefined>(1) // Default to active
 	const [page, setPage] = useState(1)
@@ -29,18 +31,20 @@ export function ItemsList() {
 				}}
 			>
 				<h1>Items</h1>
-				<Link
-					to="/items/create"
-					style={{
-						backgroundColor: '#007bff',
-						color: 'white',
-						padding: '0.5rem 1rem',
-						textDecoration: 'none',
-						borderRadius: '4px',
-					}}
-				>
-					Create Item
-				</Link>
+				{hasPermission('items', 'create') && (
+					<Link
+						to="/items/create"
+						style={{
+							backgroundColor: '#007bff',
+							color: 'white',
+							padding: '0.5rem 1rem',
+							textDecoration: 'none',
+							borderRadius: '4px',
+						}}
+					>
+						Create Item
+					</Link>
+				)}
 			</div>
 
 			{/* Filters */}
@@ -137,15 +141,6 @@ export function ItemsList() {
 								textAlign: 'left',
 							}}
 						>
-							Status
-						</th>
-						<th
-							style={{
-								padding: '0.75rem',
-								border: '1px solid #ddd',
-								textAlign: 'left',
-							}}
-						>
 							Actions
 						</th>
 					</tr>
@@ -154,7 +149,7 @@ export function ItemsList() {
 					{data.items.length === 0 ? (
 						<tr>
 							<td
-								colSpan={6}
+								colSpan={5}
 								style={{
 									padding: '1rem',
 									textAlign: 'center',
@@ -184,18 +179,8 @@ export function ItemsList() {
 									{formatPrice(item.item_price_cents)}
 								</td>
 								<td style={{ padding: '0.75rem', border: '1px solid #ddd' }}>
-									<span
-										style={{
-											color: item.item_status === 1 ? 'green' : 'red',
-											fontWeight: 'bold',
-										}}
-									>
-										{item.item_status === 1 ? 'Active' : 'Inactive'}
-									</span>
-								</td>
-								<td style={{ padding: '0.75rem', border: '1px solid #ddd' }}>
 									<Link
-										to="/items/$itemId/edit"
+										to="/items/$itemId"
 										params={{ itemId: item.id }}
 										style={{
 											marginRight: '0.5rem',
@@ -203,8 +188,20 @@ export function ItemsList() {
 											textDecoration: 'none',
 										}}
 									>
-										Edit
+										Show
 									</Link>
+									{hasPermission('items', 'update-any') && (
+										<Link
+											to="/items/$itemId/edit"
+											params={{ itemId: item.id }}
+											style={{
+												color: '#007bff',
+												textDecoration: 'none',
+											}}
+										>
+											Edit
+										</Link>
+									)}
 								</td>
 							</tr>
 						))

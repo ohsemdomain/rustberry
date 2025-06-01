@@ -6,7 +6,7 @@ import {
 	useEffect,
 	useState,
 } from 'react'
-import type { User } from '~/auth/types'
+import type { PermissionAction, ResourceType, User } from '~/auth/types'
 
 interface AuthContextType {
 	user: User | null
@@ -14,6 +14,10 @@ interface AuthContextType {
 	login: (token: string, user: User) => void
 	logout: () => void
 	refetch: () => void
+	// Permission helpers
+	hasPermission: (resource: ResourceType, action: PermissionAction) => boolean
+	canRead: (resource: ResourceType) => boolean
+	canCreate: (resource: ResourceType) => boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -57,8 +61,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		logoutMutation.mutate()
 	}
 
+	// Permission helper functions
+	const hasPermission = (
+		resource: ResourceType,
+		action: PermissionAction,
+	): boolean => {
+		if (!user) return false
+		const permissions = user.permissions[resource]
+		return permissions ? permissions.includes(action) : false
+	}
+
+	const canRead = (resource: ResourceType): boolean => {
+		return hasPermission(resource, 'read')
+	}
+
+	const canCreate = (resource: ResourceType): boolean => {
+		return hasPermission(resource, 'create')
+	}
+
 	return (
-		<AuthContext.Provider value={{ user, isLoading, login, logout, refetch }}>
+		<AuthContext.Provider
+			value={{
+				user,
+				isLoading,
+				login,
+				logout,
+				refetch,
+				hasPermission,
+				canRead,
+				canCreate,
+			}}
+		>
 			{children}
 		</AuthContext.Provider>
 	)

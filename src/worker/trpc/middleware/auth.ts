@@ -1,7 +1,11 @@
 import { TRPCError } from '@trpc/server'
 import { getJWTSecret, verifyJWT } from '~/auth/jwt'
-import type { ResourceType, User } from '~/auth/types'
-import { departmentPermissions } from '~/auth/types'
+import type {
+	OwnedResource,
+	PermissionAction,
+	ResourceType,
+	User,
+} from '~/auth/types'
 import { getUserById } from '~/auth/users'
 import { middleware, publicProcedure } from '~/trpc/trpc-instance'
 
@@ -53,8 +57,40 @@ export const isAuthenticated = middleware(async ({ ctx, next }) => {
 // Protected procedure that requires authentication
 export const protectedProcedure = publicProcedure.use(isAuthenticated)
 
-// Middleware to check department access to resources
-export const hasDepartmentAccess = (resource: ResourceType) => {
+// Helper to check if user has permission
+export function hasPermission(
+	user: User,
+	resource: ResourceType,
+	action: PermissionAction,
+	item?: OwnedResource,
+): boolean {
+	const resourcePermissions = user.permissions[resource]
+	if (!resourcePermissions) return false
+
+	// Check for any-level permissions first
+	if (action === 'create' || action === 'read') {
+		return resourcePermissions.includes(action)
+	}
+
+	// For update/delete, check both any and own permissions
+	if (action === 'update-any' || action === 'delete-any') {
+		return resourcePermissions.includes(action)
+	}
+
+	// Check ownership-based permissions
+	if (action === 'update-own' || action === 'delete-own') {
+		if (!item) return false
+		return resourcePermissions.includes(action) && item.created_by === user.id
+	}
+
+	return false
+}
+
+// Middleware to check permission for an action
+export const requirePermission = (
+	resource: ResourceType,
+	action: PermissionAction,
+) => {
 	return middleware(async ({ ctx, next }) => {
 		if (!ctx.user) {
 			throw new TRPCError({
@@ -63,43 +99,27 @@ export const hasDepartmentAccess = (resource: ResourceType) => {
 			})
 		}
 
-		const allowedResources = departmentPermissions[ctx.user.department]
-		if (!allowedResources.includes(resource)) {
-			throw new TRPCError({
-				code: 'FORBIDDEN',
-				message: `Your department (${ctx.user.department}) does not have access to ${resource}`,
-			})
+		// For create/read, we can check immediately
+		if (action === 'create' || action === 'read') {
+			if (!hasPermission(ctx.user, resource, action)) {
+				throw new TRPCError({
+					code: 'FORBIDDEN',
+					message: `You don't have permission to ${action} ${resource}`,
+				})
+			}
 		}
 
+		// For update/delete, we need the item to check ownership
+		// This will be checked in the actual route handler
+
 		return next()
 	})
 }
 
-// Create a department-specific protected procedure
-export const departmentProcedure = (resource: ResourceType) => {
-	return protectedProcedure.use(hasDepartmentAccess(resource))
+// Create a permission-specific protected procedure
+export const permissionProcedure = (
+	resource: ResourceType,
+	action: PermissionAction,
+) => {
+	return protectedProcedure.use(requirePermission(resource, action))
 }
-
-// Middleware to check ownership (for update/delete operations)
-export const checkOwnership = middleware(async ({ ctx, next }) => {
-	if (!ctx.user) {
-		throw new TRPCError({
-			code: 'UNAUTHORIZED',
-			message: 'Not authenticated',
-		})
-	}
-
-	// Wildcard users can modify any resource
-	if (ctx.user.department === 'wildcard') {
-		return next()
-	}
-
-	// This will be used later when actual resources are implemented
-	// For now, just pass through
-	return next({
-		ctx: {
-			...ctx,
-			ownershipCheck: true,
-		},
-	})
-})

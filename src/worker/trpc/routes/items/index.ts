@@ -1,9 +1,8 @@
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { canPerformAction } from '~/trpc/auth/auth-registry'
-import { departmentProcedure } from '~/trpc/middleware/auth'
+import { hasPermission, permissionProcedure } from '~/trpc/middleware/auth'
 import { router } from '~/trpc/trpc-instance'
-import { generateFallbackId, generateUniqueId } from '~/trpc/utils/id-generator'
+import { generateUniqueId } from '~/trpc/utils/id-generator'
 import { addPriceDisplay, addPriceDisplayToList } from '~/trpc/utils/price'
 import {
 	ID_PREFIX,
@@ -37,346 +36,300 @@ const listItemsSchema = z.object({
 	search: z.string().optional(),
 })
 
-// Only wildcard and sales departments can access items
-const itemsProcedure = departmentProcedure('items')
-
 export const itemsRouter = router({
 	// Create item
-	create: itemsProcedure
+	create: permissionProcedure('items', 'create')
 		.input(createItemSchema)
 		.mutation(async ({ input, ctx }) => {
-			// Check create permission
-			if (!canPerformAction(ctx.user.department, 'items', 'create')) {
-				throw new TRPCError({
-					code: 'FORBIDDEN',
-					message: 'You do not have permission to create items',
-				})
+			// User already has create permission from middleware
+			const id = await generateUniqueId(ctx.env, ID_PREFIX, 'item')
+			const now = Date.now()
+
+			const item: Item = {
+				id,
+				item_name: input.item_name,
+				item_category: input.item_category,
+				item_price_cents: input.item_price_cents,
+				item_description: input.item_description || null,
+				item_status: input.item_status || ItemStatus.ACTIVE,
+				created_at: now,
+				updated_at: now,
+				created_by: ctx.user.id,
+				updated_by: ctx.user.id,
 			}
 
 			try {
-				// Generate unique ID
-				const id = await generateUniqueId(ctx.env, ID_PREFIX, 'item')
-
-				const now = Math.floor(Date.now() / 1000) // Unix timestamp
-
-				// Insert item into database
-				const result = await ctx.env.DB.prepare(
+				await ctx.env.DB.prepare(
 					`INSERT INTO items (
 						id, item_name, item_category, item_price_cents, 
-						item_description, item_status, created_at, updated_at, 
+						item_description, item_status, created_at, updated_at,
 						created_by, updated_by
 					) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 				)
 					.bind(
-						id,
-						input.item_name,
-						input.item_category,
-						input.item_price_cents,
-						input.item_description || null,
-						input.item_status || ItemStatus.ACTIVE,
-						now,
-						now,
-						ctx.user.id,
-						ctx.user.id,
+						item.id,
+						item.item_name,
+						item.item_category,
+						item.item_price_cents,
+						item.item_description,
+						item.item_status,
+						item.created_at,
+						item.updated_at,
+						item.created_by,
+						item.updated_by,
 					)
 					.run()
 
-				if (!result.success) {
-					throw new TRPCError({
-						code: 'INTERNAL_SERVER_ERROR',
-						message: 'Failed to create item',
-					})
+				return addPriceDisplay(item)
+			} catch (error) {
+				console.error('Failed to create item:', error)
+				throw new TRPCError({
+					code: 'INTERNAL_SERVER_ERROR',
+					message: 'Failed to create item',
+				})
+			}
+		}),
+
+	// List items
+	list: permissionProcedure('items', 'read')
+		.input(listItemsSchema)
+		.query(async ({ input, ctx }) => {
+			const { page = 1, status, search } = input
+			const offset = (page - 1) * ITEMS_PER_PAGE
+
+			let query = 'SELECT * FROM items WHERE 1=1'
+			const params: unknown[] = []
+
+			// Filter by status
+			if (status !== undefined) {
+				query += ' AND item_status = ?'
+				params.push(status)
+			}
+
+			// Search by name
+			if (search) {
+				query += ' AND item_name LIKE ?'
+				params.push(`%${search}%`)
+			}
+
+			// Order and pagination
+			query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?'
+			params.push(ITEMS_PER_PAGE, offset)
+
+			try {
+				// Get items
+				const { results } = await ctx.env.DB.prepare(query)
+					.bind(...params)
+					.all<Item>()
+
+				// Get total count
+				let countQuery = 'SELECT COUNT(*) as count FROM items WHERE 1=1'
+				const countParams: unknown[] = []
+
+				if (status !== undefined) {
+					countQuery += ' AND item_status = ?'
+					countParams.push(status)
 				}
 
-				// Get the created item with all fields
-				const createdItem = await ctx.env.DB.prepare(
+				if (search) {
+					countQuery += ' AND item_name LIKE ?'
+					countParams.push(`%${search}%`)
+				}
+
+				const { results: countResult } = await ctx.env.DB.prepare(countQuery)
+					.bind(...countParams)
+					.all<{ count: number }>()
+
+				const totalItems = countResult[0]?.count || 0
+				const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE)
+
+				return {
+					items: addPriceDisplayToList(results),
+					totalItems,
+					totalPages,
+					currentPage: page,
+					hasNext: page < totalPages,
+					hasPrev: page > 1,
+				}
+			} catch (error) {
+				console.error('Failed to list items:', error)
+				throw new TRPCError({
+					code: 'INTERNAL_SERVER_ERROR',
+					message: 'Failed to list items',
+				})
+			}
+		}),
+
+	// Get item by ID
+	getById: permissionProcedure('items', 'read')
+		.input(z.string())
+		.query(async ({ input, ctx }) => {
+			try {
+				const { results } = await ctx.env.DB.prepare(
 					'SELECT * FROM items WHERE id = ?',
 				)
-					.bind(id)
-					.first<Item>()
+					.bind(input)
+					.all<Item>()
 
-				if (!createdItem) {
+				const item = results[0]
+				if (!item) {
 					throw new TRPCError({
-						code: 'INTERNAL_SERVER_ERROR',
-						message: 'Failed to retrieve created item',
+						code: 'NOT_FOUND',
+						message: 'Item not found',
 					})
 				}
 
-				return addPriceDisplay(createdItem)
+				return addPriceDisplay(item)
 			} catch (error) {
-				// If ID generation fails, try with fallback
-				if (error instanceof Error && error.message.includes('KV')) {
-					const fallbackId = generateFallbackId(ID_PREFIX)
-					// Retry with fallback ID
-					const now = Math.floor(Date.now() / 1000)
-					await ctx.env.DB.prepare(
-						`INSERT INTO items (
-							id, item_name, item_category, item_price_cents, 
-							item_description, item_status, created_at, updated_at, 
-							created_by, updated_by
-						) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-					)
-						.bind(
-							fallbackId,
-							input.item_name,
-							input.item_category,
-							input.item_price_cents,
-							input.item_description || null,
-							input.item_status || ItemStatus.ACTIVE,
-							now,
-							now,
-							ctx.user.id,
-							ctx.user.id,
-						)
-						.run()
-					// Get the created item
-					const createdItem = await ctx.env.DB.prepare(
-						'SELECT * FROM items WHERE id = ?',
-					)
-						.bind(fallbackId)
-						.first<Item>()
+				if (error instanceof TRPCError) throw error
 
-					if (!createdItem) {
-						throw new TRPCError({
-							code: 'INTERNAL_SERVER_ERROR',
-							message: 'Failed to retrieve created item',
-						})
-					}
-
-					return addPriceDisplay(createdItem)
-				}
-				throw error
-			}
-		}),
-
-	// Get single item by ID
-	getById: itemsProcedure
-		.input(z.string())
-		.query(async ({ input: id, ctx }) => {
-			// Check read permission
-			if (!canPerformAction(ctx.user.department, 'items', 'read')) {
+				console.error('Failed to get item:', error)
 				throw new TRPCError({
-					code: 'FORBIDDEN',
-					message: 'You do not have permission to view items',
+					code: 'INTERNAL_SERVER_ERROR',
+					message: 'Failed to get item',
 				})
 			}
-
-			const result = await ctx.env.DB.prepare(
-				'SELECT * FROM items WHERE id = ?',
-			)
-				.bind(id)
-				.first<Item>()
-
-			if (!result) {
-				throw new TRPCError({
-					code: 'NOT_FOUND',
-					message: 'Item not found',
-				})
-			}
-
-			return addPriceDisplay(result)
 		}),
-
-	// List items with pagination and filters
-	list: itemsProcedure.input(listItemsSchema).query(async ({ input, ctx }) => {
-		// Check read permission
-		if (!canPerformAction(ctx.user.department, 'items', 'read')) {
-			throw new TRPCError({
-				code: 'FORBIDDEN',
-				message: 'You do not have permission to view items',
-			})
-		}
-
-		const { page, status, search } = input
-		const limit = ITEMS_PER_PAGE
-		const offset = (page - 1) * limit
-
-		// Build query with filters
-		let query = 'SELECT * FROM items WHERE 1=1'
-		let countQuery = 'SELECT COUNT(*) as count FROM items WHERE 1=1'
-		const params: (string | number)[] = []
-		const countParams: (string | number)[] = []
-
-		// Status filter (default to ACTIVE if not specified)
-		if (status !== undefined) {
-			query += ' AND item_status = ?'
-			countQuery += ' AND item_status = ?'
-			params.push(status)
-			countParams.push(status)
-		} else {
-			// Default to active items only
-			query += ' AND item_status = ?'
-			countQuery += ' AND item_status = ?'
-			params.push(ItemStatus.ACTIVE)
-			countParams.push(ItemStatus.ACTIVE)
-		}
-
-		// Search filter (item name only)
-		if (search) {
-			query += ' AND item_name LIKE ?'
-			countQuery += ' AND item_name LIKE ?'
-			const searchPattern = `%${search}%`
-			params.push(searchPattern)
-			countParams.push(searchPattern)
-		}
-
-		// Order by created_at DESC (latest first)
-		query += ' ORDER BY created_at DESC'
-
-		// Add pagination
-		query += ' LIMIT ? OFFSET ?'
-		params.push(limit, offset)
-
-		// Execute queries
-		const [itemsResult, countResult] = await Promise.all([
-			ctx.env.DB.prepare(query)
-				.bind(...params)
-				.all<Item>(),
-			ctx.env.DB.prepare(countQuery)
-				.bind(...countParams)
-				.first<{ count: number }>(),
-		])
-
-		const totalCount = countResult?.count || 0
-		const totalPages = Math.ceil(totalCount / limit)
-
-		return {
-			items: addPriceDisplayToList(itemsResult.results || []),
-			totalCount,
-			currentPage: page,
-			totalPages,
-			hasNext: page < totalPages,
-			hasPrev: page > 1,
-		}
-	}),
 
 	// Update item
-	update: itemsProcedure
+	update: permissionProcedure('items', 'update-any')
 		.input(updateItemSchema)
 		.mutation(async ({ input, ctx }) => {
-			// Check update permission
-			if (!canPerformAction(ctx.user.department, 'items', 'update')) {
-				throw new TRPCError({
-					code: 'FORBIDDEN',
-					message: 'You do not have permission to update items',
-				})
-			}
-
 			const { id, ...updates } = input
 
-			// Check if item exists
-			const existing = await ctx.env.DB.prepare(
+			// First, get the existing item
+			const { results } = await ctx.env.DB.prepare(
 				'SELECT * FROM items WHERE id = ?',
 			)
 				.bind(id)
-				.first<Item>()
+				.all<Item>()
 
-			if (!existing) {
+			const existingItem = results[0]
+			if (!existingItem) {
 				throw new TRPCError({
 					code: 'NOT_FOUND',
 					message: 'Item not found',
 				})
 			}
 
-			// Build update query dynamically
-			const updateFields: string[] = []
-			const updateValues: (string | number | null)[] = []
+			// Check ownership-based permissions
+			const canUpdate =
+				hasPermission(ctx.user, 'items', 'update-any') ||
+				hasPermission(ctx.user, 'items', 'update-own', existingItem)
 
-			for (const [key, value] of Object.entries(updates)) {
-				if (value !== undefined) {
-					updateFields.push(`${key} = ?`)
-					updateValues.push(value)
-				}
+			if (!canUpdate) {
+				throw new TRPCError({
+					code: 'FORBIDDEN',
+					message: 'You do not have permission to update this item',
+				})
 			}
 
-			// Always update updated_at and updated_by
+			const updateFields: string[] = []
+			const updateValues: unknown[] = []
+
+			// Build dynamic update query
+			if (updates.item_name !== undefined) {
+				updateFields.push('item_name = ?')
+				updateValues.push(updates.item_name)
+			}
+			if (updates.item_category !== undefined) {
+				updateFields.push('item_category = ?')
+				updateValues.push(updates.item_category)
+			}
+			if (updates.item_price_cents !== undefined) {
+				updateFields.push('item_price_cents = ?')
+				updateValues.push(updates.item_price_cents)
+			}
+			if (updates.item_description !== undefined) {
+				updateFields.push('item_description = ?')
+				updateValues.push(updates.item_description)
+			}
+			if (updates.item_status !== undefined) {
+				updateFields.push('item_status = ?')
+				updateValues.push(updates.item_status)
+			}
+
+			// Always update these fields
 			updateFields.push('updated_at = ?', 'updated_by = ?')
-			updateValues.push(Math.floor(Date.now() / 1000), ctx.user.id)
+			updateValues.push(Date.now(), ctx.user.id)
 
 			// Add ID for WHERE clause
 			updateValues.push(id)
 
-			const updateQuery = `
-				UPDATE items 
-				SET ${updateFields.join(', ')}
-				WHERE id = ?
-			`
+			try {
+				await ctx.env.DB.prepare(
+					`UPDATE items SET ${updateFields.join(', ')} WHERE id = ?`,
+				)
+					.bind(...updateValues)
+					.run()
 
-			const result = await ctx.env.DB.prepare(updateQuery)
-				.bind(...updateValues)
-				.run()
+				// Get updated item
+				const { results } = await ctx.env.DB.prepare(
+					'SELECT * FROM items WHERE id = ?',
+				)
+					.bind(id)
+					.all<Item>()
 
-			if (!result.success) {
+				return addPriceDisplay(results[0])
+			} catch (error) {
+				console.error('Failed to update item:', error)
 				throw new TRPCError({
 					code: 'INTERNAL_SERVER_ERROR',
 					message: 'Failed to update item',
 				})
 			}
-
-			// Return updated item
-			const updatedItem = await ctx.env.DB.prepare(
-				'SELECT * FROM items WHERE id = ?',
-			)
-				.bind(id)
-				.first<Item>()
-
-			if (!updatedItem) {
-				throw new TRPCError({
-					code: 'INTERNAL_SERVER_ERROR',
-					message: 'Failed to retrieve updated item',
-				})
-			}
-
-			return addPriceDisplay(updatedItem)
 		}),
 
-	// Delete item (soft delete by setting status to INACTIVE)
-	delete: itemsProcedure
+	// Delete item (soft delete)
+	delete: permissionProcedure('items', 'delete-any')
 		.input(z.string())
 		.mutation(async ({ input: id, ctx }) => {
-			// Check delete permission
-			if (!canPerformAction(ctx.user.department, 'items', 'delete')) {
-				throw new TRPCError({
-					code: 'FORBIDDEN',
-					message: 'You do not have permission to delete items',
-				})
-			}
-
-			// Check if item exists
-			const existing = await ctx.env.DB.prepare(
+			// First, get the existing item
+			const { results } = await ctx.env.DB.prepare(
 				'SELECT * FROM items WHERE id = ?',
 			)
 				.bind(id)
-				.first<Item>()
+				.all<Item>()
 
-			if (!existing) {
+			const existingItem = results[0]
+			if (!existingItem) {
 				throw new TRPCError({
 					code: 'NOT_FOUND',
 					message: 'Item not found',
 				})
 			}
 
-			// Soft delete by setting status to INACTIVE
-			const result = await ctx.env.DB.prepare(
-				`UPDATE items 
-				SET item_status = ?, updated_at = ?, updated_by = ?
-				WHERE id = ?`,
-			)
-				.bind(
-					ItemStatus.INACTIVE,
-					Math.floor(Date.now() / 1000),
-					ctx.user.id,
-					id,
-				)
-				.run()
+			// Check ownership-based permissions
+			const canDelete =
+				hasPermission(ctx.user, 'items', 'delete-any') ||
+				hasPermission(ctx.user, 'items', 'delete-own', existingItem)
 
-			if (!result.success) {
+			if (!canDelete) {
+				throw new TRPCError({
+					code: 'FORBIDDEN',
+					message: 'You do not have permission to delete this item',
+				})
+			}
+
+			try {
+				// Soft delete by setting status to inactive
+				await ctx.env.DB.prepare(
+					`UPDATE items SET 
+						item_status = ?, 
+						updated_at = ?, 
+						updated_by = ? 
+					WHERE id = ?`,
+				)
+					.bind(ItemStatus.INACTIVE, Date.now(), ctx.user.id, id)
+					.run()
+
+				return { success: true }
+			} catch (error) {
+				console.error('Failed to delete item:', error)
 				throw new TRPCError({
 					code: 'INTERNAL_SERVER_ERROR',
 					message: 'Failed to delete item',
 				})
 			}
-
-			return { success: true }
 		}),
 })

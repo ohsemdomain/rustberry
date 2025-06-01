@@ -34,15 +34,6 @@ export function EditItem({ itemId }: EditItemProps) {
 		},
 	})
 
-	// Delete mutation
-	const deleteMutation = trpc.items.delete.useMutation({
-		onSuccess: () => {
-			navigate({ to: '/items' })
-		},
-		onError: (error) => {
-			alert(`Error: ${error.message}`)
-		},
-	})
 
 	// Populate form when item loads
 	useEffect(() => {
@@ -73,15 +64,6 @@ export function EditItem({ itemId }: EditItemProps) {
 		})
 	}
 
-	const handleDelete = () => {
-		if (
-			window.confirm(
-				'Are you sure you want to delete this item? This will set it to inactive.',
-			)
-		) {
-			deleteMutation.mutate(itemId)
-		}
-	}
 
 	const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const sanitized = sanitizePriceInput(e.target.value)
@@ -275,36 +257,6 @@ export function EditItem({ itemId }: EditItemProps) {
 					</button>
 				</div>
 			</form>
-
-			{/* Delete Section */}
-			<div
-				style={{
-					borderTop: '1px solid #ddd',
-					paddingTop: '1rem',
-					marginTop: '2rem',
-				}}
-			>
-				<h3 style={{ color: '#dc3545' }}>Danger Zone</h3>
-				<p style={{ color: '#666', fontSize: '0.9rem' }}>
-					This will set the item status to inactive. The item will no longer
-					appear in the default list.
-				</p>
-				<button
-					type="button"
-					onClick={handleDelete}
-					disabled={deleteMutation.isPending}
-					style={{
-						backgroundColor: '#dc3545',
-						color: 'white',
-						padding: '0.5rem 1rem',
-						border: 'none',
-						borderRadius: '4px',
-						cursor: deleteMutation.isPending ? 'not-allowed' : 'pointer',
-					}}
-				>
-					{deleteMutation.isPending ? 'Deleting...' : 'Delete Item'}
-				</button>
-			</div>
 		</div>
 	)
 }
