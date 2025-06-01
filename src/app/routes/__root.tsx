@@ -31,16 +31,16 @@ function RootComponent() {
 							Contact
 						</Link>{' '}
 						<Link
-							to="/trpc-demo"
+							to="/demo-trpc"
 							activeProps={{ style: { fontWeight: 'bold' } }}
 						>
-							tRPC Demo
+							TRPC
 						</Link>{' '}
 						<Link
-							to="/hono-demo"
+							to="/demo-hono"
 							activeProps={{ style: { fontWeight: 'bold' } }}
 						>
-							Hono Demo
+							HONO
 						</Link>
 					</div>
 

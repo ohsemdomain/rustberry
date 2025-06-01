@@ -15,8 +15,8 @@ import { Route as PublicImport } from './routes/_public'
 import { Route as AuthenticatedImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexImport } from './routes/_authenticated/index'
 import { Route as PublicLoginImport } from './routes/_public/login'
-import { Route as AuthenticatedTrpcDemoImport } from './routes/_authenticated/trpc-demo'
-import { Route as AuthenticatedHonoDemoImport } from './routes/_authenticated/hono-demo'
+import { Route as AuthenticatedDemoTrpcImport } from './routes/_authenticated/demo-trpc'
+import { Route as AuthenticatedDemoHonoImport } from './routes/_authenticated/demo-hono'
 import { Route as AuthenticatedContactImport } from './routes/_authenticated/contact'
 import { Route as AuthenticatedAboutImport } from './routes/_authenticated/about'
 
@@ -44,15 +44,15 @@ const PublicLoginRoute = PublicLoginImport.update({
   getParentRoute: () => PublicRoute,
 } as any)
 
-const AuthenticatedTrpcDemoRoute = AuthenticatedTrpcDemoImport.update({
-  id: '/trpc-demo',
-  path: '/trpc-demo',
+const AuthenticatedDemoTrpcRoute = AuthenticatedDemoTrpcImport.update({
+  id: '/demo-trpc',
+  path: '/demo-trpc',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
-const AuthenticatedHonoDemoRoute = AuthenticatedHonoDemoImport.update({
-  id: '/hono-demo',
-  path: '/hono-demo',
+const AuthenticatedDemoHonoRoute = AuthenticatedDemoHonoImport.update({
+  id: '/demo-hono',
+  path: '/demo-hono',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
@@ -100,18 +100,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedContactImport
       parentRoute: typeof AuthenticatedImport
     }
-    '/_authenticated/hono-demo': {
-      id: '/_authenticated/hono-demo'
-      path: '/hono-demo'
-      fullPath: '/hono-demo'
-      preLoaderRoute: typeof AuthenticatedHonoDemoImport
+    '/_authenticated/demo-hono': {
+      id: '/_authenticated/demo-hono'
+      path: '/demo-hono'
+      fullPath: '/demo-hono'
+      preLoaderRoute: typeof AuthenticatedDemoHonoImport
       parentRoute: typeof AuthenticatedImport
     }
-    '/_authenticated/trpc-demo': {
-      id: '/_authenticated/trpc-demo'
-      path: '/trpc-demo'
-      fullPath: '/trpc-demo'
-      preLoaderRoute: typeof AuthenticatedTrpcDemoImport
+    '/_authenticated/demo-trpc': {
+      id: '/_authenticated/demo-trpc'
+      path: '/demo-trpc'
+      fullPath: '/demo-trpc'
+      preLoaderRoute: typeof AuthenticatedDemoTrpcImport
       parentRoute: typeof AuthenticatedImport
     }
     '/_public/login': {
@@ -136,16 +136,16 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedAboutRoute: typeof AuthenticatedAboutRoute
   AuthenticatedContactRoute: typeof AuthenticatedContactRoute
-  AuthenticatedHonoDemoRoute: typeof AuthenticatedHonoDemoRoute
-  AuthenticatedTrpcDemoRoute: typeof AuthenticatedTrpcDemoRoute
+  AuthenticatedDemoHonoRoute: typeof AuthenticatedDemoHonoRoute
+  AuthenticatedDemoTrpcRoute: typeof AuthenticatedDemoTrpcRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAboutRoute: AuthenticatedAboutRoute,
   AuthenticatedContactRoute: AuthenticatedContactRoute,
-  AuthenticatedHonoDemoRoute: AuthenticatedHonoDemoRoute,
-  AuthenticatedTrpcDemoRoute: AuthenticatedTrpcDemoRoute,
+  AuthenticatedDemoHonoRoute: AuthenticatedDemoHonoRoute,
+  AuthenticatedDemoTrpcRoute: AuthenticatedDemoTrpcRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 
@@ -168,8 +168,8 @@ export interface FileRoutesByFullPath {
   '': typeof PublicRouteWithChildren
   '/about': typeof AuthenticatedAboutRoute
   '/contact': typeof AuthenticatedContactRoute
-  '/hono-demo': typeof AuthenticatedHonoDemoRoute
-  '/trpc-demo': typeof AuthenticatedTrpcDemoRoute
+  '/demo-hono': typeof AuthenticatedDemoHonoRoute
+  '/demo-trpc': typeof AuthenticatedDemoTrpcRoute
   '/login': typeof PublicLoginRoute
   '/': typeof AuthenticatedIndexRoute
 }
@@ -178,8 +178,8 @@ export interface FileRoutesByTo {
   '': typeof PublicRouteWithChildren
   '/about': typeof AuthenticatedAboutRoute
   '/contact': typeof AuthenticatedContactRoute
-  '/hono-demo': typeof AuthenticatedHonoDemoRoute
-  '/trpc-demo': typeof AuthenticatedTrpcDemoRoute
+  '/demo-hono': typeof AuthenticatedDemoHonoRoute
+  '/demo-trpc': typeof AuthenticatedDemoTrpcRoute
   '/login': typeof PublicLoginRoute
   '/': typeof AuthenticatedIndexRoute
 }
@@ -190,8 +190,8 @@ export interface FileRoutesById {
   '/_public': typeof PublicRouteWithChildren
   '/_authenticated/about': typeof AuthenticatedAboutRoute
   '/_authenticated/contact': typeof AuthenticatedContactRoute
-  '/_authenticated/hono-demo': typeof AuthenticatedHonoDemoRoute
-  '/_authenticated/trpc-demo': typeof AuthenticatedTrpcDemoRoute
+  '/_authenticated/demo-hono': typeof AuthenticatedDemoHonoRoute
+  '/_authenticated/demo-trpc': typeof AuthenticatedDemoTrpcRoute
   '/_public/login': typeof PublicLoginRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
 }
@@ -202,20 +202,20 @@ export interface FileRouteTypes {
     | ''
     | '/about'
     | '/contact'
-    | '/hono-demo'
-    | '/trpc-demo'
+    | '/demo-hono'
+    | '/demo-trpc'
     | '/login'
     | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '' | '/about' | '/contact' | '/hono-demo' | '/trpc-demo' | '/login' | '/'
+  to: '' | '/about' | '/contact' | '/demo-hono' | '/demo-trpc' | '/login' | '/'
   id:
     | '__root__'
     | '/_authenticated'
     | '/_public'
     | '/_authenticated/about'
     | '/_authenticated/contact'
-    | '/_authenticated/hono-demo'
-    | '/_authenticated/trpc-demo'
+    | '/_authenticated/demo-hono'
+    | '/_authenticated/demo-trpc'
     | '/_public/login'
     | '/_authenticated/'
   fileRoutesById: FileRoutesById
@@ -250,8 +250,8 @@ export const routeTree = rootRoute
       "children": [
         "/_authenticated/about",
         "/_authenticated/contact",
-        "/_authenticated/hono-demo",
-        "/_authenticated/trpc-demo",
+        "/_authenticated/demo-hono",
+        "/_authenticated/demo-trpc",
         "/_authenticated/"
       ]
     },
@@ -269,12 +269,12 @@ export const routeTree = rootRoute
       "filePath": "_authenticated/contact.tsx",
       "parent": "/_authenticated"
     },
-    "/_authenticated/hono-demo": {
-      "filePath": "_authenticated/hono-demo.tsx",
+    "/_authenticated/demo-hono": {
+      "filePath": "_authenticated/demo-hono.tsx",
       "parent": "/_authenticated"
     },
-    "/_authenticated/trpc-demo": {
-      "filePath": "_authenticated/trpc-demo.tsx",
+    "/_authenticated/demo-trpc": {
+      "filePath": "_authenticated/demo-trpc.tsx",
       "parent": "/_authenticated"
     },
     "/_public/login": {
