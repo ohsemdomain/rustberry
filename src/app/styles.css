@@ -62,10 +62,12 @@ button:hover {
 
 .header {
 	position: fixed;
-	top: 20;
-	margin: '0 auto';
+	top: 0;
+	left: 0;
+	right: 0;
 	z-index: 1000;
-	border-bottom: '1px solid #ddd';
+	border-bottom: 1px solid #ddd;
+	background-color: white;
 }
 
 .component-header {
@@ -93,4 +95,30 @@ button:hover {
 .light-text {
 	color: #858585;
 	font-size: 14px;
+}
+
+.header-container {
+	max-width: 1280px;
+	margin: 0 auto;
+}
+
+.nav {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0.5rem;
+	font-size: 14px;
+}
+
+.nav-links {
+	display: flex;
+	gap: 1rem;
+}
+
+.user-info {
+	margin-right: 1rem;
+}
+
+.content {
+	padding: 1rem;
 }
