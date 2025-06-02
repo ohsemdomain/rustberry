@@ -557,20 +557,33 @@ export const customersRouter = router({
 		}),
 
 	// Address management
-	addAddress: permissionProcedure('customers', 'update-any')
+	addAddress: permissionProcedure('customers', 'read')
 		.input(createAddressSchema)
 		.mutation(async ({ input, ctx }) => {
-			// Verify customer exists
+			// Verify customer exists and check permissions
 			const { results } = await ctx.env.DB.prepare(
-				'SELECT id FROM customers WHERE id = ?',
+				'SELECT * FROM customers WHERE id = ?',
 			)
 				.bind(input.customer_id)
-				.all()
+				.all<Customer>()
 
-			if (results.length === 0) {
+			const customer = results[0]
+			if (!customer) {
 				throw new TRPCError({
 					code: 'NOT_FOUND',
 					message: 'Customer not found',
+				})
+			}
+
+			// Check if user can update this customer
+			const canUpdate =
+				hasPermission(ctx.user, 'customers', 'update-any') ||
+				hasPermission(ctx.user, 'customers', 'update-own', customer)
+
+			if (!canUpdate) {
+				throw new TRPCError({
+					code: 'FORBIDDEN',
+					message: 'You do not have permission to update this customer',
 				})
 			}
 
@@ -641,7 +654,7 @@ export const customersRouter = router({
 			}
 		}),
 
-	updateAddress: permissionProcedure('customers', 'update-any')
+	updateAddress: permissionProcedure('customers', 'read')
 		.input(updateAddressSchema)
 		.mutation(async ({ input, ctx }) => {
 			const { id, ...updates } = input
@@ -661,6 +674,33 @@ export const customersRouter = router({
 			}
 
 			const address = results[0]
+
+			// Get the customer to check permissions
+			const { results: customerResults } = await ctx.env.DB.prepare(
+				'SELECT * FROM customers WHERE id = ?',
+			)
+				.bind(address.customer_id)
+				.all<Customer>()
+
+			const customer = customerResults[0]
+			if (!customer) {
+				throw new TRPCError({
+					code: 'NOT_FOUND',
+					message: 'Customer not found',
+				})
+			}
+
+			// Check if user can update this customer
+			const canUpdate =
+				hasPermission(ctx.user, 'customers', 'update-any') ||
+				hasPermission(ctx.user, 'customers', 'update-own', customer)
+
+			if (!canUpdate) {
+				throw new TRPCError({
+					code: 'FORBIDDEN',
+					message: 'You do not have permission to update this customer',
+				})
+			}
 
 			// If setting as default, unset other defaults of same type
 			if (updates.is_default === 1) {
@@ -712,9 +752,52 @@ export const customersRouter = router({
 			}
 		}),
 
-	removeAddress: permissionProcedure('customers', 'update-any')
+	removeAddress: permissionProcedure('customers', 'read')
 		.input(z.string())
 		.mutation(async ({ input: id, ctx }) => {
+			// Get the address first to check customer
+			const { results } = await ctx.env.DB.prepare(
+				'SELECT * FROM customer_addresses WHERE id = ?',
+			)
+				.bind(id)
+				.all<CustomerAddress>()
+
+			if (results.length === 0) {
+				throw new TRPCError({
+					code: 'NOT_FOUND',
+					message: 'Address not found',
+				})
+			}
+
+			const address = results[0]
+
+			// Get the customer to check permissions
+			const { results: customerResults } = await ctx.env.DB.prepare(
+				'SELECT * FROM customers WHERE id = ?',
+			)
+				.bind(address.customer_id)
+				.all<Customer>()
+
+			const customer = customerResults[0]
+			if (!customer) {
+				throw new TRPCError({
+					code: 'NOT_FOUND',
+					message: 'Customer not found',
+				})
+			}
+
+			// Check if user can update this customer
+			const canUpdate =
+				hasPermission(ctx.user, 'customers', 'update-any') ||
+				hasPermission(ctx.user, 'customers', 'update-own', customer)
+
+			if (!canUpdate) {
+				throw new TRPCError({
+					code: 'FORBIDDEN',
+					message: 'You do not have permission to update this customer',
+				})
+			}
+
 			try {
 				await ctx.env.DB.prepare('DELETE FROM customer_addresses WHERE id = ?')
 					.bind(id)

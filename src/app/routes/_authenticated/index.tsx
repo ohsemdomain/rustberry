@@ -1,3 +1,4 @@
+import { AdminDashboard } from '@/app/features/dashboard/AdminDashboard'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/')({
@@ -5,5 +6,5 @@ export const Route = createFileRoute('/_authenticated/')({
 })
 
 function RouteComponent() {
-	return <div>Hello "/"!</div>
+	return <AdminDashboard />
 }
