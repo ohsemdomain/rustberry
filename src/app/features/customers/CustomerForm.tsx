@@ -29,6 +29,31 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 		is_primary: 0,
 	})
 
+	// Address state for new customer creation
+	const [billingAddress, setBillingAddress] = useState({
+		address_label: '',
+		address_line1: '',
+		address_line2: '',
+		address_line3: '',
+		address_line4: '',
+		postcode: '',
+		city: '',
+		state: '',
+		country: '',
+	})
+	const [sameAsShipping, setSameAsShipping] = useState(true)
+	const [shippingAddress, setShippingAddress] = useState({
+		address_label: '',
+		address_line1: '',
+		address_line2: '',
+		address_line3: '',
+		address_line4: '',
+		postcode: '',
+		city: '',
+		state: '',
+		country: '',
+	})
+
 	// Fetch existing customer if in edit mode
 	const { data: customer, isLoading, refetch } = trpc.customers.getById.useQuery(customerId!, {
 		enabled: isEditMode,
@@ -48,16 +73,74 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 
 	const createMutation = trpc.customers.create.useMutation({
 		onSuccess: async (newCustomer) => {
-			// Add phone contacts if any
-			for (const contact of contacts) {
-				await addContactMutation.mutateAsync({
-					customer_id: newCustomer.id,
-					phone_number: contact.phone_number,
-					phone_label: contact.phone_label || null,
-					is_primary: contact.is_primary,
-				})
+			try {
+				// Add phone contacts if any
+				for (const contact of contacts) {
+					await addContactMutation.mutateAsync({
+						customer_id: newCustomer.id,
+						phone_number: contact.phone_number,
+						phone_label: contact.phone_label || null,
+						is_primary: contact.is_primary,
+					})
+				}
+
+				// Add billing address (required)
+				if (billingAddress.address_line1) {
+					await addAddressMutation.mutateAsync({
+						customer_id: newCustomer.id,
+						address_type: 'billing' as const,
+						address_label: billingAddress.address_label || null,
+						address_line1: billingAddress.address_line1,
+						address_line2: billingAddress.address_line2 || null,
+						address_line3: billingAddress.address_line3 || null,
+						address_line4: billingAddress.address_line4 || null,
+						postcode: billingAddress.postcode || null,
+						city: billingAddress.city || null,
+						state: billingAddress.state || null,
+						country: billingAddress.country || null,
+						is_default: 1,
+					})
+				}
+
+				// Add shipping address if different from billing
+				if (!sameAsShipping && shippingAddress.address_line1) {
+					await addAddressMutation.mutateAsync({
+						customer_id: newCustomer.id,
+						address_type: 'shipping' as const,
+						address_label: shippingAddress.address_label || null,
+						address_line1: shippingAddress.address_line1,
+						address_line2: shippingAddress.address_line2 || null,
+						address_line3: shippingAddress.address_line3 || null,
+						address_line4: shippingAddress.address_line4 || null,
+						postcode: shippingAddress.postcode || null,
+						city: shippingAddress.city || null,
+						state: shippingAddress.state || null,
+						country: shippingAddress.country || null,
+						is_default: 1,
+					})
+				} else if (sameAsShipping && billingAddress.address_line1) {
+					// Create shipping address same as billing
+					await addAddressMutation.mutateAsync({
+						customer_id: newCustomer.id,
+						address_type: 'shipping' as const,
+						address_label: billingAddress.address_label || null,
+						address_line1: billingAddress.address_line1,
+						address_line2: billingAddress.address_line2 || null,
+						address_line3: billingAddress.address_line3 || null,
+						address_line4: billingAddress.address_line4 || null,
+						postcode: billingAddress.postcode || null,
+						city: billingAddress.city || null,
+						state: billingAddress.state || null,
+						country: billingAddress.country || null,
+						is_default: 1,
+					})
+				}
+
+				navigate({ to: '/customers' })
+			} catch (error) {
+				console.error('Error creating customer with addresses:', error)
+				alert('Customer created but there was an error adding some details')
 			}
-			navigate({ to: '/customers' })
 		},
 		onError: (error) => {
 			alert(`Error: ${error.message}`)
@@ -76,9 +159,22 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 	const addContactMutation = trpc.customers.addContact.useMutation()
 	const updateContactMutation = trpc.customers.updateContact.useMutation()
 	const removeContactMutation = trpc.customers.removeContact.useMutation()
+	const addAddressMutation = trpc.customers.addAddress.useMutation()
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
+
+		// Validate billing address for new customers
+		if (!isEditMode && !billingAddress.address_line1) {
+			alert('Billing address is required for new customers')
+			return
+		}
+
+		// Validate shipping address if not same as billing
+		if (!isEditMode && !sameAsShipping && !shippingAddress.address_line1) {
+			alert('Shipping address is required when not same as billing')
+			return
+		}
 
 		if (isEditMode) {
 			updateMutation.mutate({
@@ -375,7 +471,255 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 					</div>
 				</div>
 
-				{/* Address Management - Only show in edit mode */}
+				{/* Address Section for New Customer */}
+				{!isEditMode && (
+					<div style={{ marginTop: '2rem' }}>
+						<h3>Billing Address (Required)</h3>
+						<div style={{ marginBottom: '1rem' }}>
+							<label htmlFor="billing_address_label" style={{ display: 'block', marginBottom: '0.5rem' }}>
+								Address Label (e.g., Main Office)
+							</label>
+							<input
+								id="billing_address_label"
+								type="text"
+								value={billingAddress.address_label}
+								onChange={(e) => setBillingAddress(prev => ({ ...prev, address_label: e.target.value }))}
+								style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+							/>
+						</div>
+
+						<div style={{ marginBottom: '1rem' }}>
+							<label htmlFor="billing_address_line1" style={{ display: 'block', marginBottom: '0.5rem' }}>
+								Address Line 1 *
+							</label>
+							<input
+								id="billing_address_line1"
+								type="text"
+								value={billingAddress.address_line1}
+								onChange={(e) => setBillingAddress(prev => ({ ...prev, address_line1: e.target.value }))}
+								required
+								style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+							/>
+						</div>
+
+						<div style={{ marginBottom: '1rem' }}>
+							<label htmlFor="billing_address_line2" style={{ display: 'block', marginBottom: '0.5rem' }}>
+								Address Line 2
+							</label>
+							<input
+								id="billing_address_line2"
+								type="text"
+								value={billingAddress.address_line2}
+								onChange={(e) => setBillingAddress(prev => ({ ...prev, address_line2: e.target.value }))}
+								style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+							/>
+						</div>
+
+						<div style={{ marginBottom: '1rem' }}>
+							<label htmlFor="billing_address_line3" style={{ display: 'block', marginBottom: '0.5rem' }}>
+								Address Line 3
+							</label>
+							<input
+								id="billing_address_line3"
+								type="text"
+								value={billingAddress.address_line3}
+								onChange={(e) => setBillingAddress(prev => ({ ...prev, address_line3: e.target.value }))}
+								style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+							/>
+						</div>
+
+						<div style={{ marginBottom: '1rem' }}>
+							<label htmlFor="billing_address_line4" style={{ display: 'block', marginBottom: '0.5rem' }}>
+								Address Line 4
+							</label>
+							<input
+								id="billing_address_line4"
+								type="text"
+								value={billingAddress.address_line4}
+								onChange={(e) => setBillingAddress(prev => ({ ...prev, address_line4: e.target.value }))}
+								style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+							/>
+						</div>
+
+						<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+							<div>
+								<label htmlFor="billing_city" style={{ display: 'block', marginBottom: '0.5rem' }}>City</label>
+								<input
+									id="billing_city"
+									type="text"
+									value={billingAddress.city}
+									onChange={(e) => setBillingAddress(prev => ({ ...prev, city: e.target.value }))}
+									style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+								/>
+							</div>
+							<div>
+								<label htmlFor="billing_state" style={{ display: 'block', marginBottom: '0.5rem' }}>State</label>
+								<input
+									id="billing_state"
+									type="text"
+									value={billingAddress.state}
+									onChange={(e) => setBillingAddress(prev => ({ ...prev, state: e.target.value }))}
+									style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+								/>
+							</div>
+						</div>
+
+						<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+							<div>
+								<label htmlFor="billing_postcode" style={{ display: 'block', marginBottom: '0.5rem' }}>Postcode</label>
+								<input
+									id="billing_postcode"
+									type="text"
+									value={billingAddress.postcode}
+									onChange={(e) => setBillingAddress(prev => ({ ...prev, postcode: e.target.value }))}
+									style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+								/>
+							</div>
+							<div>
+								<label htmlFor="billing_country" style={{ display: 'block', marginBottom: '0.5rem' }}>Country</label>
+								<input
+									id="billing_country"
+									type="text"
+									value={billingAddress.country}
+									onChange={(e) => setBillingAddress(prev => ({ ...prev, country: e.target.value }))}
+									style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+								/>
+							</div>
+						</div>
+
+						{/* Shipping Address */}
+						<div style={{ marginTop: '2rem', padding: '1rem', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
+							<label style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+								<input
+									type="checkbox"
+									checked={sameAsShipping}
+									onChange={(e) => setSameAsShipping(e.target.checked)}
+									style={{ marginRight: '0.5rem' }}
+								/>
+								<strong>Shipping address same as billing</strong>
+							</label>
+
+							{!sameAsShipping && (
+								<>
+									<h3>Shipping Address</h3>
+									<div style={{ marginBottom: '1rem' }}>
+										<label htmlFor="shipping_address_label" style={{ display: 'block', marginBottom: '0.5rem' }}>
+											Address Label (e.g., Warehouse)
+										</label>
+										<input
+											id="shipping_address_label"
+											type="text"
+											value={shippingAddress.address_label}
+											onChange={(e) => setShippingAddress(prev => ({ ...prev, address_label: e.target.value }))}
+											style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+										/>
+									</div>
+
+									<div style={{ marginBottom: '1rem' }}>
+										<label htmlFor="shipping_address_line1" style={{ display: 'block', marginBottom: '0.5rem' }}>
+											Address Line 1 *
+										</label>
+										<input
+											id="shipping_address_line1"
+											type="text"
+											value={shippingAddress.address_line1}
+											onChange={(e) => setShippingAddress(prev => ({ ...prev, address_line1: e.target.value }))}
+											required={!sameAsShipping}
+											style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+										/>
+									</div>
+
+									<div style={{ marginBottom: '1rem' }}>
+										<label htmlFor="shipping_address_line2" style={{ display: 'block', marginBottom: '0.5rem' }}>
+											Address Line 2
+										</label>
+										<input
+											id="shipping_address_line2"
+											type="text"
+											value={shippingAddress.address_line2}
+											onChange={(e) => setShippingAddress(prev => ({ ...prev, address_line2: e.target.value }))}
+											style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+										/>
+									</div>
+
+									<div style={{ marginBottom: '1rem' }}>
+										<label htmlFor="shipping_address_line3" style={{ display: 'block', marginBottom: '0.5rem' }}>
+											Address Line 3
+										</label>
+										<input
+											id="shipping_address_line3"
+											type="text"
+											value={shippingAddress.address_line3}
+											onChange={(e) => setShippingAddress(prev => ({ ...prev, address_line3: e.target.value }))}
+											style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+										/>
+									</div>
+
+									<div style={{ marginBottom: '1rem' }}>
+										<label htmlFor="shipping_address_line4" style={{ display: 'block', marginBottom: '0.5rem' }}>
+											Address Line 4
+										</label>
+										<input
+											id="shipping_address_line4"
+											type="text"
+											value={shippingAddress.address_line4}
+											onChange={(e) => setShippingAddress(prev => ({ ...prev, address_line4: e.target.value }))}
+											style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+										/>
+									</div>
+
+									<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+										<div>
+											<label htmlFor="shipping_city" style={{ display: 'block', marginBottom: '0.5rem' }}>City</label>
+											<input
+												id="shipping_city"
+												type="text"
+												value={shippingAddress.city}
+												onChange={(e) => setShippingAddress(prev => ({ ...prev, city: e.target.value }))}
+												style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+											/>
+										</div>
+										<div>
+											<label htmlFor="shipping_state" style={{ display: 'block', marginBottom: '0.5rem' }}>State</label>
+											<input
+												id="shipping_state"
+												type="text"
+												value={shippingAddress.state}
+												onChange={(e) => setShippingAddress(prev => ({ ...prev, state: e.target.value }))}
+												style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+											/>
+										</div>
+									</div>
+
+									<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+										<div>
+											<label htmlFor="shipping_postcode" style={{ display: 'block', marginBottom: '0.5rem' }}>Postcode</label>
+											<input
+												id="shipping_postcode"
+												type="text"
+												value={shippingAddress.postcode}
+												onChange={(e) => setShippingAddress(prev => ({ ...prev, postcode: e.target.value }))}
+												style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+											/>
+										</div>
+										<div>
+											<label htmlFor="shipping_country" style={{ display: 'block', marginBottom: '0.5rem' }}>Country</label>
+											<input
+												id="shipping_country"
+												type="text"
+												value={shippingAddress.country}
+												onChange={(e) => setShippingAddress(prev => ({ ...prev, country: e.target.value }))}
+												style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+											/>
+										</div>
+									</div>
+								</>
+							)}
+						</div>
+					</div>
+				)}
+
+				{/* Address Management for Existing Customer */}
 				{isEditMode && customerId && (
 					<div style={{ marginTop: '2rem' }}>
 						<CustomerAddressManager

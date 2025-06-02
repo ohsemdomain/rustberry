@@ -17,10 +17,16 @@ function RootComponent() {
 						display: 'flex',
 						justifyContent: 'space-between',
 						alignItems: 'center',
-						padding: '1rem',
+						padding: '0.5rem',
 					}}
 				>
-					<div>
+					<div
+						style={{
+							display: 'flex',
+							paddingRight: '1rem',
+							gap: '1rem',
+						}}
+					>
 						<Link to="/" activeProps={{ style: { fontWeight: 'bold' } }}>
 							Home
 						</Link>{' '}
