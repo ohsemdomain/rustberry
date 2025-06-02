@@ -1,6 +1,7 @@
 import { trpc } from '@/app/trpc'
 import { useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
+import { CustomerAddressManager } from './CustomerAddressManager'
 
 interface CustomerFormProps {
 	customerId?: string
@@ -29,7 +30,7 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 	})
 
 	// Fetch existing customer if in edit mode
-	const { data: customer, isLoading } = trpc.customers.getById.useQuery(customerId!, {
+	const { data: customer, isLoading, refetch } = trpc.customers.getById.useQuery(customerId!, {
 		enabled: isEditMode,
 	})
 
@@ -373,6 +374,17 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 						</div>
 					</div>
 				</div>
+
+				{/* Address Management - Only show in edit mode */}
+				{isEditMode && customerId && (
+					<div style={{ marginTop: '2rem' }}>
+						<CustomerAddressManager
+							customerId={customerId}
+							addresses={customer?.addresses || []}
+							onAddressesChange={() => refetch()}
+						/>
+					</div>
+				)}
 
 				<div style={{ display: 'flex', gap: '1rem' }}>
 					<button
