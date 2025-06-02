@@ -20,9 +20,17 @@ import { Route as AuthenticatedDemoHonoImport } from './routes/_authenticated/de
 import { Route as AuthenticatedContactImport } from './routes/_authenticated/contact'
 import { Route as AuthenticatedAboutImport } from './routes/_authenticated/about'
 import { Route as AuthenticatedItemsIndexImport } from './routes/_authenticated/items/index'
+import { Route as AuthenticatedInvoicesIndexImport } from './routes/_authenticated/invoices/index'
+import { Route as AuthenticatedCustomersIndexImport } from './routes/_authenticated/customers/index'
 import { Route as AuthenticatedItemsCreateImport } from './routes/_authenticated/items/create'
 import { Route as AuthenticatedItemsItemIdImport } from './routes/_authenticated/items/$itemId'
+import { Route as AuthenticatedInvoicesCreateImport } from './routes/_authenticated/invoices/create'
+import { Route as AuthenticatedInvoicesInvoiceIdImport } from './routes/_authenticated/invoices/$invoiceId'
+import { Route as AuthenticatedCustomersCreateImport } from './routes/_authenticated/customers/create'
+import { Route as AuthenticatedCustomersCustomerIdImport } from './routes/_authenticated/customers/$customerId'
 import { Route as AuthenticatedItemsItemIdEditImport } from './routes/_authenticated/items/$itemId.edit'
+import { Route as AuthenticatedInvoicesInvoiceIdEditImport } from './routes/_authenticated/invoices/$invoiceId.edit'
+import { Route as AuthenticatedCustomersCustomerIdEditImport } from './routes/_authenticated/customers/$customerId.edit'
 
 // Create/Update Routes
 
@@ -78,6 +86,21 @@ const AuthenticatedItemsIndexRoute = AuthenticatedItemsIndexImport.update({
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
+const AuthenticatedInvoicesIndexRoute = AuthenticatedInvoicesIndexImport.update(
+  {
+    id: '/invoices/',
+    path: '/invoices/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any,
+)
+
+const AuthenticatedCustomersIndexRoute =
+  AuthenticatedCustomersIndexImport.update({
+    id: '/customers/',
+    path: '/customers/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+
 const AuthenticatedItemsCreateRoute = AuthenticatedItemsCreateImport.update({
   id: '/items/create',
   path: '/items/create',
@@ -90,11 +113,53 @@ const AuthenticatedItemsItemIdRoute = AuthenticatedItemsItemIdImport.update({
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
+const AuthenticatedInvoicesCreateRoute =
+  AuthenticatedInvoicesCreateImport.update({
+    id: '/invoices/create',
+    path: '/invoices/create',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+
+const AuthenticatedInvoicesInvoiceIdRoute =
+  AuthenticatedInvoicesInvoiceIdImport.update({
+    id: '/invoices/$invoiceId',
+    path: '/invoices/$invoiceId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+
+const AuthenticatedCustomersCreateRoute =
+  AuthenticatedCustomersCreateImport.update({
+    id: '/customers/create',
+    path: '/customers/create',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+
+const AuthenticatedCustomersCustomerIdRoute =
+  AuthenticatedCustomersCustomerIdImport.update({
+    id: '/customers/$customerId',
+    path: '/customers/$customerId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+
 const AuthenticatedItemsItemIdEditRoute =
   AuthenticatedItemsItemIdEditImport.update({
     id: '/edit',
     path: '/edit',
     getParentRoute: () => AuthenticatedItemsItemIdRoute,
+  } as any)
+
+const AuthenticatedInvoicesInvoiceIdEditRoute =
+  AuthenticatedInvoicesInvoiceIdEditImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => AuthenticatedInvoicesInvoiceIdRoute,
+  } as any)
+
+const AuthenticatedCustomersCustomerIdEditRoute =
+  AuthenticatedCustomersCustomerIdEditImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => AuthenticatedCustomersCustomerIdRoute,
   } as any)
 
 // Populate the FileRoutesByPath interface
@@ -157,6 +222,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexImport
       parentRoute: typeof AuthenticatedImport
     }
+    '/_authenticated/customers/$customerId': {
+      id: '/_authenticated/customers/$customerId'
+      path: '/customers/$customerId'
+      fullPath: '/customers/$customerId'
+      preLoaderRoute: typeof AuthenticatedCustomersCustomerIdImport
+      parentRoute: typeof AuthenticatedImport
+    }
+    '/_authenticated/customers/create': {
+      id: '/_authenticated/customers/create'
+      path: '/customers/create'
+      fullPath: '/customers/create'
+      preLoaderRoute: typeof AuthenticatedCustomersCreateImport
+      parentRoute: typeof AuthenticatedImport
+    }
+    '/_authenticated/invoices/$invoiceId': {
+      id: '/_authenticated/invoices/$invoiceId'
+      path: '/invoices/$invoiceId'
+      fullPath: '/invoices/$invoiceId'
+      preLoaderRoute: typeof AuthenticatedInvoicesInvoiceIdImport
+      parentRoute: typeof AuthenticatedImport
+    }
+    '/_authenticated/invoices/create': {
+      id: '/_authenticated/invoices/create'
+      path: '/invoices/create'
+      fullPath: '/invoices/create'
+      preLoaderRoute: typeof AuthenticatedInvoicesCreateImport
+      parentRoute: typeof AuthenticatedImport
+    }
     '/_authenticated/items/$itemId': {
       id: '/_authenticated/items/$itemId'
       path: '/items/$itemId'
@@ -171,12 +264,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedItemsCreateImport
       parentRoute: typeof AuthenticatedImport
     }
+    '/_authenticated/customers/': {
+      id: '/_authenticated/customers/'
+      path: '/customers'
+      fullPath: '/customers'
+      preLoaderRoute: typeof AuthenticatedCustomersIndexImport
+      parentRoute: typeof AuthenticatedImport
+    }
+    '/_authenticated/invoices/': {
+      id: '/_authenticated/invoices/'
+      path: '/invoices'
+      fullPath: '/invoices'
+      preLoaderRoute: typeof AuthenticatedInvoicesIndexImport
+      parentRoute: typeof AuthenticatedImport
+    }
     '/_authenticated/items/': {
       id: '/_authenticated/items/'
       path: '/items'
       fullPath: '/items'
       preLoaderRoute: typeof AuthenticatedItemsIndexImport
       parentRoute: typeof AuthenticatedImport
+    }
+    '/_authenticated/customers/$customerId/edit': {
+      id: '/_authenticated/customers/$customerId/edit'
+      path: '/edit'
+      fullPath: '/customers/$customerId/edit'
+      preLoaderRoute: typeof AuthenticatedCustomersCustomerIdEditImport
+      parentRoute: typeof AuthenticatedCustomersCustomerIdImport
+    }
+    '/_authenticated/invoices/$invoiceId/edit': {
+      id: '/_authenticated/invoices/$invoiceId/edit'
+      path: '/edit'
+      fullPath: '/invoices/$invoiceId/edit'
+      preLoaderRoute: typeof AuthenticatedInvoicesInvoiceIdEditImport
+      parentRoute: typeof AuthenticatedInvoicesInvoiceIdImport
     }
     '/_authenticated/items/$itemId/edit': {
       id: '/_authenticated/items/$itemId/edit'
@@ -189,6 +310,36 @@ declare module '@tanstack/react-router' {
 }
 
 // Create and export the route tree
+
+interface AuthenticatedCustomersCustomerIdRouteChildren {
+  AuthenticatedCustomersCustomerIdEditRoute: typeof AuthenticatedCustomersCustomerIdEditRoute
+}
+
+const AuthenticatedCustomersCustomerIdRouteChildren: AuthenticatedCustomersCustomerIdRouteChildren =
+  {
+    AuthenticatedCustomersCustomerIdEditRoute:
+      AuthenticatedCustomersCustomerIdEditRoute,
+  }
+
+const AuthenticatedCustomersCustomerIdRouteWithChildren =
+  AuthenticatedCustomersCustomerIdRoute._addFileChildren(
+    AuthenticatedCustomersCustomerIdRouteChildren,
+  )
+
+interface AuthenticatedInvoicesInvoiceIdRouteChildren {
+  AuthenticatedInvoicesInvoiceIdEditRoute: typeof AuthenticatedInvoicesInvoiceIdEditRoute
+}
+
+const AuthenticatedInvoicesInvoiceIdRouteChildren: AuthenticatedInvoicesInvoiceIdRouteChildren =
+  {
+    AuthenticatedInvoicesInvoiceIdEditRoute:
+      AuthenticatedInvoicesInvoiceIdEditRoute,
+  }
+
+const AuthenticatedInvoicesInvoiceIdRouteWithChildren =
+  AuthenticatedInvoicesInvoiceIdRoute._addFileChildren(
+    AuthenticatedInvoicesInvoiceIdRouteChildren,
+  )
 
 interface AuthenticatedItemsItemIdRouteChildren {
   AuthenticatedItemsItemIdEditRoute: typeof AuthenticatedItemsItemIdEditRoute
@@ -210,8 +361,14 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDemoHonoRoute: typeof AuthenticatedDemoHonoRoute
   AuthenticatedDemoTrpcRoute: typeof AuthenticatedDemoTrpcRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedCustomersCustomerIdRoute: typeof AuthenticatedCustomersCustomerIdRouteWithChildren
+  AuthenticatedCustomersCreateRoute: typeof AuthenticatedCustomersCreateRoute
+  AuthenticatedInvoicesInvoiceIdRoute: typeof AuthenticatedInvoicesInvoiceIdRouteWithChildren
+  AuthenticatedInvoicesCreateRoute: typeof AuthenticatedInvoicesCreateRoute
   AuthenticatedItemsItemIdRoute: typeof AuthenticatedItemsItemIdRouteWithChildren
   AuthenticatedItemsCreateRoute: typeof AuthenticatedItemsCreateRoute
+  AuthenticatedCustomersIndexRoute: typeof AuthenticatedCustomersIndexRoute
+  AuthenticatedInvoicesIndexRoute: typeof AuthenticatedInvoicesIndexRoute
   AuthenticatedItemsIndexRoute: typeof AuthenticatedItemsIndexRoute
 }
 
@@ -221,8 +378,16 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDemoHonoRoute: AuthenticatedDemoHonoRoute,
   AuthenticatedDemoTrpcRoute: AuthenticatedDemoTrpcRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedCustomersCustomerIdRoute:
+    AuthenticatedCustomersCustomerIdRouteWithChildren,
+  AuthenticatedCustomersCreateRoute: AuthenticatedCustomersCreateRoute,
+  AuthenticatedInvoicesInvoiceIdRoute:
+    AuthenticatedInvoicesInvoiceIdRouteWithChildren,
+  AuthenticatedInvoicesCreateRoute: AuthenticatedInvoicesCreateRoute,
   AuthenticatedItemsItemIdRoute: AuthenticatedItemsItemIdRouteWithChildren,
   AuthenticatedItemsCreateRoute: AuthenticatedItemsCreateRoute,
+  AuthenticatedCustomersIndexRoute: AuthenticatedCustomersIndexRoute,
+  AuthenticatedInvoicesIndexRoute: AuthenticatedInvoicesIndexRoute,
   AuthenticatedItemsIndexRoute: AuthenticatedItemsIndexRoute,
 }
 
@@ -249,9 +414,17 @@ export interface FileRoutesByFullPath {
   '/demo-trpc': typeof AuthenticatedDemoTrpcRoute
   '/login': typeof PublicLoginRoute
   '/': typeof AuthenticatedIndexRoute
+  '/customers/$customerId': typeof AuthenticatedCustomersCustomerIdRouteWithChildren
+  '/customers/create': typeof AuthenticatedCustomersCreateRoute
+  '/invoices/$invoiceId': typeof AuthenticatedInvoicesInvoiceIdRouteWithChildren
+  '/invoices/create': typeof AuthenticatedInvoicesCreateRoute
   '/items/$itemId': typeof AuthenticatedItemsItemIdRouteWithChildren
   '/items/create': typeof AuthenticatedItemsCreateRoute
+  '/customers': typeof AuthenticatedCustomersIndexRoute
+  '/invoices': typeof AuthenticatedInvoicesIndexRoute
   '/items': typeof AuthenticatedItemsIndexRoute
+  '/customers/$customerId/edit': typeof AuthenticatedCustomersCustomerIdEditRoute
+  '/invoices/$invoiceId/edit': typeof AuthenticatedInvoicesInvoiceIdEditRoute
   '/items/$itemId/edit': typeof AuthenticatedItemsItemIdEditRoute
 }
 
@@ -263,9 +436,17 @@ export interface FileRoutesByTo {
   '/demo-trpc': typeof AuthenticatedDemoTrpcRoute
   '/login': typeof PublicLoginRoute
   '/': typeof AuthenticatedIndexRoute
+  '/customers/$customerId': typeof AuthenticatedCustomersCustomerIdRouteWithChildren
+  '/customers/create': typeof AuthenticatedCustomersCreateRoute
+  '/invoices/$invoiceId': typeof AuthenticatedInvoicesInvoiceIdRouteWithChildren
+  '/invoices/create': typeof AuthenticatedInvoicesCreateRoute
   '/items/$itemId': typeof AuthenticatedItemsItemIdRouteWithChildren
   '/items/create': typeof AuthenticatedItemsCreateRoute
+  '/customers': typeof AuthenticatedCustomersIndexRoute
+  '/invoices': typeof AuthenticatedInvoicesIndexRoute
   '/items': typeof AuthenticatedItemsIndexRoute
+  '/customers/$customerId/edit': typeof AuthenticatedCustomersCustomerIdEditRoute
+  '/invoices/$invoiceId/edit': typeof AuthenticatedInvoicesInvoiceIdEditRoute
   '/items/$itemId/edit': typeof AuthenticatedItemsItemIdEditRoute
 }
 
@@ -279,9 +460,17 @@ export interface FileRoutesById {
   '/_authenticated/demo-trpc': typeof AuthenticatedDemoTrpcRoute
   '/_public/login': typeof PublicLoginRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/customers/$customerId': typeof AuthenticatedCustomersCustomerIdRouteWithChildren
+  '/_authenticated/customers/create': typeof AuthenticatedCustomersCreateRoute
+  '/_authenticated/invoices/$invoiceId': typeof AuthenticatedInvoicesInvoiceIdRouteWithChildren
+  '/_authenticated/invoices/create': typeof AuthenticatedInvoicesCreateRoute
   '/_authenticated/items/$itemId': typeof AuthenticatedItemsItemIdRouteWithChildren
   '/_authenticated/items/create': typeof AuthenticatedItemsCreateRoute
+  '/_authenticated/customers/': typeof AuthenticatedCustomersIndexRoute
+  '/_authenticated/invoices/': typeof AuthenticatedInvoicesIndexRoute
   '/_authenticated/items/': typeof AuthenticatedItemsIndexRoute
+  '/_authenticated/customers/$customerId/edit': typeof AuthenticatedCustomersCustomerIdEditRoute
+  '/_authenticated/invoices/$invoiceId/edit': typeof AuthenticatedInvoicesInvoiceIdEditRoute
   '/_authenticated/items/$itemId/edit': typeof AuthenticatedItemsItemIdEditRoute
 }
 
@@ -295,9 +484,17 @@ export interface FileRouteTypes {
     | '/demo-trpc'
     | '/login'
     | '/'
+    | '/customers/$customerId'
+    | '/customers/create'
+    | '/invoices/$invoiceId'
+    | '/invoices/create'
     | '/items/$itemId'
     | '/items/create'
+    | '/customers'
+    | '/invoices'
     | '/items'
+    | '/customers/$customerId/edit'
+    | '/invoices/$invoiceId/edit'
     | '/items/$itemId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -308,9 +505,17 @@ export interface FileRouteTypes {
     | '/demo-trpc'
     | '/login'
     | '/'
+    | '/customers/$customerId'
+    | '/customers/create'
+    | '/invoices/$invoiceId'
+    | '/invoices/create'
     | '/items/$itemId'
     | '/items/create'
+    | '/customers'
+    | '/invoices'
     | '/items'
+    | '/customers/$customerId/edit'
+    | '/invoices/$invoiceId/edit'
     | '/items/$itemId/edit'
   id:
     | '__root__'
@@ -322,9 +527,17 @@ export interface FileRouteTypes {
     | '/_authenticated/demo-trpc'
     | '/_public/login'
     | '/_authenticated/'
+    | '/_authenticated/customers/$customerId'
+    | '/_authenticated/customers/create'
+    | '/_authenticated/invoices/$invoiceId'
+    | '/_authenticated/invoices/create'
     | '/_authenticated/items/$itemId'
     | '/_authenticated/items/create'
+    | '/_authenticated/customers/'
+    | '/_authenticated/invoices/'
     | '/_authenticated/items/'
+    | '/_authenticated/customers/$customerId/edit'
+    | '/_authenticated/invoices/$invoiceId/edit'
     | '/_authenticated/items/$itemId/edit'
   fileRoutesById: FileRoutesById
 }
@@ -361,8 +574,14 @@ export const routeTree = rootRoute
         "/_authenticated/demo-hono",
         "/_authenticated/demo-trpc",
         "/_authenticated/",
+        "/_authenticated/customers/$customerId",
+        "/_authenticated/customers/create",
+        "/_authenticated/invoices/$invoiceId",
+        "/_authenticated/invoices/create",
         "/_authenticated/items/$itemId",
         "/_authenticated/items/create",
+        "/_authenticated/customers/",
+        "/_authenticated/invoices/",
         "/_authenticated/items/"
       ]
     },
@@ -396,6 +615,28 @@ export const routeTree = rootRoute
       "filePath": "_authenticated/index.tsx",
       "parent": "/_authenticated"
     },
+    "/_authenticated/customers/$customerId": {
+      "filePath": "_authenticated/customers/$customerId.tsx",
+      "parent": "/_authenticated",
+      "children": [
+        "/_authenticated/customers/$customerId/edit"
+      ]
+    },
+    "/_authenticated/customers/create": {
+      "filePath": "_authenticated/customers/create.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/invoices/$invoiceId": {
+      "filePath": "_authenticated/invoices/$invoiceId.tsx",
+      "parent": "/_authenticated",
+      "children": [
+        "/_authenticated/invoices/$invoiceId/edit"
+      ]
+    },
+    "/_authenticated/invoices/create": {
+      "filePath": "_authenticated/invoices/create.tsx",
+      "parent": "/_authenticated"
+    },
     "/_authenticated/items/$itemId": {
       "filePath": "_authenticated/items/$itemId.tsx",
       "parent": "/_authenticated",
@@ -407,9 +648,25 @@ export const routeTree = rootRoute
       "filePath": "_authenticated/items/create.tsx",
       "parent": "/_authenticated"
     },
+    "/_authenticated/customers/": {
+      "filePath": "_authenticated/customers/index.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/invoices/": {
+      "filePath": "_authenticated/invoices/index.tsx",
+      "parent": "/_authenticated"
+    },
     "/_authenticated/items/": {
       "filePath": "_authenticated/items/index.tsx",
       "parent": "/_authenticated"
+    },
+    "/_authenticated/customers/$customerId/edit": {
+      "filePath": "_authenticated/customers/$customerId.edit.tsx",
+      "parent": "/_authenticated/customers/$customerId"
+    },
+    "/_authenticated/invoices/$invoiceId/edit": {
+      "filePath": "_authenticated/invoices/$invoiceId.edit.tsx",
+      "parent": "/_authenticated/invoices/$invoiceId"
     },
     "/_authenticated/items/$itemId/edit": {
       "filePath": "_authenticated/items/$itemId.edit.tsx",

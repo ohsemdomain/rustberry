@@ -1,6 +1,6 @@
 export type UserRole = 'admin' | 'sales' | 'marketing' | 'creative' | 'hr'
 
-export type ResourceType = 'note' | 'task' | 'invoice' | 'items'
+export type ResourceType = 'note' | 'task' | 'invoices' | 'items' | 'customers'
 
 // Permission actions for each resource
 export type PermissionAction =
@@ -74,7 +74,15 @@ export const rolePermissions: Record<
 			| 'delete-own'
 			| 'delete-any'
 		>
-		invoice?: Array<
+		invoices?: Array<
+			| 'create'
+			| 'read'
+			| 'update-own'
+			| 'update-any'
+			| 'delete-own'
+			| 'delete-any'
+		>
+		customers?: Array<
 			| 'create'
 			| 'read'
 			| 'update-own'
@@ -88,30 +96,35 @@ export const rolePermissions: Record<
 		items: ['create', 'read', 'update-any', 'delete-any'],
 		note: ['create', 'read', 'update-any', 'delete-any'],
 		task: ['create', 'read', 'update-any', 'delete-any'],
-		invoice: ['create', 'read', 'update-any', 'delete-any'],
+		invoices: ['create', 'read', 'update-any', 'delete-any'],
+		customers: ['create', 'read', 'update-any', 'delete-any'],
 	},
 	marketing: {
 		items: ['read'],
 		note: ['create', 'read', 'update-own', 'delete-own'],
 		task: ['create', 'read', 'update-own'],
-		invoice: [],
+		invoices: [],
+		customers: [],
 	},
 	sales: {
 		items: ['create', 'read', 'update-own', 'delete-own'],
 		note: ['create', 'read', 'update-own', 'delete-own'],
 		task: ['create', 'read', 'update-any', 'delete-any'],
-		invoice: ['create', 'read', 'update-own'],
+		invoices: ['create', 'read', 'update-own'],
+		customers: ['create', 'read', 'update-own'],
 	},
 	creative: {
 		items: ['create', 'read', 'update-own', 'delete-own'],
 		note: ['create', 'read', 'update-own', 'delete-own'],
 		task: ['create', 'read', 'update-own', 'delete-own'],
-		invoice: [],
+		invoices: [],
+		customers: [],
 	},
 	hr: {
 		items: ['read'],
 		note: ['create', 'read', 'update-any', 'delete-any'],
 		task: ['create', 'read', 'update-any', 'delete-any'],
-		invoice: [],
+		invoices: [],
+		customers: [],
 	},
 }

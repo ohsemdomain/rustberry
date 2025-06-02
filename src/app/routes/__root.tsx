@@ -53,6 +53,28 @@ function RootComponent() {
 								</Link>
 							</>
 						)}
+						{user && canRead('customers') && (
+							<>
+								{' '}
+								<Link
+									to="/customers"
+									activeProps={{ style: { fontWeight: 'bold' } }}
+								>
+									Customers
+								</Link>
+							</>
+						)}
+						{user && canRead('invoices') && (
+							<>
+								{' '}
+								<Link
+									to="/invoices"
+									activeProps={{ style: { fontWeight: 'bold' } }}
+								>
+									Invoices
+								</Link>
+							</>
+						)}
 					</div>
 
 					<div>
