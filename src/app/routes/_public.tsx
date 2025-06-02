@@ -8,7 +8,7 @@ export const Route = createFileRoute('/_public')({
 function PublicLayout() {
 	const { user, isLoading } = useAuth()
 
-	// If user is already logged in, redirect to home
+	// If user is already logged in, redirect to dashboard
 	if (!isLoading && user) {
 		return <Navigate to="/" />
 	}

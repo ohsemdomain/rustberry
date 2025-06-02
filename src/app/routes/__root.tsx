@@ -11,8 +11,9 @@ function RootComponent() {
 
 	return (
 		<>
-			<div>
-				<nav
+			{user && (
+				<div>
+					<nav
 					style={{
 						display: 'flex',
 						justifyContent: 'space-between',
@@ -27,16 +28,26 @@ function RootComponent() {
 							gap: '1rem',
 						}}
 					>
-						<Link to="/" activeProps={{ style: { fontWeight: 'bold' } }}>
-							Dashboard
-						</Link>{' '}
-						<Link to="/about" activeProps={{ style: { fontWeight: 'bold' } }}>
-							About
-						</Link>{' '}
-						<Link to="/contact" activeProps={{ style: { fontWeight: 'bold' } }}>
-							Contact
-						</Link>{' '}
-						
+						{user && (
+							<>
+								<Link to="/" activeProps={{ style: { fontWeight: 'bold' } }}>
+									Dashboard
+								</Link>{' '}
+								<Link
+									to="/about"
+									activeProps={{ style: { fontWeight: 'bold' } }}
+								>
+									About
+								</Link>{' '}
+								<Link
+									to="/contact"
+									activeProps={{ style: { fontWeight: 'bold' } }}
+								>
+									Contact
+								</Link>{' '}
+							</>
+						)}
+
 						{user && canRead('items') && (
 							<>
 								{' '}
@@ -93,7 +104,8 @@ function RootComponent() {
 				</nav>
 				<hr />
 			</div>
-			<Outlet />
+		)}
+		<Outlet />
 			<TanStackRouterDevtools />
 		</>
 	)
