@@ -28,7 +28,7 @@ function RootComponent() {
 						}}
 					>
 						<Link to="/" activeProps={{ style: { fontWeight: 'bold' } }}>
-							Home
+							Dashboard
 						</Link>{' '}
 						<Link to="/about" activeProps={{ style: { fontWeight: 'bold' } }}>
 							About

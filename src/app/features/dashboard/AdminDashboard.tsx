@@ -1,4 +1,5 @@
 import { useAuth } from '@/app/AuthProvider'
+import { QuoteComponent } from '@/app/components/zen-quotes/QuoteComponent'
 import { Navigate } from '@tanstack/react-router'
 
 export function AdminDashboard() {
@@ -26,6 +27,7 @@ export function AdminDashboard() {
 		<div>
 			<h1>Admin Dashboard</h1>
 			<p>Welcome, {user?.name}! You have administrator privileges.</p>
+			<QuoteComponent />
 		</div>
 	)
 }
