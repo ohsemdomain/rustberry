@@ -36,18 +36,7 @@ function RootComponent() {
 						<Link to="/contact" activeProps={{ style: { fontWeight: 'bold' } }}>
 							Contact
 						</Link>{' '}
-						<Link
-							to="/demo-trpc"
-							activeProps={{ style: { fontWeight: 'bold' } }}
-						>
-							TRPC
-						</Link>{' '}
-						<Link
-							to="/demo-hono"
-							activeProps={{ style: { fontWeight: 'bold' } }}
-						>
-							HONO
-						</Link>{' '}
+						
 						{user && canRead('items') && (
 							<>
 								{' '}
