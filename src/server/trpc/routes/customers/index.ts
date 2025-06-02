@@ -5,9 +5,9 @@ import {
 import { router } from '@/server/trpc/trpc-instance'
 import { generateUniqueId } from '@/server/trpc/utils/id-generator'
 import {
-	CUSTOMER_ID_PREFIX,
 	ADDRESS_ID_PREFIX,
 	CONTACT_ID_PREFIX,
+	CUSTOMER_ID_PREFIX,
 	type Customer,
 	type CustomerAddress,
 	type CustomerContact,
@@ -426,7 +426,11 @@ export const customersRouter = router({
 				})
 			}
 
-			const id = await generateUniqueId(ctx.env, CONTACT_ID_PREFIX, 'customer_contact')
+			const id = await generateUniqueId(
+				ctx.env,
+				CONTACT_ID_PREFIX,
+				'customer_contact',
+			)
 			const now = Date.now()
 
 			// If setting as primary, unset other primary contacts
@@ -587,7 +591,11 @@ export const customersRouter = router({
 				})
 			}
 
-			const id = await generateUniqueId(ctx.env, ADDRESS_ID_PREFIX, 'customer_address')
+			const id = await generateUniqueId(
+				ctx.env,
+				ADDRESS_ID_PREFIX,
+				'customer_address',
+			)
 			const now = Date.now()
 
 			// If setting as default, unset other defaults of same type
@@ -717,9 +725,17 @@ export const customersRouter = router({
 
 			// Build update query for all possible fields
 			const fieldsToUpdate = [
-				'address_type', 'address_label', 'address_line1', 'address_line2',
-				'address_line3', 'address_line4', 'postcode', 'city', 'state',
-				'country', 'is_default'
+				'address_type',
+				'address_label',
+				'address_line1',
+				'address_line2',
+				'address_line3',
+				'address_line4',
+				'postcode',
+				'city',
+				'state',
+				'country',
+				'is_default',
 			]
 
 			for (const field of fieldsToUpdate) {

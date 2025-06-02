@@ -8,7 +8,9 @@ import { useState } from 'react'
 export function InvoicesList() {
 	const { hasPermission } = useAuth()
 	const [search, setSearch] = useState('')
-	const [status, setStatus] = useState<InvoiceStatus | undefined>(InvoiceStatus.UNPAID)
+	const [status, setStatus] = useState<InvoiceStatus | undefined>(
+		InvoiceStatus.UNPAID,
+	)
 	const [page, setPage] = useState(1)
 
 	const { data, isLoading, error } = trpc.invoices.list.useQuery({
@@ -104,7 +106,9 @@ export function InvoicesList() {
 					value={status === undefined ? 'all' : status}
 					onChange={(e) => {
 						const value = e.target.value
-						setStatus(value === 'all' ? undefined : (Number(value) as InvoiceStatus))
+						setStatus(
+							value === 'all' ? undefined : (Number(value) as InvoiceStatus),
+						)
 						setPage(1) // Reset to first page
 					}}
 					style={{

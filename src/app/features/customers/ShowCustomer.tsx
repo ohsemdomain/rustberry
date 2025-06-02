@@ -9,12 +9,17 @@ interface ShowCustomerProps {
 export function ShowCustomer({ customerId }: ShowCustomerProps) {
 	const { hasPermission } = useAuth()
 	const navigate = useNavigate()
-	const { data: customer, isLoading, error } = trpc.customers.getById.useQuery(customerId)
+	const {
+		data: customer,
+		isLoading,
+		error,
+	} = trpc.customers.getById.useQuery(customerId)
 
 	if (isLoading) return <div style={{ padding: '1rem' }}>Loading...</div>
 	if (error)
 		return <div style={{ padding: '1rem' }}>Error: {error.message}</div>
-	if (!customer) return <div style={{ padding: '1rem' }}>Customer not found</div>
+	if (!customer)
+		return <div style={{ padding: '1rem' }}>Customer not found</div>
 
 	const getStatusColor = (status: number) => {
 		return status === 1 ? 'green' : 'red'
@@ -279,7 +284,9 @@ export function ShowCustomer({ customerId }: ShowCustomerProps) {
 											}}
 										>
 											{address.address_label && (
-												<div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>
+												<div
+													style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}
+												>
 													{address.address_label}
 													{address.is_default === 1 && (
 														<span
@@ -297,10 +304,18 @@ export function ShowCustomer({ customerId }: ShowCustomerProps) {
 													)}
 												</div>
 											)}
-											{address.address_line1 && <div>{address.address_line1}</div>}
-											{address.address_line2 && <div>{address.address_line2}</div>}
-											{address.address_line3 && <div>{address.address_line3}</div>}
-											{address.address_line4 && <div>{address.address_line4}</div>}
+											{address.address_line1 && (
+												<div>{address.address_line1}</div>
+											)}
+											{address.address_line2 && (
+												<div>{address.address_line2}</div>
+											)}
+											{address.address_line3 && (
+												<div>{address.address_line3}</div>
+											)}
+											{address.address_line4 && (
+												<div>{address.address_line4}</div>
+											)}
 											<div>
 												{[address.city, address.state, address.postcode]
 													.filter(Boolean)
@@ -328,7 +343,9 @@ export function ShowCustomer({ customerId }: ShowCustomerProps) {
 											}}
 										>
 											{address.address_label && (
-												<div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>
+												<div
+													style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}
+												>
 													{address.address_label}
 													{address.is_default === 1 && (
 														<span
@@ -346,10 +363,18 @@ export function ShowCustomer({ customerId }: ShowCustomerProps) {
 													)}
 												</div>
 											)}
-											{address.address_line1 && <div>{address.address_line1}</div>}
-											{address.address_line2 && <div>{address.address_line2}</div>}
-											{address.address_line3 && <div>{address.address_line3}</div>}
-											{address.address_line4 && <div>{address.address_line4}</div>}
+											{address.address_line1 && (
+												<div>{address.address_line1}</div>
+											)}
+											{address.address_line2 && (
+												<div>{address.address_line2}</div>
+											)}
+											{address.address_line3 && (
+												<div>{address.address_line3}</div>
+											)}
+											{address.address_line4 && (
+												<div>{address.address_line4}</div>
+											)}
 											<div>
 												{[address.city, address.state, address.postcode]
 													.filter(Boolean)

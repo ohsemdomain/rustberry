@@ -1,4 +1,8 @@
-import { createFileRoute, Outlet, useChildMatches } from '@tanstack/react-router'
+import {
+	Outlet,
+	createFileRoute,
+	useChildMatches,
+} from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/invoices/$invoiceId')({
 	component: ShowInvoicePage,

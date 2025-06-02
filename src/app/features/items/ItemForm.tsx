@@ -1,5 +1,9 @@
 import { trpc } from '@/app/trpc'
-import { centsToDisplay, displayToCents, sanitizePriceInput } from '@/app/utils/price'
+import {
+	centsToDisplay,
+	displayToCents,
+	sanitizePriceInput,
+} from '@/app/utils/price'
 import { ItemCategory, ItemStatus } from '@/shared/items'
 import { useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
@@ -86,7 +90,8 @@ export function ItemForm({ itemId }: ItemFormProps) {
 		setFormData((prev) => ({ ...prev, item_price_display: sanitized }))
 	}
 
-	if (isEditMode && isLoading) return <div style={{ padding: '1rem' }}>Loading...</div>
+	if (isEditMode && isLoading)
+		return <div style={{ padding: '1rem' }}>Loading...</div>
 
 	const isPending = createMutation.isPending || updateMutation.isPending
 
@@ -243,7 +248,13 @@ export function ItemForm({ itemId }: ItemFormProps) {
 							cursor: isPending ? 'not-allowed' : 'pointer',
 						}}
 					>
-						{isPending ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update Item' : 'Create Item')}
+						{isPending
+							? isEditMode
+								? 'Updating...'
+								: 'Creating...'
+							: isEditMode
+								? 'Update Item'
+								: 'Create Item'}
 					</button>
 
 					<button

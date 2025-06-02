@@ -1,41 +1,41 @@
 // Follow pattern from src/shared/items.ts
 
 export interface Customer {
-  id: string
-  customer_name: string
-  customer_email: string | null
-  status: 0 | 1
-  created_at: number
-  updated_at: number
-  created_by: string
-  updated_by: string
+	id: string
+	customer_name: string
+	customer_email: string | null
+	status: 0 | 1
+	created_at: number
+	updated_at: number
+	created_by: string
+	updated_by: string
 }
 
 export interface CustomerAddress {
-  id: string
-  customer_id: string
-  address_type: 'billing' | 'shipping'
-  address_label: string | null
-  address_line1: string | null
-  address_line2: string | null
-  address_line3: string | null
-  address_line4: string | null
-  postcode: string | null
-  city: string | null
-  state: string | null
-  country: string | null
-  is_default: 0 | 1
-  created_at: number
-  updated_at: number
+	id: string
+	customer_id: string
+	address_type: 'billing' | 'shipping'
+	address_label: string | null
+	address_line1: string | null
+	address_line2: string | null
+	address_line3: string | null
+	address_line4: string | null
+	postcode: string | null
+	city: string | null
+	state: string | null
+	country: string | null
+	is_default: 0 | 1
+	created_at: number
+	updated_at: number
 }
 
 export interface CustomerContact {
-  id: string
-  customer_id: string
-  phone_number: string
-  phone_label: string | null
-  is_primary: 0 | 1
-  created_at: number
+	id: string
+	customer_id: string
+	phone_number: string
+	phone_label: string | null
+	is_primary: 0 | 1
+	created_at: number
 }
 
 export const CUSTOMER_ID_PREFIX = 'CUST'

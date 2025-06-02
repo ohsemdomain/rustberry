@@ -1,5 +1,9 @@
 import { ShowItem } from '@/app/features/items/ShowItem'
-import { createFileRoute, Outlet, useChildMatches } from '@tanstack/react-router'
+import {
+	Outlet,
+	createFileRoute,
+	useChildMatches,
+} from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/items/$itemId')({
 	component: ShowItemPage,

@@ -7,13 +7,13 @@ import { generateUniqueId } from '@/server/trpc/utils/id-generator'
 import {
 	INVOICE_ID_PREFIX,
 	INVOICE_ITEM_ID_PREFIX,
-	InvoiceStatus,
 	type Invoice,
 	type InvoiceItem,
+	InvoiceStatus,
 } from '@/shared/invoice'
+import type { D1PreparedStatement } from '@cloudflare/workers-types'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import type { D1PreparedStatement } from '@cloudflare/workers-types'
 
 const INVOICES_PER_PAGE = 20
 
@@ -128,7 +128,11 @@ export const invoicesRouter = router({
 		.input(createInvoiceSchema)
 		.mutation(async ({ input, ctx }) => {
 			const id = await generateUniqueId(ctx.env, INVOICE_ID_PREFIX, 'invoice')
-			const invoice_number = await generateUniqueId(ctx.env, INVOICE_ID_PREFIX, 'invoice')
+			const invoice_number = await generateUniqueId(
+				ctx.env,
+				INVOICE_ID_PREFIX,
+				'invoice',
+			)
 			const now = Date.now()
 
 			// Calculate totals
@@ -467,7 +471,9 @@ export const invoicesRouter = router({
 
 			// Customer info fields
 			const customerFields = [
-				'customer_name', 'customer_email', 'customer_phone'
+				'customer_name',
+				'customer_email',
+				'customer_phone',
 			]
 			for (const field of customerFields) {
 				if (updates[field as keyof typeof updates] !== undefined) {
@@ -478,13 +484,22 @@ export const invoicesRouter = router({
 
 			// Address fields
 			const addressFields = [
-				'billing_address_line1', 'billing_address_line2',
-				'billing_address_line3', 'billing_address_line4',
-				'billing_postcode', 'billing_city', 'billing_state',
-				'billing_country', 'shipping_address_line1',
-				'shipping_address_line2', 'shipping_address_line3',
-				'shipping_address_line4', 'shipping_postcode',
-				'shipping_city', 'shipping_state', 'shipping_country'
+				'billing_address_line1',
+				'billing_address_line2',
+				'billing_address_line3',
+				'billing_address_line4',
+				'billing_postcode',
+				'billing_city',
+				'billing_state',
+				'billing_country',
+				'shipping_address_line1',
+				'shipping_address_line2',
+				'shipping_address_line3',
+				'shipping_address_line4',
+				'shipping_postcode',
+				'shipping_city',
+				'shipping_state',
+				'shipping_country',
 			]
 			for (const field of addressFields) {
 				if (updates[field as keyof typeof updates] !== undefined) {

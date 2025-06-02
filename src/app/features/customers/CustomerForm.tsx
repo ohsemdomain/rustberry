@@ -55,7 +55,11 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 	})
 
 	// Fetch existing customer if in edit mode
-	const { data: customer, isLoading, refetch } = trpc.customers.getById.useQuery(customerId!, {
+	const {
+		data: customer,
+		isLoading,
+		refetch,
+	} = trpc.customers.getById.useQuery(customerId!, {
 		enabled: isEditMode,
 	})
 
@@ -197,17 +201,24 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 
 		if (isEditMode && customerId) {
 			// Add contact directly to database
-			addContactMutation.mutate({
-				customer_id: customerId,
-				phone_number: newContact.phone_number,
-				phone_label: newContact.phone_label || null,
-				is_primary: newContact.is_primary,
-			}, {
-				onSuccess: (contact) => {
-					setContacts([...contacts, contact])
-					setNewContact({ phone_number: '', phone_label: null, is_primary: 0 })
-				}
-			})
+			addContactMutation.mutate(
+				{
+					customer_id: customerId,
+					phone_number: newContact.phone_number,
+					phone_label: newContact.phone_label || null,
+					is_primary: newContact.is_primary,
+				},
+				{
+					onSuccess: (contact) => {
+						setContacts([...contacts, contact])
+						setNewContact({
+							phone_number: '',
+							phone_label: null,
+							is_primary: 0,
+						})
+					},
+				},
+			)
 		} else {
 			// Add to local state for new customer
 			setContacts([...contacts, newContact])
@@ -221,7 +232,7 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 			removeContactMutation.mutate(contact.id, {
 				onSuccess: () => {
 					setContacts(contacts.filter((_, i) => i !== index))
-				}
+				},
 			})
 		} else {
 			setContacts(contacts.filter((_, i) => i !== index))
@@ -231,26 +242,40 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 	const handleSetPrimary = (index: number) => {
 		const contact = contacts[index]
 		if (isEditMode && contact.id) {
-			updateContactMutation.mutate({
-				id: contact.id,
-				is_primary: 1,
-			}, {
-				onSuccess: () => {
-					setContacts(contacts.map((c, i) => ({
-						...c,
-						is_primary: i === index ? 1 : 0,
-					}) as PhoneContact))
-				}
-			})
+			updateContactMutation.mutate(
+				{
+					id: contact.id,
+					is_primary: 1,
+				},
+				{
+					onSuccess: () => {
+						setContacts(
+							contacts.map(
+								(c, i) =>
+									({
+										...c,
+										is_primary: i === index ? 1 : 0,
+									}) as PhoneContact,
+							),
+						)
+					},
+				},
+			)
 		} else {
-			setContacts(contacts.map((c, i) => ({
-				...c,
-				is_primary: i === index ? 1 : 0,
-			}) as PhoneContact))
+			setContacts(
+				contacts.map(
+					(c, i) =>
+						({
+							...c,
+							is_primary: i === index ? 1 : 0,
+						}) as PhoneContact,
+				),
+			)
 		}
 	}
 
-	if (isEditMode && isLoading) return <div style={{ padding: '1rem' }}>Loading...</div>
+	if (isEditMode && isLoading)
+		return <div style={{ padding: '1rem' }}>Loading...</div>
 
 	const isPending = createMutation.isPending || updateMutation.isPending
 
@@ -271,7 +296,10 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 						id="customer_name"
 						value={formData.customer_name}
 						onChange={(e) =>
-							setFormData((prev) => ({ ...prev, customer_name: e.target.value }))
+							setFormData((prev) => ({
+								...prev,
+								customer_name: e.target.value,
+							}))
 						}
 						required
 						style={{
@@ -295,7 +323,10 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 						id="customer_email"
 						value={formData.customer_email}
 						onChange={(e) =>
-							setFormData((prev) => ({ ...prev, customer_email: e.target.value }))
+							setFormData((prev) => ({
+								...prev,
+								customer_email: e.target.value,
+							}))
 						}
 						style={{
 							width: '100%',
@@ -337,7 +368,7 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 				{/* Phone Contacts Section */}
 				<div style={{ marginBottom: '1rem' }}>
 					<h3>Phone Contacts</h3>
-					
+
 					{/* Existing contacts */}
 					{contacts.length > 0 && (
 						<div style={{ marginBottom: '1rem' }}>
@@ -367,7 +398,9 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 										{contact.phone_label || 'No label'}
 									</span>
 									{contact.is_primary === 1 && (
-										<span style={{ color: 'green', fontWeight: 'bold' }}>Primary</span>
+										<span style={{ color: 'green', fontWeight: 'bold' }}>
+											Primary
+										</span>
 									)}
 									{contact.is_primary === 0 && (
 										<button
@@ -405,15 +438,26 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 					)}
 
 					{/* Add new contact */}
-					<div style={{ border: '1px solid #ddd', padding: '1rem', borderRadius: '4px' }}>
+					<div
+						style={{
+							border: '1px solid #ddd',
+							padding: '1rem',
+							borderRadius: '4px',
+						}}
+					>
 						<h4>Add Phone Contact</h4>
-						<div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+						<div
+							style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}
+						>
 							<input
 								type="text"
 								placeholder="Phone number"
 								value={newContact.phone_number}
 								onChange={(e) =>
-									setNewContact((prev) => ({ ...prev, phone_number: e.target.value }))
+									setNewContact((prev) => ({
+										...prev,
+										phone_number: e.target.value,
+									}))
 								}
 								style={{
 									flex: 1,
@@ -427,7 +471,10 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 								placeholder="Label (e.g., mobile, office)"
 								value={newContact.phone_label || ''}
 								onChange={(e) =>
-									setNewContact((prev) => ({ ...prev, phone_label: e.target.value || null }))
+									setNewContact((prev) => ({
+										...prev,
+										phone_label: e.target.value || null,
+									}))
 								}
 								style={{
 									flex: 1,
@@ -437,7 +484,9 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 								}}
 							/>
 						</div>
-						<div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+						<div
+							style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}
+						>
 							<label>
 								<input
 									type="checkbox"
@@ -448,8 +497,8 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 											is_primary: e.target.checked ? 1 : 0,
 										}))
 									}
-								/>
-								{' '}Set as primary
+								/>{' '}
+								Set as primary
 							</label>
 							<button
 								type="button"
@@ -476,120 +525,272 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 					<div style={{ marginTop: '2rem' }}>
 						<h3>Billing Address (Required)</h3>
 						<div style={{ marginBottom: '1rem' }}>
-							<label htmlFor="billing_address_label" style={{ display: 'block', marginBottom: '0.5rem' }}>
+							<label
+								htmlFor="billing_address_label"
+								style={{ display: 'block', marginBottom: '0.5rem' }}
+							>
 								Address Label (e.g., Main Office)
 							</label>
 							<input
 								id="billing_address_label"
 								type="text"
 								value={billingAddress.address_label}
-								onChange={(e) => setBillingAddress(prev => ({ ...prev, address_label: e.target.value }))}
-								style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+								onChange={(e) =>
+									setBillingAddress((prev) => ({
+										...prev,
+										address_label: e.target.value,
+									}))
+								}
+								style={{
+									width: '100%',
+									padding: '0.5rem',
+									border: '1px solid #ccc',
+									borderRadius: '4px',
+								}}
 							/>
 						</div>
 
 						<div style={{ marginBottom: '1rem' }}>
-							<label htmlFor="billing_address_line1" style={{ display: 'block', marginBottom: '0.5rem' }}>
+							<label
+								htmlFor="billing_address_line1"
+								style={{ display: 'block', marginBottom: '0.5rem' }}
+							>
 								Address Line 1 *
 							</label>
 							<input
 								id="billing_address_line1"
 								type="text"
 								value={billingAddress.address_line1}
-								onChange={(e) => setBillingAddress(prev => ({ ...prev, address_line1: e.target.value }))}
+								onChange={(e) =>
+									setBillingAddress((prev) => ({
+										...prev,
+										address_line1: e.target.value,
+									}))
+								}
 								required
-								style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+								style={{
+									width: '100%',
+									padding: '0.5rem',
+									border: '1px solid #ccc',
+									borderRadius: '4px',
+								}}
 							/>
 						</div>
 
 						<div style={{ marginBottom: '1rem' }}>
-							<label htmlFor="billing_address_line2" style={{ display: 'block', marginBottom: '0.5rem' }}>
+							<label
+								htmlFor="billing_address_line2"
+								style={{ display: 'block', marginBottom: '0.5rem' }}
+							>
 								Address Line 2
 							</label>
 							<input
 								id="billing_address_line2"
 								type="text"
 								value={billingAddress.address_line2}
-								onChange={(e) => setBillingAddress(prev => ({ ...prev, address_line2: e.target.value }))}
-								style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+								onChange={(e) =>
+									setBillingAddress((prev) => ({
+										...prev,
+										address_line2: e.target.value,
+									}))
+								}
+								style={{
+									width: '100%',
+									padding: '0.5rem',
+									border: '1px solid #ccc',
+									borderRadius: '4px',
+								}}
 							/>
 						</div>
 
 						<div style={{ marginBottom: '1rem' }}>
-							<label htmlFor="billing_address_line3" style={{ display: 'block', marginBottom: '0.5rem' }}>
+							<label
+								htmlFor="billing_address_line3"
+								style={{ display: 'block', marginBottom: '0.5rem' }}
+							>
 								Address Line 3
 							</label>
 							<input
 								id="billing_address_line3"
 								type="text"
 								value={billingAddress.address_line3}
-								onChange={(e) => setBillingAddress(prev => ({ ...prev, address_line3: e.target.value }))}
-								style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+								onChange={(e) =>
+									setBillingAddress((prev) => ({
+										...prev,
+										address_line3: e.target.value,
+									}))
+								}
+								style={{
+									width: '100%',
+									padding: '0.5rem',
+									border: '1px solid #ccc',
+									borderRadius: '4px',
+								}}
 							/>
 						</div>
 
 						<div style={{ marginBottom: '1rem' }}>
-							<label htmlFor="billing_address_line4" style={{ display: 'block', marginBottom: '0.5rem' }}>
+							<label
+								htmlFor="billing_address_line4"
+								style={{ display: 'block', marginBottom: '0.5rem' }}
+							>
 								Address Line 4
 							</label>
 							<input
 								id="billing_address_line4"
 								type="text"
 								value={billingAddress.address_line4}
-								onChange={(e) => setBillingAddress(prev => ({ ...prev, address_line4: e.target.value }))}
-								style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+								onChange={(e) =>
+									setBillingAddress((prev) => ({
+										...prev,
+										address_line4: e.target.value,
+									}))
+								}
+								style={{
+									width: '100%',
+									padding: '0.5rem',
+									border: '1px solid #ccc',
+									borderRadius: '4px',
+								}}
 							/>
 						</div>
 
-						<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+						<div
+							style={{
+								display: 'grid',
+								gridTemplateColumns: '1fr 1fr',
+								gap: '1rem',
+								marginBottom: '1rem',
+							}}
+						>
 							<div>
-								<label htmlFor="billing_city" style={{ display: 'block', marginBottom: '0.5rem' }}>City</label>
+								<label
+									htmlFor="billing_city"
+									style={{ display: 'block', marginBottom: '0.5rem' }}
+								>
+									City
+								</label>
 								<input
 									id="billing_city"
 									type="text"
 									value={billingAddress.city}
-									onChange={(e) => setBillingAddress(prev => ({ ...prev, city: e.target.value }))}
-									style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+									onChange={(e) =>
+										setBillingAddress((prev) => ({
+											...prev,
+											city: e.target.value,
+										}))
+									}
+									style={{
+										width: '100%',
+										padding: '0.5rem',
+										border: '1px solid #ccc',
+										borderRadius: '4px',
+									}}
 								/>
 							</div>
 							<div>
-								<label htmlFor="billing_state" style={{ display: 'block', marginBottom: '0.5rem' }}>State</label>
+								<label
+									htmlFor="billing_state"
+									style={{ display: 'block', marginBottom: '0.5rem' }}
+								>
+									State
+								</label>
 								<input
 									id="billing_state"
 									type="text"
 									value={billingAddress.state}
-									onChange={(e) => setBillingAddress(prev => ({ ...prev, state: e.target.value }))}
-									style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+									onChange={(e) =>
+										setBillingAddress((prev) => ({
+											...prev,
+											state: e.target.value,
+										}))
+									}
+									style={{
+										width: '100%',
+										padding: '0.5rem',
+										border: '1px solid #ccc',
+										borderRadius: '4px',
+									}}
 								/>
 							</div>
 						</div>
 
-						<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+						<div
+							style={{
+								display: 'grid',
+								gridTemplateColumns: '1fr 1fr',
+								gap: '1rem',
+								marginBottom: '1rem',
+							}}
+						>
 							<div>
-								<label htmlFor="billing_postcode" style={{ display: 'block', marginBottom: '0.5rem' }}>Postcode</label>
+								<label
+									htmlFor="billing_postcode"
+									style={{ display: 'block', marginBottom: '0.5rem' }}
+								>
+									Postcode
+								</label>
 								<input
 									id="billing_postcode"
 									type="text"
 									value={billingAddress.postcode}
-									onChange={(e) => setBillingAddress(prev => ({ ...prev, postcode: e.target.value }))}
-									style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+									onChange={(e) =>
+										setBillingAddress((prev) => ({
+											...prev,
+											postcode: e.target.value,
+										}))
+									}
+									style={{
+										width: '100%',
+										padding: '0.5rem',
+										border: '1px solid #ccc',
+										borderRadius: '4px',
+									}}
 								/>
 							</div>
 							<div>
-								<label htmlFor="billing_country" style={{ display: 'block', marginBottom: '0.5rem' }}>Country</label>
+								<label
+									htmlFor="billing_country"
+									style={{ display: 'block', marginBottom: '0.5rem' }}
+								>
+									Country
+								</label>
 								<input
 									id="billing_country"
 									type="text"
 									value={billingAddress.country}
-									onChange={(e) => setBillingAddress(prev => ({ ...prev, country: e.target.value }))}
-									style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+									onChange={(e) =>
+										setBillingAddress((prev) => ({
+											...prev,
+											country: e.target.value,
+										}))
+									}
+									style={{
+										width: '100%',
+										padding: '0.5rem',
+										border: '1px solid #ccc',
+										borderRadius: '4px',
+									}}
 								/>
 							</div>
 						</div>
 
 						{/* Shipping Address */}
-						<div style={{ marginTop: '2rem', padding: '1rem', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-							<label style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+						<div
+							style={{
+								marginTop: '2rem',
+								padding: '1rem',
+								backgroundColor: '#f8f9fa',
+								borderRadius: '4px',
+							}}
+						>
+							<label
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									marginBottom: '1rem',
+								}}
+							>
 								<input
 									type="checkbox"
 									checked={sameAsShipping}
@@ -603,113 +804,252 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 								<>
 									<h3>Shipping Address</h3>
 									<div style={{ marginBottom: '1rem' }}>
-										<label htmlFor="shipping_address_label" style={{ display: 'block', marginBottom: '0.5rem' }}>
+										<label
+											htmlFor="shipping_address_label"
+											style={{ display: 'block', marginBottom: '0.5rem' }}
+										>
 											Address Label (e.g., Warehouse)
 										</label>
 										<input
 											id="shipping_address_label"
 											type="text"
 											value={shippingAddress.address_label}
-											onChange={(e) => setShippingAddress(prev => ({ ...prev, address_label: e.target.value }))}
-											style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+											onChange={(e) =>
+												setShippingAddress((prev) => ({
+													...prev,
+													address_label: e.target.value,
+												}))
+											}
+											style={{
+												width: '100%',
+												padding: '0.5rem',
+												border: '1px solid #ccc',
+												borderRadius: '4px',
+											}}
 										/>
 									</div>
 
 									<div style={{ marginBottom: '1rem' }}>
-										<label htmlFor="shipping_address_line1" style={{ display: 'block', marginBottom: '0.5rem' }}>
+										<label
+											htmlFor="shipping_address_line1"
+											style={{ display: 'block', marginBottom: '0.5rem' }}
+										>
 											Address Line 1 *
 										</label>
 										<input
 											id="shipping_address_line1"
 											type="text"
 											value={shippingAddress.address_line1}
-											onChange={(e) => setShippingAddress(prev => ({ ...prev, address_line1: e.target.value }))}
+											onChange={(e) =>
+												setShippingAddress((prev) => ({
+													...prev,
+													address_line1: e.target.value,
+												}))
+											}
 											required={!sameAsShipping}
-											style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+											style={{
+												width: '100%',
+												padding: '0.5rem',
+												border: '1px solid #ccc',
+												borderRadius: '4px',
+											}}
 										/>
 									</div>
 
 									<div style={{ marginBottom: '1rem' }}>
-										<label htmlFor="shipping_address_line2" style={{ display: 'block', marginBottom: '0.5rem' }}>
+										<label
+											htmlFor="shipping_address_line2"
+											style={{ display: 'block', marginBottom: '0.5rem' }}
+										>
 											Address Line 2
 										</label>
 										<input
 											id="shipping_address_line2"
 											type="text"
 											value={shippingAddress.address_line2}
-											onChange={(e) => setShippingAddress(prev => ({ ...prev, address_line2: e.target.value }))}
-											style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+											onChange={(e) =>
+												setShippingAddress((prev) => ({
+													...prev,
+													address_line2: e.target.value,
+												}))
+											}
+											style={{
+												width: '100%',
+												padding: '0.5rem',
+												border: '1px solid #ccc',
+												borderRadius: '4px',
+											}}
 										/>
 									</div>
 
 									<div style={{ marginBottom: '1rem' }}>
-										<label htmlFor="shipping_address_line3" style={{ display: 'block', marginBottom: '0.5rem' }}>
+										<label
+											htmlFor="shipping_address_line3"
+											style={{ display: 'block', marginBottom: '0.5rem' }}
+										>
 											Address Line 3
 										</label>
 										<input
 											id="shipping_address_line3"
 											type="text"
 											value={shippingAddress.address_line3}
-											onChange={(e) => setShippingAddress(prev => ({ ...prev, address_line3: e.target.value }))}
-											style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+											onChange={(e) =>
+												setShippingAddress((prev) => ({
+													...prev,
+													address_line3: e.target.value,
+												}))
+											}
+											style={{
+												width: '100%',
+												padding: '0.5rem',
+												border: '1px solid #ccc',
+												borderRadius: '4px',
+											}}
 										/>
 									</div>
 
 									<div style={{ marginBottom: '1rem' }}>
-										<label htmlFor="shipping_address_line4" style={{ display: 'block', marginBottom: '0.5rem' }}>
+										<label
+											htmlFor="shipping_address_line4"
+											style={{ display: 'block', marginBottom: '0.5rem' }}
+										>
 											Address Line 4
 										</label>
 										<input
 											id="shipping_address_line4"
 											type="text"
 											value={shippingAddress.address_line4}
-											onChange={(e) => setShippingAddress(prev => ({ ...prev, address_line4: e.target.value }))}
-											style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+											onChange={(e) =>
+												setShippingAddress((prev) => ({
+													...prev,
+													address_line4: e.target.value,
+												}))
+											}
+											style={{
+												width: '100%',
+												padding: '0.5rem',
+												border: '1px solid #ccc',
+												borderRadius: '4px',
+											}}
 										/>
 									</div>
 
-									<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+									<div
+										style={{
+											display: 'grid',
+											gridTemplateColumns: '1fr 1fr',
+											gap: '1rem',
+											marginBottom: '1rem',
+										}}
+									>
 										<div>
-											<label htmlFor="shipping_city" style={{ display: 'block', marginBottom: '0.5rem' }}>City</label>
+											<label
+												htmlFor="shipping_city"
+												style={{ display: 'block', marginBottom: '0.5rem' }}
+											>
+												City
+											</label>
 											<input
 												id="shipping_city"
 												type="text"
 												value={shippingAddress.city}
-												onChange={(e) => setShippingAddress(prev => ({ ...prev, city: e.target.value }))}
-												style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+												onChange={(e) =>
+													setShippingAddress((prev) => ({
+														...prev,
+														city: e.target.value,
+													}))
+												}
+												style={{
+													width: '100%',
+													padding: '0.5rem',
+													border: '1px solid #ccc',
+													borderRadius: '4px',
+												}}
 											/>
 										</div>
 										<div>
-											<label htmlFor="shipping_state" style={{ display: 'block', marginBottom: '0.5rem' }}>State</label>
+											<label
+												htmlFor="shipping_state"
+												style={{ display: 'block', marginBottom: '0.5rem' }}
+											>
+												State
+											</label>
 											<input
 												id="shipping_state"
 												type="text"
 												value={shippingAddress.state}
-												onChange={(e) => setShippingAddress(prev => ({ ...prev, state: e.target.value }))}
-												style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+												onChange={(e) =>
+													setShippingAddress((prev) => ({
+														...prev,
+														state: e.target.value,
+													}))
+												}
+												style={{
+													width: '100%',
+													padding: '0.5rem',
+													border: '1px solid #ccc',
+													borderRadius: '4px',
+												}}
 											/>
 										</div>
 									</div>
 
-									<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+									<div
+										style={{
+											display: 'grid',
+											gridTemplateColumns: '1fr 1fr',
+											gap: '1rem',
+											marginBottom: '1rem',
+										}}
+									>
 										<div>
-											<label htmlFor="shipping_postcode" style={{ display: 'block', marginBottom: '0.5rem' }}>Postcode</label>
+											<label
+												htmlFor="shipping_postcode"
+												style={{ display: 'block', marginBottom: '0.5rem' }}
+											>
+												Postcode
+											</label>
 											<input
 												id="shipping_postcode"
 												type="text"
 												value={shippingAddress.postcode}
-												onChange={(e) => setShippingAddress(prev => ({ ...prev, postcode: e.target.value }))}
-												style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+												onChange={(e) =>
+													setShippingAddress((prev) => ({
+														...prev,
+														postcode: e.target.value,
+													}))
+												}
+												style={{
+													width: '100%',
+													padding: '0.5rem',
+													border: '1px solid #ccc',
+													borderRadius: '4px',
+												}}
 											/>
 										</div>
 										<div>
-											<label htmlFor="shipping_country" style={{ display: 'block', marginBottom: '0.5rem' }}>Country</label>
+											<label
+												htmlFor="shipping_country"
+												style={{ display: 'block', marginBottom: '0.5rem' }}
+											>
+												Country
+											</label>
 											<input
 												id="shipping_country"
 												type="text"
 												value={shippingAddress.country}
-												onChange={(e) => setShippingAddress(prev => ({ ...prev, country: e.target.value }))}
-												style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+												onChange={(e) =>
+													setShippingAddress((prev) => ({
+														...prev,
+														country: e.target.value,
+													}))
+												}
+												style={{
+													width: '100%',
+													padding: '0.5rem',
+													border: '1px solid #ccc',
+													borderRadius: '4px',
+												}}
 											/>
 										</div>
 									</div>
@@ -743,7 +1083,13 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 							cursor: isPending ? 'not-allowed' : 'pointer',
 						}}
 					>
-						{isPending ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update Customer' : 'Create Customer')}
+						{isPending
+							? isEditMode
+								? 'Updating...'
+								: 'Creating...'
+							: isEditMode
+								? 'Update Customer'
+								: 'Create Customer'}
 					</button>
 
 					<button

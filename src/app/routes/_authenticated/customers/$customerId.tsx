@@ -1,5 +1,9 @@
 import { ShowCustomer } from '@/app/features/customers/ShowCustomer'
-import { createFileRoute, Outlet, useChildMatches } from '@tanstack/react-router'
+import {
+	Outlet,
+	createFileRoute,
+	useChildMatches,
+} from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/customers/$customerId')({
 	component: ShowCustomerPage,
