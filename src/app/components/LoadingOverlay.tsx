@@ -1,3 +1,4 @@
+//src/app/components/LoadingOverlay.tsx
 import { useEffect, useRef, useState } from 'react'
 
 interface LoadingOverlayProps {

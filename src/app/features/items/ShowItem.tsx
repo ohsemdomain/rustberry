@@ -1,3 +1,4 @@
+//src/app/features/items/ShowItem.tsx
 import { useAuth } from '@/app/AuthProvider'
 import { LoadingOverlay } from '@/app/components/LoadingOverlay'
 import { trpc } from '@/app/trpc'

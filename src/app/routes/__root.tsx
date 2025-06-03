@@ -1,3 +1,4 @@
+//src/app/routes/__root.tsx
 import { useAuth } from '@/app/AuthProvider'
 import type { ResourceType } from '@/shared/types'
 import { Link, Outlet, createRootRoute } from '@tanstack/react-router'
