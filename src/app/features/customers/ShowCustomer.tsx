@@ -1,4 +1,5 @@
 import { useAuth } from '@/app/AuthProvider'
+import { LoadingOverlay } from '@/app/components/LoadingOverlay'
 import { trpc } from '@/app/trpc'
 import { formatDateTime } from '@/app/utils/date'
 import { Link, useNavigate } from '@tanstack/react-router'
@@ -16,11 +17,8 @@ export function ShowCustomer({ customerId }: ShowCustomerProps) {
 		error,
 	} = trpc.customers.getById.useQuery(customerId)
 
-	if (isLoading) return <div style={{ padding: '1rem' }}>Loading...</div>
-	if (error)
-		return <div style={{ padding: '1rem' }}>Error: {error.message}</div>
-	if (!customer)
-		return <div style={{ padding: '1rem' }}>Customer not found</div>
+	if (error) return <div>Error: {error.message}</div>
+	if (!isLoading && !customer) return <div>Customer not found</div>
 
 	return (
 		<div>
@@ -31,7 +29,7 @@ export function ShowCustomer({ customerId }: ShowCustomerProps) {
 						<Link to="/customers">← Back</Link>
 					</div>
 					<div>
-						{hasPermission('customers', 'update-any') && (
+						{hasPermission('customers', 'update-any') && customer && (
 							<button
 								className="button-gray"
 								type="button"
@@ -51,7 +49,9 @@ export function ShowCustomer({ customerId }: ShowCustomerProps) {
 
 			<div className="content-body">
 				<div className="scroll-container">
-					<div className="detail-content">
+					<LoadingOverlay isLoading={isLoading} />
+					{customer && (
+						<div className="detail-content">
 						<div>
 							<p>
 								<strong>ID:</strong> {customer.id}
@@ -179,18 +179,19 @@ export function ShowCustomer({ customerId }: ShowCustomerProps) {
 								<strong>Created:</strong> {formatDateTime(customer.created_at)}
 							</p>
 							<p>
-								<strong>Created by:</strong> user-id
+								<strong>Created by:</strong> {customer.created_by}
 							</p>
 							<p>
 								<strong>Updated:</strong> {formatDateTime(customer.updated_at)}
 							</p>
 							<p>
-								<strong>Updated by:</strong> user-id
+								<strong>Updated by:</strong> {customer.updated_by}
 							</p>
 						</div>
 					</div>
-				</div>
+				)}
 			</div>
 		</div>
-	)
+	</div>
+)
 }
