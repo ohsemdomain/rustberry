@@ -13,7 +13,7 @@ export function ItemsList() {
 	const [displayedCount, setDisplayedCount] = useState(20) // How many items to show
 
 	// Load ALL items for the current status filter
-	const { data, isLoading, error, isFetching } = trpc.items.listAll.useQuery({
+	const { data, isLoading, error, } = trpc.items.listAll.useQuery({
 		status,
 	})
 
@@ -113,7 +113,7 @@ export function ItemsList() {
 				</div>
 
 				<div className="fetch-container">
-					{(isLoading || isFetching) && (
+					{(isLoading) && (
 						<LoadingOverlay
 							isLoading={true}
 						/>
