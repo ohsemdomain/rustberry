@@ -102,8 +102,9 @@ export const itemsRouter = router({
 				params.push(status)
 			}
 
-			// Order by created_at (newest first)
-			query += ' ORDER BY created_at DESC'
+			// Order by latest activity (newest updates or creates first)
+			// In SQLite/D1, we use CASE to get the maximum of two values
+			query += ' ORDER BY CASE WHEN updated_at > created_at THEN updated_at ELSE created_at END DESC'
 
 			try {
 				// Get ALL items for the current status filter

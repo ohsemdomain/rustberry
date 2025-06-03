@@ -17,6 +17,7 @@ interface ItemFormProps {
 export function ItemForm({ itemId }: ItemFormProps) {
 	const isEditMode = !!itemId
 	const navigate = useNavigate()
+	const utils = trpc.useUtils()
 	const [formData, setFormData] = useState({
 		item_name: '',
 		item_category: ItemCategory.PACKAGING,
@@ -44,7 +45,9 @@ export function ItemForm({ itemId }: ItemFormProps) {
 	}, [item, isEditMode])
 
 	const createMutation = trpc.items.create.useMutation({
-		onSuccess: () => {
+		onSuccess: async () => {
+			// Invalidate items list to show the new item
+			await utils.items.listAll.invalidate()
 			navigate({ to: '/items' })
 		},
 		onError: (error) => {
@@ -53,7 +56,9 @@ export function ItemForm({ itemId }: ItemFormProps) {
 	})
 
 	const updateMutation = trpc.items.update.useMutation({
-		onSuccess: () => {
+		onSuccess: async () => {
+			// Invalidate items list to show the updated item at top
+			await utils.items.listAll.invalidate()
 			navigate({ to: '/items' })
 		},
 		onError: (error) => {
