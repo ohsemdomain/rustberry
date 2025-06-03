@@ -101,116 +101,118 @@ export function ItemForm({ itemId }: ItemFormProps) {
 			</div>
 
 			<div className="content-body">
-				<div className="form-container">
-					<form onSubmit={handleSubmit}>
-						<div className="form-row">
-							<label htmlFor="item_name">Item Name *</label>
-							<input
-								type="text"
-								id="item_name"
-								value={formData.item_name}
-								onChange={(e) =>
-									setFormData((prev) => ({
-										...prev,
-										item_name: e.target.value,
-									}))
-								}
-								required
-							/>
-						</div>
-
-						<div className="form-row">
-							<label htmlFor="item_category">Category *</label>
-							<select
-								className="custom-select"
-								id="item_category"
-								value={formData.item_category}
-								onChange={(e) =>
-									setFormData((prev) => ({
-										...prev,
-										item_category: Number(e.target.value) as ItemCategory,
-									}))
-								}
-								required
-							>
-								<option value={ItemCategory.PACKAGING}>Packaging</option>
-								<option value={ItemCategory.LABEL}>Label</option>
-								<option value={ItemCategory.OTHER}>Other</option>
-							</select>
-						</div>
-
-						<div className="form-row">
-							<label htmlFor="item_price">Price (RM) *</label>
-							<input
-								type="text"
-								id="item_price"
-								value={formData.item_price_display}
-								onChange={handlePriceChange}
-								placeholder="25.00"
-								required
-							/>
-						</div>
-
-						<div className="form-row textarea-row">
-							<label htmlFor="item_description">Description</label>
-							<textarea
-								id="item_description"
-								value={formData.item_description}
-								onChange={(e) =>
-									setFormData((prev) => ({
-										...prev,
-										item_description: e.target.value,
-									}))
-								}
-								rows={3}
-							/>
-						</div>
-
-						{/* Status field only shown in edit mode */}
-						{isEditMode && (
+				<div className="fetch-container">
+					<div className="form-container">
+						<form onSubmit={handleSubmit}>
 							<div className="form-row">
-								<label htmlFor="item_status">Status</label>
-								<select
-									className="custom-select"
-									id="item_status"
-									value={formData.item_status}
+								<label htmlFor="item_name">Item Name *</label>
+								<input
+									type="text"
+									id="item_name"
+									value={formData.item_name}
 									onChange={(e) =>
 										setFormData((prev) => ({
 											...prev,
-											item_status: Number(e.target.value) as ItemStatus,
+											item_name: e.target.value,
 										}))
 									}
+									required
+								/>
+							</div>
+
+							<div className="form-row">
+								<label htmlFor="item_category">Category *</label>
+								<select
+									className="custom-select"
+									id="item_category"
+									value={formData.item_category}
+									onChange={(e) =>
+										setFormData((prev) => ({
+											...prev,
+											item_category: Number(e.target.value) as ItemCategory,
+										}))
+									}
+									required
 								>
-									<option value={ItemStatus.ACTIVE}>Active</option>
-									<option value={ItemStatus.INACTIVE}>Inactive</option>
+									<option value={ItemCategory.PACKAGING}>Packaging</option>
+									<option value={ItemCategory.LABEL}>Label</option>
+									<option value={ItemCategory.OTHER}>Other</option>
 								</select>
 							</div>
-						)}
 
-						<div className="form-actions">
-							<button
-								className="button-blue"
-								type="submit"
-								disabled={isPending}
-							>
-								{isPending
-									? isEditMode
-										? 'Updating...'
-										: 'Creating...'
-									: isEditMode
-										? 'Update Item'
-										: 'Create Item'}
-							</button>
+							<div className="form-row">
+								<label htmlFor="item_price">Price (RM) *</label>
+								<input
+									type="text"
+									id="item_price"
+									value={formData.item_price_display}
+									onChange={handlePriceChange}
+									placeholder="25.00"
+									required
+								/>
+							</div>
 
-							<button
-								className="button-gray"
-								type="button"
-								onClick={() => navigate({ to: '/items' })}
-							>
-								Cancel
-							</button>
-						</div>
-					</form>
+							<div className="form-row textarea-row">
+								<label htmlFor="item_description">Description</label>
+								<textarea
+									id="item_description"
+									value={formData.item_description}
+									onChange={(e) =>
+										setFormData((prev) => ({
+											...prev,
+											item_description: e.target.value,
+										}))
+									}
+									rows={3}
+								/>
+							</div>
+
+							{/* Status field only shown in edit mode */}
+							{isEditMode && (
+								<div className="form-row">
+									<label htmlFor="item_status">Status</label>
+									<select
+										className="custom-select"
+										id="item_status"
+										value={formData.item_status}
+										onChange={(e) =>
+											setFormData((prev) => ({
+												...prev,
+												item_status: Number(e.target.value) as ItemStatus,
+											}))
+										}
+									>
+										<option value={ItemStatus.ACTIVE}>Active</option>
+										<option value={ItemStatus.INACTIVE}>Inactive</option>
+									</select>
+								</div>
+							)}
+
+							<div className="form-actions">
+								<button
+									className="button-blue"
+									type="submit"
+									disabled={isPending}
+								>
+									{isPending
+										? isEditMode
+											? 'Updating...'
+											: 'Creating...'
+										: isEditMode
+											? 'Update Item'
+											: 'Create Item'}
+								</button>
+
+								<button
+									className="button-gray"
+									type="button"
+									onClick={() => navigate({ to: '/items' })}
+								>
+									Cancel
+								</button>
+							</div>
+						</form>
+					</div>
 				</div>
 			</div>
 		</div>

@@ -62,42 +62,45 @@ export function ShowItem({ itemId }: ShowItemProps) {
 			</div>
 
 			<div className="content-body">
-				<div className="show-container-1">
-					<div className="show-container-item-1">
-						<div>
-							<p>
-								<strong>ID:</strong> {item.id}
-							</p>
-							<p>
-								<strong>Name:</strong> {item.item_name}
-							</p>
-							<p>
-								<strong>Category:</strong> {getCategoryName(item.item_category)}
-							</p>
-							<p>
-								<strong>Price:</strong> {formatPrice(item.item_price_cents)}
-							</p>
-							<p>
-								<strong>Description:</strong>{' '}
-								{item.item_description || 'No description provided'}
-							</p>
-							<p>
-								<strong>Status:</strong> {getStatusName(item.item_status)}
-							</p>
-						</div>
-						<div className="light-text">
-							<p>
-								<strong>Created:</strong> {formatDateTime(item.created_at)}
-							</p>
-							<p>
-								<strong>Created by:</strong> {item.created_by}
-							</p>
-							<p>
-								<strong>Updated:</strong> {formatDateTime(item.updated_at)}
-							</p>
-							<p>
-								<strong>Updated by:</strong> {item.updated_by}
-							</p>
+				<div className="fetch-container">
+					<div className="show-container-1">
+						<div className="show-container-item-1">
+							<div>
+								<p>
+									<strong>ID:</strong> {item.id}
+								</p>
+								<p>
+									<strong>Name:</strong> {item.item_name}
+								</p>
+								<p>
+									<strong>Category:</strong>{' '}
+									{getCategoryName(item.item_category)}
+								</p>
+								<p>
+									<strong>Price:</strong> {formatPrice(item.item_price_cents)}
+								</p>
+								<p>
+									<strong>Description:</strong>{' '}
+									{item.item_description || 'No description provided'}
+								</p>
+								<p>
+									<strong>Status:</strong> {getStatusName(item.item_status)}
+								</p>
+							</div>
+							<div className="light-text">
+								<p>
+									<strong>Created:</strong> {formatDateTime(item.created_at)}
+								</p>
+								<p>
+									<strong>Created by:</strong> {item.created_by}
+								</p>
+								<p>
+									<strong>Updated:</strong> {formatDateTime(item.updated_at)}
+								</p>
+								<p>
+									<strong>Updated by:</strong> {item.updated_by}
+								</p>
+							</div>
 						</div>
 					</div>
 				</div>
