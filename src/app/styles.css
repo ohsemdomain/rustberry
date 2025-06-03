@@ -353,3 +353,145 @@ table {
 	width: 100%;
 	border: 1px solid #ddd;
 }
+
+/* Contact Cards Section */
+.contact-cards-section {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1.5rem;
+	padding: 2rem 3rem;
+	background-color: #f8f9fa;
+	border-bottom: 1px solid #eeeeee;
+	position: sticky;
+	top: 0;
+	z-index: 10;
+}
+
+.contact-card {
+	background-color: white;
+	border: 1px solid #e5e7eb;
+	border-radius: 12px;
+	padding: 2rem;
+	display: flex;
+	gap: 1.5rem;
+	align-items: flex-start;
+	transition: all 0.2s ease;
+}
+
+.primary-card {
+	background-color: white;
+}
+
+.contact-card-icon {
+	width: 48px;
+	height: 48px;
+	background-color: #eaf0ff;
+	border-radius: 10px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	color: #3155b9;
+}
+
+.contact-card-content {
+	flex: 1;
+}
+
+.contact-card-title {
+	font-size: 14px;
+	font-weight: 600;
+	color: #6b7280;
+	margin: 0 0 0.75rem 0;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.contact-card-phone {
+	font-size: 18px;
+	font-weight: 600;
+	color: #111827;
+	margin: 0 0 0.25rem 0;
+}
+
+.contact-card-label {
+	font-size: 14px;
+	color: #6b7280;
+	margin: 0 0 1rem 0;
+}
+
+.contact-card-empty {
+	font-size: 14px;
+	color: #9ca3af;
+	font-style: italic;
+	margin: 0;
+}
+
+.contact-card-actions {
+	margin-top: 1rem;
+}
+
+.contact-card-link {
+	color: #3b82f6;
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.contact-card-link:hover {
+	color: #2563eb;
+}
+
+/* Add Contact Card */
+.add-contact-card {
+	border: 2px dashed #e5e7eb;
+	background-color: #fafafa;
+	cursor: pointer;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-height: 140px;
+	text-align: center;
+	gap: 0.75rem;
+	padding: 2rem;
+	min-width: unset;
+}
+
+.add-contact-icon {
+	width: 60px;
+	height: 60px;
+	background-color: #e5e7eb;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #6b7280;
+	transition: all 0.2s ease;
+}
+
+.add-contact-card:hover .add-contact-icon {
+	background-color: #d1d5db;
+	color: #4b5563;
+}
+
+.add-contact-text {
+	font-size: 14px;
+	font-weight: 500;
+	color: #6b7280;
+	margin: 0;
+	text-transform: none;
+}
+
+/* Contact List Header */
+.contact-list-header {
+	padding: 1.5rem 3rem 1rem;
+	background-color: white;
+	border-bottom: 1px solid #f3f4f6;
+}
+
+.contact-list-header h3 {
+	margin: 0;
+	font-size: 16px;
+	font-weight: 600;
+	color: #374151;
+}
