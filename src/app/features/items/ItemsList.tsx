@@ -80,7 +80,6 @@ export function ItemsList() {
 			</div>
 
 			<div className="content-body">
-				{/* Filters */}
 				<div className="content-actions">
 					<input
 						className="search-input"

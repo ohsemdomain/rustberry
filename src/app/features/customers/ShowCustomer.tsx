@@ -22,14 +22,6 @@ export function ShowCustomer({ customerId }: ShowCustomerProps) {
 	if (!customer)
 		return <div style={{ padding: '1rem' }}>Customer not found</div>
 
-	const getStatusColor = (status: number) => {
-		return status === 1 ? 'green' : 'red'
-	}
-
-	const getStatusName = (status: number) => {
-		return status === 1 ? 'Active' : 'Inactive'
-	}
-
 	return (
 		<div style={{ padding: '1rem', maxWidth: '800px' }}>
 			{/* Header */}
@@ -37,10 +29,7 @@ export function ShowCustomer({ customerId }: ShowCustomerProps) {
 				style={{
 					display: 'flex',
 					justifyContent: 'space-between',
-					alignItems: 'center',
 					marginBottom: '2rem',
-					borderBottom: '1px solid #ddd',
-					paddingBottom: '1rem',
 				}}
 			>
 				<h1>Customer Details</h1>
@@ -49,260 +38,73 @@ export function ShowCustomer({ customerId }: ShowCustomerProps) {
 						<Link
 							to="/customers/$customerId/edit"
 							params={{ customerId: customer.id }}
-							style={{
-								backgroundColor: '#007bff',
-								color: 'white',
-								padding: '0.5rem 1rem',
-								textDecoration: 'none',
-								borderRadius: '4px',
-							}}
 						>
 							Edit Customer
 						</Link>
 					)}
-					<button
-						type="button"
-						onClick={() => navigate({ to: '/customers' })}
-						style={{
-							backgroundColor: '#6c757d',
-							color: 'white',
-							padding: '0.5rem 1rem',
-							border: 'none',
-							borderRadius: '4px',
-							cursor: 'pointer',
-						}}
-					>
+					<button type='button' onClick={() => navigate({ to: '/customers' })}>
 						Back to Customers
 					</button>
 				</div>
 			</div>
 
 			{/* Customer Info */}
-			<div style={{ display: 'grid', gap: '1.5rem' }}>
-				{/* ID */}
+			<div style={{ lineHeight: '1.8' }}>
 				<div>
-					<div
-						style={{
-							display: 'block',
-							fontWeight: 'bold',
-							marginBottom: '0.5rem',
-							color: '#555',
-						}}
-					>
-						Customer ID
-					</div>
-					<div
-						style={{
-							padding: '0.75rem',
-							backgroundColor: '#f8f9fa',
-							border: '1px solid #e9ecef',
-							borderRadius: '4px',
-							fontFamily: 'monospace',
-						}}
-					>
-						{customer.id}
-					</div>
+					<strong>Customer ID:</strong> {customer.id}
 				</div>
-
-				{/* Name */}
 				<div>
-					<div
-						style={{
-							display: 'block',
-							fontWeight: 'bold',
-							marginBottom: '0.5rem',
-							color: '#555',
-						}}
-					>
-						Customer Name
-					</div>
-					<div
-						style={{
-							padding: '0.75rem',
-							backgroundColor: '#f8f9fa',
-							border: '1px solid #e9ecef',
-							borderRadius: '4px',
-						}}
-					>
-						{customer.customer_name}
-					</div>
+					<strong>Customer Name:</strong> {customer.customer_name}
 				</div>
-
-				{/* Email */}
 				<div>
-					<div
-						style={{
-							display: 'block',
-							fontWeight: 'bold',
-							marginBottom: '0.5rem',
-							color: '#555',
-						}}
-					>
-						Email
-					</div>
-					<div
-						style={{
-							padding: '0.75rem',
-							backgroundColor: '#f8f9fa',
-							border: '1px solid #e9ecef',
-							borderRadius: '4px',
-						}}
-					>
-						{customer.customer_email || 'No email provided'}
-					</div>
+					<strong>Email:</strong>{' '}
+					{customer.customer_email || 'No email provided'}
 				</div>
-
-				{/* Status */}
 				<div>
-					<div
-						style={{
-							display: 'block',
-							fontWeight: 'bold',
-							marginBottom: '0.5rem',
-							color: '#555',
-						}}
-					>
-						Status
-					</div>
-					<div
-						style={{
-							padding: '0.75rem',
-							backgroundColor: '#f8f9fa',
-							border: '1px solid #e9ecef',
-							borderRadius: '4px',
-						}}
-					>
-						<span
-							style={{
-								color: getStatusColor(customer.status),
-								fontWeight: 'bold',
-							}}
-						>
-							{getStatusName(customer.status)}
-						</span>
-					</div>
+					<strong>Status:</strong>{' '}
+					<span style={{ color: customer.status === 1 ? 'green' : 'red' }}>
+						{customer.status === 1 ? 'Active' : 'Inactive'}
+					</span>
 				</div>
 
 				{/* Phone Contacts */}
-				<div>
-					<div
-						style={{
-							display: 'block',
-							fontWeight: 'bold',
-							marginBottom: '0.5rem',
-							color: '#555',
-						}}
-					>
-						Phone Contacts
-					</div>
+				<div style={{ marginTop: '1rem' }}>
+					<strong>Phone Contacts:</strong>
 					{customer.contacts && customer.contacts.length > 0 ? (
-						<div
-							style={{
-								border: '1px solid #e9ecef',
-								borderRadius: '4px',
-								overflow: 'hidden',
-							}}
-						>
+						<div>
 							{customer.contacts.map((contact) => (
-								<div
-									key={contact.id}
-									style={{
-										padding: '0.75rem',
-										backgroundColor: '#f8f9fa',
-										borderBottom: '1px solid #e9ecef',
-										display: 'flex',
-										justifyContent: 'space-between',
-										alignItems: 'center',
-									}}
-								>
-									<div>
-										<strong>{contact.phone_number}</strong>
-										{contact.phone_label && (
-											<span style={{ marginLeft: '1rem', color: '#666' }}>
-												({contact.phone_label})
-											</span>
-										)}
-									</div>
-									{contact.is_primary === 1 && (
-										<span
-											style={{
-												backgroundColor: '#28a745',
-												color: 'white',
-												padding: '0.25rem 0.5rem',
-												borderRadius: '4px',
-												fontSize: '0.85rem',
-											}}
-										>
-											Primary
-										</span>
-									)}
+								<div key={contact.id} style={{ marginLeft: '1rem' }}>
+									{contact.phone_number}
+									{contact.phone_label && ` (${contact.phone_label})`}
+									{contact.is_primary === 1 && <strong> Primary</strong>}
 								</div>
 							))}
 						</div>
 					) : (
-						<div
-							style={{
-								padding: '0.75rem',
-								backgroundColor: '#f8f9fa',
-								border: '1px solid #e9ecef',
-								borderRadius: '4px',
-								color: '#666',
-							}}
-						>
-							No phone contacts
-						</div>
+						<span> No phone contacts</span>
 					)}
 				</div>
 
 				{/* Addresses */}
-				<div>
-					<div
-						style={{
-							display: 'block',
-							fontWeight: 'bold',
-							marginBottom: '0.5rem',
-							color: '#555',
-						}}
-					>
-						Addresses
-					</div>
-					{customer.addresses && customer.addresses.length > 0 ? (
-						<div style={{ display: 'grid', gap: '1rem' }}>
-							{/* Billing addresses */}
-							<div>
-								<h4 style={{ marginBottom: '0.5rem' }}>Billing Addresses</h4>
+				{customer.addresses && customer.addresses.length > 0 && (
+					<div style={{ marginTop: '1rem' }}>
+						{/* Billing addresses */}
+						{customer.addresses.filter(
+							(addr) => addr.address_type === 'billing',
+						).length > 0 && (
+							<div style={{ marginBottom: '1rem' }}>
+								<strong>Billing Addresses:</strong>
 								{customer.addresses
 									.filter((addr) => addr.address_type === 'billing')
 									.map((address) => (
 										<div
 											key={address.id}
-											style={{
-												padding: '0.75rem',
-												backgroundColor: '#f8f9fa',
-												border: '1px solid #e9ecef',
-												borderRadius: '4px',
-												marginBottom: '0.5rem',
-											}}
+											style={{ marginLeft: '1rem', marginTop: '0.5rem' }}
 										>
 											{address.address_label && (
-												<div
-													style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}
-												>
-													{address.address_label}
-													{address.is_default === 1 && (
-														<span
-															style={{
-																marginLeft: '0.5rem',
-																backgroundColor: '#007bff',
-																color: 'white',
-																padding: '0.15rem 0.5rem',
-																borderRadius: '4px',
-																fontSize: '0.8rem',
-															}}
-														>
-															Default
-														</span>
-													)}
+												<div>
+													<strong>{address.address_label}</strong>{' '}
+													{address.is_default === 1 && '(Default)'}
 												</div>
 											)}
 											{address.address_line1 && (
@@ -326,42 +128,25 @@ export function ShowCustomer({ customerId }: ShowCustomerProps) {
 										</div>
 									))}
 							</div>
+						)}
 
-							{/* Shipping addresses */}
+						{/* Shipping addresses */}
+						{customer.addresses.filter(
+							(addr) => addr.address_type === 'shipping',
+						).length > 0 && (
 							<div>
-								<h4 style={{ marginBottom: '0.5rem' }}>Shipping Addresses</h4>
+								<strong>Shipping Addresses:</strong>
 								{customer.addresses
 									.filter((addr) => addr.address_type === 'shipping')
 									.map((address) => (
 										<div
 											key={address.id}
-											style={{
-												padding: '0.75rem',
-												backgroundColor: '#f8f9fa',
-												border: '1px solid #e9ecef',
-												borderRadius: '4px',
-												marginBottom: '0.5rem',
-											}}
+											style={{ marginLeft: '1rem', marginTop: '0.5rem' }}
 										>
 											{address.address_label && (
-												<div
-													style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}
-												>
-													{address.address_label}
-													{address.is_default === 1 && (
-														<span
-															style={{
-																marginLeft: '0.5rem',
-																backgroundColor: '#007bff',
-																color: 'white',
-																padding: '0.15rem 0.5rem',
-																borderRadius: '4px',
-																fontSize: '0.8rem',
-															}}
-														>
-															Default
-														</span>
-													)}
+												<div>
+													<strong>{address.address_label}</strong>{' '}
+													{address.is_default === 1 && '(Default)'}
 												</div>
 											)}
 											{address.address_line1 && (
@@ -385,73 +170,22 @@ export function ShowCustomer({ customerId }: ShowCustomerProps) {
 										</div>
 									))}
 							</div>
-						</div>
-					) : (
-						<div
-							style={{
-								padding: '0.75rem',
-								backgroundColor: '#f8f9fa',
-								border: '1px solid #e9ecef',
-								borderRadius: '4px',
-								color: '#666',
-							}}
-						>
-							No addresses
-						</div>
-					)}
-				</div>
+						)}
+					</div>
+				)}
 
 				{/* Metadata */}
 				<div
 					style={{
-						borderTop: '1px solid #ddd',
+						marginTop: '2rem',
 						paddingTop: '1rem',
-						marginTop: '1rem',
+						borderTop: '1px solid #ddd',
+						fontSize: '0.9rem',
+						color: '#666',
 					}}
 				>
-					<h3 style={{ marginBottom: '1rem', color: '#666' }}>
-						Customer Information
-					</h3>
-					<div
-						style={{
-							display: 'grid',
-							gridTemplateColumns: '1fr 1fr',
-							gap: '1rem',
-						}}
-					>
-						<div>
-							<div
-								style={{
-									display: 'block',
-									fontWeight: 'bold',
-									marginBottom: '0.25rem',
-									color: '#666',
-									fontSize: '0.9rem',
-								}}
-							>
-								Created At
-							</div>
-							<div style={{ fontSize: '0.9rem', color: '#666' }}>
-								{formatDateTime(customer.created_at)}
-							</div>
-						</div>
-						<div>
-							<div
-								style={{
-									display: 'block',
-									fontWeight: 'bold',
-									marginBottom: '0.25rem',
-									color: '#666',
-									fontSize: '0.9rem',
-								}}
-							>
-								Last Updated
-							</div>
-							<div style={{ fontSize: '0.9rem', color: '#666' }}>
-								{formatDateTime(customer.updated_at)}
-							</div>
-						</div>
-					</div>
+					<div>Created: {formatDateTime(customer.created_at)}</div>
+					<div>Updated: {formatDateTime(customer.updated_at)}</div>
 				</div>
 			</div>
 		</div>
