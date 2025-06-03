@@ -44,6 +44,7 @@ export function ShowItem({ itemId }: ShowItemProps) {
 					<div>
 						{hasPermission('items', 'update-any') && (
 							<button
+								className="button-gray"
 								type="button"
 								onClick={() =>
 									navigate({
@@ -60,37 +61,39 @@ export function ShowItem({ itemId }: ShowItemProps) {
 			</div>
 
 			<div className="content-body">
-				<div className="content-body-inside">
-					<div>
-						<p>
-							<strong>ID:</strong> {item.id}
-						</p>
-						<p>
-							<strong>Name:</strong> {item.item_name}
-						</p>
-						<p>
-							<strong>Category:</strong> {getCategoryName(item.item_category)}
-						</p>
-						<p>
-							<strong>Price:</strong> {formatPrice(item.item_price_cents)}
-						</p>
-						<p>
-							<strong>Description:</strong>{' '}
-							{item.item_description || 'No description provided'}
-						</p>
-						<p>
-							<strong>Status:</strong> {getStatusName(item.item_status)}
-						</p>
-					</div>
-					<div className="light-text">
-						<p>
-							<strong>Created:</strong>{' '}
-							{new Date(item.created_at).toLocaleString()}
-						</p>
-						<p>
-							<strong>Updated:</strong>{' '}
-							{new Date(item.updated_at).toLocaleString()}
-						</p>
+				<div className="show-container-1">
+					<div className="show-container-item-1">
+						<div>
+							<p>
+								<strong>ID:</strong> {item.id}
+							</p>
+							<p>
+								<strong>Name:</strong> {item.item_name}
+							</p>
+							<p>
+								<strong>Category:</strong> {getCategoryName(item.item_category)}
+							</p>
+							<p>
+								<strong>Price:</strong> {formatPrice(item.item_price_cents)}
+							</p>
+							<p>
+								<strong>Description:</strong>{' '}
+								{item.item_description || 'No description provided'}
+							</p>
+							<p>
+								<strong>Status:</strong> {getStatusName(item.item_status)}
+							</p>
+						</div>
+						<div className="light-text">
+							<p>
+								<strong>Created:</strong>{' '}
+								{new Date(item.created_at).toLocaleString()}
+							</p>
+							<p>
+								<strong>Updated:</strong>{' '}
+								{new Date(item.updated_at).toLocaleString()}
+							</p>
+						</div>
 					</div>
 				</div>
 			</div>

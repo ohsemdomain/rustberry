@@ -20,7 +20,11 @@ function RootComponent() {
 	const { user, logout, canRead } = useAuth()
 
 	// Navigation items
-	const navItems: Array<{ to: string; label: string; permission?: ResourceType }> = [
+	const navItems: Array<{
+		to: string
+		label: string
+		permission?: ResourceType
+	}> = [
 		{ to: '/', label: 'Dashboard' },
 		{ to: '/about', label: 'About' },
 		{ to: '/contact', label: 'Contact' },
@@ -37,7 +41,9 @@ function RootComponent() {
 						<nav className="nav">
 							<div className="nav-links">
 								{navItems
-									.filter(item => !item.permission || canRead(item.permission))
+									.filter(
+										(item) => !item.permission || canRead(item.permission),
+									)
 									.map((item, index) => (
 										<span key={item.to}>
 											{index > 0 && ' '}
@@ -48,7 +54,7 @@ function RootComponent() {
 
 							<div className="light-text">
 								<span className="user-info">{user.name}</span>
-								<button type="button" onClick={logout}>
+								<button className="button-gray" type="button" onClick={logout}>
 									Logout
 								</button>
 							</div>

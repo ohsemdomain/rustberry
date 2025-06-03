@@ -28,6 +28,7 @@ export function ItemsList() {
 				<div>
 					{hasPermission('items', 'create') && (
 						<button
+							className="button-blue"
 							type="button"
 							onClick={() => navigate({ to: '/items/create' })}
 						>
@@ -48,7 +49,7 @@ export function ItemsList() {
 					/>
 					<div className="display-flex">
 						<select
-							className="custom-select"
+							className="custom-select select-short"
 							value={status === undefined ? 'all' : status}
 							onChange={(e) => {
 								const value = e.target.value
