@@ -1,4 +1,4 @@
-import { ShowCustomer } from '@/app/features/customers/ShowCustomer'
+import { CustomerDetail } from '@/app/features/customers/CustomerDetail'
 import {
 	Outlet,
 	createFileRoute,
@@ -15,10 +15,10 @@ function ShowCustomerPage() {
 	const hasChildRoute = childMatches.length > 0
 
 	// If there's a child route (like edit), render only the Outlet
-	// Otherwise, render the ShowCustomer component
+	// Otherwise, render the CustomerDetail component
 	if (hasChildRoute) {
 		return <Outlet />
 	}
 
-	return <ShowCustomer customerId={customerId} />
+	return <CustomerDetail customerId={customerId} />
 }

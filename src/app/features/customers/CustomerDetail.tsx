@@ -4,11 +4,11 @@ import { trpc } from '@/app/trpc'
 import { formatDateTime } from '@/app/utils/date'
 import { Link, useNavigate } from '@tanstack/react-router'
 
-interface ShowCustomerProps {
+interface CustomerDetailProps {
 	customerId: string
 }
 
-export function ShowCustomer({ customerId }: ShowCustomerProps) {
+export function CustomerDetail({ customerId }: CustomerDetailProps) {
 	const { hasPermission } = useAuth()
 	const navigate = useNavigate()
 	const {

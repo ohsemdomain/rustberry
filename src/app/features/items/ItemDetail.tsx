@@ -1,4 +1,3 @@
-//src/app/features/items/ShowItem.tsx
 import { useAuth } from '@/app/AuthProvider'
 import { LoadingOverlay } from '@/app/components/LoadingOverlay'
 import { trpc } from '@/app/trpc'
@@ -6,11 +5,11 @@ import { formatDateTime } from '@/app/utils/date'
 import { formatPrice } from '@/app/utils/price'
 import { Link, useNavigate } from '@tanstack/react-router'
 
-interface ShowItemProps {
+interface ItemDetailProps {
 	itemId: string
 }
 
-export function ShowItem({ itemId }: ShowItemProps) {
+export function ItemDetail({ itemId }: ItemDetailProps) {
 	const { hasPermission } = useAuth()
 	const navigate = useNavigate()
 	const { data: item, isLoading, error } = trpc.items.getById.useQuery(itemId)

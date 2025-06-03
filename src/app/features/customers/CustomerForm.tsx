@@ -1,11 +1,5 @@
-import {
-	AddressForm,
-	type AddressFormData,
-} from '@/app/components/forms/AddressForm'
-import {
-	ContactManager,
-	type PhoneContact,
-} from '@/app/components/forms/ContactManager'
+import { AddressForm, type AddressFormData } from './AddressForm'
+import { ContactManager, type PhoneContact } from './ContactManager'
 import { trpc } from '@/app/trpc'
 import { useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'

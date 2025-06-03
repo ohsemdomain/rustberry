@@ -1,7 +1,4 @@
-import {
-	AddressForm,
-	type AddressFormData,
-} from '@/app/components/forms/AddressForm'
+import { AddressForm, type AddressFormData } from './AddressForm'
 import { trpc } from '@/app/trpc'
 import type { CustomerAddress } from '@/shared/customer'
 import { useState } from 'react'

@@ -1,4 +1,4 @@
-import { ShowItem } from '@/app/features/items/ShowItem'
+import { ItemDetail } from '@/app/features/items/ItemDetail'
 import {
 	Outlet,
 	createFileRoute,
@@ -15,10 +15,10 @@ function ShowItemPage() {
 	const hasChildRoute = childMatches.length > 0
 
 	// If there's a child route (like edit), render only the Outlet
-	// Otherwise, render the ShowItem component
+	// Otherwise, render the ItemDetail component
 	if (hasChildRoute) {
 		return <Outlet />
 	}
 
-	return <ShowItem itemId={itemId} />
+	return <ItemDetail itemId={itemId} />
 }
