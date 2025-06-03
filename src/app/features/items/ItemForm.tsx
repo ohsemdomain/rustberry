@@ -1,4 +1,4 @@
-//src/app/features/items/ItemForm.tsx
+// src/app/features/items/ItemForm.tsx
 import { LoadingOverlay } from '@/app/components/LoadingOverlay'
 import { trpc } from '@/app/trpc'
 import {
@@ -94,13 +94,13 @@ export function ItemForm({ itemId }: ItemFormProps) {
 	const isPending = createMutation.isPending || updateMutation.isPending
 
 	return (
-		<div className="component-wrapper">
+		<>
 			<div className="content-header">
 				<h1>{isEditMode ? 'Edit Item' : 'Create New Item'}</h1>
 			</div>
 
 			<div className="content-body">
-				<div className="fetch-container">
+				<div className="scroll-container">
 					<LoadingOverlay isLoading={isEditMode && isLoading} />
 					<div className="form-container">
 						<form onSubmit={handleSubmit}>
@@ -209,6 +209,6 @@ export function ItemForm({ itemId }: ItemFormProps) {
 					</div>
 				</div>
 			</div>
-		</div>
+		</>
 	)
 }

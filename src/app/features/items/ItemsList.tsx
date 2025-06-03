@@ -14,7 +14,7 @@ export function ItemsList() {
 	const [displayedCount, setDisplayedCount] = useState(20) // How many items to show
 
 	// Load ALL items for the current status filter
-	const { data, isLoading, error, } = trpc.items.listAll.useQuery({
+	const { data, isLoading, error } = trpc.items.listAll.useQuery({
 		status,
 	})
 
@@ -63,7 +63,7 @@ export function ItemsList() {
 	const filteredCount = filteredItems.length
 
 	return (
-		<div className="component-wrapper">
+		<div>
 			<div className="content-header">
 				<h1>Items</h1>
 				<div>
@@ -113,83 +113,72 @@ export function ItemsList() {
 					</div>
 				</div>
 
-				<div className="fetch-container">
-					{(isLoading) && (
-						<LoadingOverlay
-							isLoading={true}
-						/>
-					)}
-					<div className="list-scroll-container">
-						{/* Items List */}
-						<div className="list-container">
-							{displayedItems.length === 0 && !isLoading ? (
-								<div className="list-empty">
-									{searchInput
-										? 'No items match your search'
-										: 'No items found'}
-								</div>
-							) : (
-								displayedItems.map((item) => (
-									<div key={item.id} className="list-item">
-										{/* Left side - Item info */}
-										<div className="list-item-content">
-											<div className="list-item-info">
-												<div className="list-item-title">{item.item_name}</div>
-												<div className="list-item-meta">
-													{item.id} •{' '}
-													{item.item_category === 1
-														? 'Packaging'
-														: item.item_category === 2
-															? 'Label'
-															: 'Other'}{' '}
-													• {formatPrice(item.item_price_cents)}
-												</div>
-											</div>
-										</div>
-
-										{/* Right side - Actions only */}
-										<div className="list-item-links">
-											<Link to="/items/$itemId" params={{ itemId: item.id }}>
-												Show
-											</Link>
-											{hasPermission('items', 'update-any') && (
-												<>
-													<span className="list-item-separator">|</span>
-													<Link
-														to="/items/$itemId/edit"
-														params={{ itemId: item.id }}
-													>
-														Edit
-													</Link>
-												</>
-											)}
-										</div>
-									</div>
-								))
-							)}
-
-							{/* Load More button */}
-							{hasMoreToLoad && (
-								<div className="list-item">
-									<div className="list-item-content">
-										<div
-											className="list-item-info"
-											style={{ textAlign: 'center', width: '100%' }}
-										>
-											<button
-												type="button"
-												onClick={handleLoadMore}
-												className="button-blue"
-												style={{ margin: '0 auto' }}
-											>
-												Load More ({displayedCount} of {filteredCount} shown)
-											</button>
-										</div>
-									</div>
-								</div>
-							)}
+				<div className="scroll-container">
+					{isLoading && <LoadingOverlay isLoading={true} />}
+					{displayedItems.length === 0 && !isLoading ? (
+						<div className="list-empty">
+							{searchInput ? 'No items match your search' : 'No items found'}
 						</div>
-					</div>
+					) : (
+						displayedItems.map((item) => (
+							<div key={item.id} className="list-item">
+								{/* Left side - Item info */}
+								<div className="list-item-content">
+									<div className="list-item-info">
+										<div className="list-item-title">{item.item_name}</div>
+										<div className="list-item-meta">
+											{item.id} •{' '}
+											{item.item_category === 1
+												? 'Packaging'
+												: item.item_category === 2
+													? 'Label'
+													: 'Other'}{' '}
+											• {formatPrice(item.item_price_cents)}
+										</div>
+									</div>
+								</div>
+
+								{/* Right side - Actions only */}
+								<div className="list-item-links">
+									<Link to="/items/$itemId" params={{ itemId: item.id }}>
+										Show
+									</Link>
+									{hasPermission('items', 'update-any') && (
+										<>
+											<span className="list-item-separator">|</span>
+											<Link
+												to="/items/$itemId/edit"
+												params={{ itemId: item.id }}
+											>
+												Edit
+											</Link>
+										</>
+									)}
+								</div>
+							</div>
+						))
+					)}
+
+					{/* Load More button */}
+					{hasMoreToLoad && (
+						<div className="list-item">
+							<div className="list-item-content">
+								<div
+									className="list-item-info"
+									style={{ textAlign: 'center', width: '100%' }}
+								>
+									<button
+										type="button"
+										onClick={handleLoadMore}
+										className="button-blue"
+										style={{ margin: '0 auto' }}
+									>
+										Load More ({displayedCount} of {filteredCount} shown)
+									</button>
+								</div>
+							</div>
+						</div>
+					)}
 				</div>
 			</div>
 		</div>
