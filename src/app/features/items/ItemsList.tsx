@@ -2,18 +2,27 @@ import { useAuth } from '@/app/AuthProvider'
 import { trpc } from '@/app/trpc'
 import { formatPrice } from '@/app/utils/price'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export function ItemsList() {
 	const { hasPermission } = useAuth()
 	const navigate = useNavigate()
-	const [search, setSearch] = useState('')
+	const [searchInput, setSearchInput] = useState('')
+	const [debouncedSearch, setDebouncedSearch] = useState('')
 	const [status, setStatus] = useState<0 | 1 | undefined>(1) // Default to active
-	const [page, setPage] = useState(1)
+
+	// Debounce search input
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setDebouncedSearch(searchInput)
+		}, 300) // 300ms delay
+
+		return () => clearTimeout(timer)
+	}, [searchInput])
 
 	const { data, isLoading, error } = trpc.items.list.useQuery({
-		page,
-		search: search || undefined,
+		page: 1,
+		search: debouncedSearch || undefined,
 		status,
 	})
 
@@ -44,10 +53,12 @@ export function ItemsList() {
 					<input
 						className="search-input"
 						type="text"
-						value={search}
-						onChange={(e) => setSearch(e.target.value)}
+						placeholder="Search items..."
+						value={searchInput}
+						onChange={(e) => setSearchInput(e.target.value)}
 					/>
 					<div className="display-flex">
+						<span className="light-text">Total Items: {data.totalItems}</span>
 						<select
 							className="custom-select select-short"
 							value={status === undefined ? 'all' : status}
@@ -56,7 +67,6 @@ export function ItemsList() {
 								setStatus(
 									value === 'all' ? undefined : (Number(value) as 0 | 1),
 								)
-								setPage(1) // Reset to first page
 							}}
 						>
 							<option value={1}>Active</option>
@@ -112,51 +122,6 @@ export function ItemsList() {
 							))
 						)}
 					</div>
-
-					{/* Pagination */}
-					{data.totalPages > 1 && (
-						<div
-							style={{
-								marginTop: '1rem',
-								display: 'flex',
-								justifyContent: 'center',
-								alignItems: 'center',
-								gap: '0.5rem',
-							}}
-						>
-							<button
-								type="button"
-								onClick={() => setPage(page - 1)}
-								disabled={!data.hasPrev}
-								style={{
-									padding: '0.5rem 1rem',
-									border: '1px solid #ccc',
-									backgroundColor: data.hasPrev ? 'white' : '#f5f5f5',
-									cursor: data.hasPrev ? 'pointer' : 'not-allowed',
-								}}
-							>
-								Previous
-							</button>
-
-							<span>
-								Page {data.currentPage} of {data.totalPages}
-							</span>
-
-							<button
-								type="button"
-								onClick={() => setPage(page + 1)}
-								disabled={!data.hasNext}
-								style={{
-									padding: '0.5rem 1rem',
-									border: '1px solid #ccc',
-									backgroundColor: data.hasNext ? 'white' : '#f5f5f5',
-									cursor: data.hasNext ? 'pointer' : 'not-allowed',
-								}}
-							>
-								Next
-							</button>
-						</div>
-					)}
 				</div>
 			</div>
 		</div>

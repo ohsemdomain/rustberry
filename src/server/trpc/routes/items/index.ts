@@ -100,8 +100,8 @@ export const itemsRouter = router({
 	list: permissionProcedure('items', 'read')
 		.input(listItemsSchema)
 		.query(async ({ input, ctx }) => {
-			const { page = 1, status, search } = input
-			const offset = (page - 1) * ITEMS_PER_PAGE
+			const { status, search } = input
+			const displayLimit = 100 // Always show max 100 items
 
 			let query = 'SELECT * FROM items WHERE 1=1'
 			const params: unknown[] = []
@@ -112,50 +112,36 @@ export const itemsRouter = router({
 				params.push(status)
 			}
 
-			// Search by name
+			// Search by name (searches ALL items)
 			if (search) {
 				query += ' AND item_name LIKE ?'
 				params.push(`%${search}%`)
 			}
 
-			// Order and pagination
-			query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?'
-			params.push(ITEMS_PER_PAGE, offset)
+			// Order by created_at and limit to 100
+			query += ' ORDER BY created_at DESC LIMIT ?'
+			params.push(displayLimit)
 
 			try {
-				// Get items
+				// Get items (max 100)
 				const { results } = await ctx.env.DB.prepare(query)
 					.bind(...params)
 					.all<Item>()
 
-				// Get total count
-				let countQuery = 'SELECT COUNT(*) as count FROM items WHERE 1=1'
-				const countParams: unknown[] = []
+				// Get TOTAL count of ALL items (regardless of search/filter)
+				const { results: totalCountResult } = await ctx.env.DB.prepare(
+					'SELECT COUNT(*) as count FROM items',
+				).all<{ count: number }>()
 
-				if (status !== undefined) {
-					countQuery += ' AND item_status = ?'
-					countParams.push(status)
-				}
-
-				if (search) {
-					countQuery += ' AND item_name LIKE ?'
-					countParams.push(`%${search}%`)
-				}
-
-				const { results: countResult } = await ctx.env.DB.prepare(countQuery)
-					.bind(...countParams)
-					.all<{ count: number }>()
-
-				const totalItems = countResult[0]?.count || 0
-				const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE)
+				const totalItems = totalCountResult[0]?.count || 0
 
 				return {
 					items: addPriceDisplayToList(results),
-					totalItems,
-					totalPages,
-					currentPage: page,
-					hasNext: page < totalPages,
-					hasPrev: page > 1,
+					totalItems, // This is the total of ALL items in database
+					totalPages: 1, // Keep for backward compatibility
+					currentPage: 1, // Keep for backward compatibility
+					hasNext: false, // No pagination
+					hasPrev: false, // No pagination
 				}
 			} catch (error) {
 				console.error('Failed to list items:', error)

@@ -1,6 +1,6 @@
 /* Global styles */
 :root {
-	font-family: 'Geist', system-ui, Avenir, Helvetica, Arial, sans-serif;
+	font-family: "Geist", system-ui, Avenir, Helvetica, Arial, sans-serif;
 	line-height: 1.2;
 	font-weight: 400;
 	font-size: 15px;
@@ -102,7 +102,7 @@ textarea {
 }
 
 .custom-select option {
-	line-height: 2.2
+	line-height: 2.2;
 }
 
 .custom-select {
@@ -185,7 +185,6 @@ Top Header
 /**   
 Content Below Top Header
 */
-
 
 .content {
 	padding-top: 60px;
