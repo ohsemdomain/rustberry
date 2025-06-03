@@ -28,20 +28,46 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 					<div className="display-flex">
 						<Link to="/customers">← Back</Link>
 					</div>
-					<div>
+					<div className="button-group">
 						{hasPermission('customers', 'update-any') && customer && (
-							<button
-								className="button-gray"
-								type="button"
-								onClick={() =>
-									navigate({
-										to: '/customers/$customerId/edit',
-										params: { customerId: customer.id },
-									})
-								}
-							>
-								Edit Customer
-							</button>
+							<>
+								<button
+									className="button-gray"
+									type="button"
+									onClick={() =>
+										navigate({
+											to: '/customers/$customerId/edit',
+											params: { customerId: customer.id },
+										})
+									}
+								>
+									Edit Customer
+								</button>
+								<button
+									className="button-secondary"
+									type="button"
+									onClick={() =>
+										navigate({
+											to: '/customers/$customerId/addresses',
+											params: { customerId: customer.id },
+										})
+									}
+								>
+									Manage Addresses
+								</button>
+								<button
+									className="button-secondary"
+									type="button"
+									onClick={() =>
+										navigate({
+											to: '/customers/$customerId/contacts',
+											params: { customerId: customer.id },
+										})
+									}
+								>
+									Manage Contacts
+								</button>
+							</>
 						)}
 					</div>
 				</div>
@@ -52,146 +78,170 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 					<LoadingOverlay isLoading={isLoading} />
 					{customer && (
 						<div className="detail-content">
-						<div>
-							<p>
-								<strong>ID:</strong> {customer.id}
-							</p>
-							<p>
-								<strong>Customer Name:</strong> {customer.customer_name}
-							</p>
-							<p>
-								<strong>Email:</strong>
-								{customer.customer_email || 'No email provided'}
-							</p>
-							<p>
-								<strong>Status:</strong>
-								<span>{customer.status === 1 ? 'Active' : 'Inactive'}</span>
-							</p>
-
-							<p>
-								<strong>Phone Contacts:</strong>
-								{customer.contacts && customer.contacts.length > 0 ? (
-									<p>
-										{customer.contacts.map((contact) => (
-											<p key={contact.id}>
-												{contact.phone_number}
-												{contact.phone_label && ` (${contact.phone_label})`}
-												{contact.is_primary === 1 && <strong> Primary</strong>}
-											</p>
-										))}
-									</p>
-								) : (
-									<span> No phone contacts</span>
-								)}
-							</p>
-
-							{customer.addresses && customer.addresses.length > 0 && (
-								<div style={{ marginTop: '1rem' }}>
-									{/* Billing addresses */}
-									{customer.addresses.filter(
-										(addr) => addr.address_type === 'billing',
-									).length > 0 && (
-										<div style={{ marginBottom: '1rem' }}>
-											<strong>Billing Addresses:</strong>
-											{customer.addresses
-												.filter((addr) => addr.address_type === 'billing')
-												.map((address) => (
-													<div
-														key={address.id}
-														style={{ marginLeft: '1rem', marginTop: '0.5rem' }}
-													>
-														{address.address_label && (
-															<div>
-																<strong>{address.address_label}</strong>{' '}
-																{address.is_default === 1 && '(Default)'}
-															</div>
-														)}
-														{address.address_line1 && (
-															<div>{address.address_line1}</div>
-														)}
-														{address.address_line2 && (
-															<div>{address.address_line2}</div>
-														)}
-														{address.address_line3 && (
-															<div>{address.address_line3}</div>
-														)}
-														{address.address_line4 && (
-															<div>{address.address_line4}</div>
-														)}
-														<div>
-															{[address.city, address.state, address.postcode]
-																.filter(Boolean)
-																.join(', ')}
-														</div>
-														{address.country && <div>{address.country}</div>}
-													</div>
-												))}
-										</div>
-									)}
-
-									{/* Shipping addresses */}
-									{customer.addresses.filter(
-										(addr) => addr.address_type === 'shipping',
-									).length > 0 && (
-										<div>
-											<strong>Shipping Addresses:</strong>
-											{customer.addresses
-												.filter((addr) => addr.address_type === 'shipping')
-												.map((address) => (
-													<div
-														key={address.id}
-														style={{ marginLeft: '1rem', marginTop: '0.5rem' }}
-													>
-														{address.address_label && (
-															<div>
-																<strong>{address.address_label}</strong>{' '}
-																{address.is_default === 1 && '(Default)'}
-															</div>
-														)}
-														{address.address_line1 && (
-															<div>{address.address_line1}</div>
-														)}
-														{address.address_line2 && (
-															<div>{address.address_line2}</div>
-														)}
-														{address.address_line3 && (
-															<div>{address.address_line3}</div>
-														)}
-														{address.address_line4 && (
-															<div>{address.address_line4}</div>
-														)}
-														<div>
-															{[address.city, address.state, address.postcode]
-																.filter(Boolean)
-																.join(', ')}
-														</div>
-														{address.country && <div>{address.country}</div>}
-													</div>
-												))}
-										</div>
-									)}
+							{/* Basic Information */}
+							<div className="info-section">
+								<h2>Basic Information</h2>
+								<div className="info-grid">
+									<div>
+										<p>
+											<strong>Customer ID:</strong> {customer.id}
+										</p>
+										<p>
+											<strong>Name:</strong> {customer.customer_name}
+										</p>
+									</div>
+									<div>
+										<p>
+											<strong>Email:</strong>{' '}
+											{customer.customer_email || 'No email provided'}
+										</p>
+										<p>
+											<strong>Status:</strong>{' '}
+											<span
+												className={
+													customer.status === 1
+														? 'badge-success'
+														: 'badge-inactive'
+												}
+											>
+												{customer.status === 1 ? 'Active' : 'Inactive'}
+											</span>
+										</p>
+									</div>
 								</div>
-							)}
-						</div>
+							</div>
 
-						<div className="light-text">
-							<p>
-								<strong>Created:</strong> {formatDateTime(customer.created_at)}
-							</p>
-							<p>
-								<strong>Created by:</strong> {customer.created_by}
-							</p>
-							<p>
-								<strong>Updated:</strong> {formatDateTime(customer.updated_at)}
-							</p>
-							<p>
-								<strong>Updated by:</strong> {customer.updated_by}
-							</p>
+							{/* Primary Contact Card */}
+							<div className="info-section">
+								<h2>Primary Contact</h2>
+								{(() => {
+									const primaryContact = customer.contacts?.find(
+										(c) => c.is_primary === 1,
+									)
+									return primaryContact ? (
+										<div className="card">
+											<p className="contact-number">
+												{primaryContact.phone_number}
+											</p>
+											{primaryContact.phone_label && (
+												<p className="contact-label">
+													{primaryContact.phone_label}
+												</p>
+											)}
+										</div>
+									) : (
+										<p className="no-data">No primary contact set</p>
+									)
+								})()}
+							</div>
+
+							{/* Default Billing Address Card */}
+							<div className="info-section">
+								<h2>Default Billing Address</h2>
+								{(() => {
+									const defaultBilling = customer.addresses?.find(
+										(a) => a.address_type === 'billing' && a.is_default === 1,
+									)
+									return defaultBilling ? (
+										<div className="card">
+											{defaultBilling.address_label && (
+												<p className="address-label">
+													{defaultBilling.address_label}
+												</p>
+											)}
+											<p>{defaultBilling.address_line1}</p>
+											{defaultBilling.address_line2 && (
+												<p>{defaultBilling.address_line2}</p>
+											)}
+											{defaultBilling.address_line3 && (
+												<p>{defaultBilling.address_line3}</p>
+											)}
+											{defaultBilling.address_line4 && (
+												<p>{defaultBilling.address_line4}</p>
+											)}
+											<p>
+												{[
+													defaultBilling.city,
+													defaultBilling.state,
+													defaultBilling.postcode,
+												]
+													.filter(Boolean)
+													.join(', ')}
+											</p>
+											{defaultBilling.country && (
+												<p>{defaultBilling.country}</p>
+											)}
+										</div>
+									) : (
+										<p className="no-data">No default billing address set</p>
+									)
+								})()}
+							</div>
+
+							{/* Default Shipping Address Card */}
+							<div className="info-section">
+								<h2>Default Shipping Address</h2>
+								{(() => {
+									const defaultShipping = customer.addresses?.find(
+										(a) => a.address_type === 'shipping' && a.is_default === 1,
+									)
+									return defaultShipping ? (
+										<div className="card">
+											{defaultShipping.address_label && (
+												<p className="address-label">
+													{defaultShipping.address_label}
+												</p>
+											)}
+											<p>{defaultShipping.address_line1}</p>
+											{defaultShipping.address_line2 && (
+												<p>{defaultShipping.address_line2}</p>
+											)}
+											{defaultShipping.address_line3 && (
+												<p>{defaultShipping.address_line3}</p>
+											)}
+											{defaultShipping.address_line4 && (
+												<p>{defaultShipping.address_line4}</p>
+											)}
+											<p>
+												{[
+													defaultShipping.city,
+													defaultShipping.state,
+													defaultShipping.postcode,
+												]
+													.filter(Boolean)
+													.join(', ')}
+											</p>
+											{defaultShipping.country && (
+												<p>{defaultShipping.country}</p>
+											)}
+										</div>
+									) : (
+										<p className="no-data">No default shipping address set</p>
+									)
+								})()}
+							</div>
+
+							{/* Metadata */}
+							<div className="info-section light-text">
+								<p>
+									<strong>Created:</strong>{' '}
+									{formatDateTime(customer.created_at)}
+								</p>
+								<p>
+									<strong>Created by:</strong> {customer.created_by}
+								</p>
+								<p>
+									<strong>Updated:</strong>{' '}
+									{formatDateTime(customer.updated_at)}
+								</p>
+								<p>
+									<strong>Updated by:</strong> {customer.updated_by}
+								</p>
+							</div>
 						</div>
-					</div>
-				)}
+					)}
+				</div>
 			</div>
 		</div>
-	</div>
-)
+	)
 }
