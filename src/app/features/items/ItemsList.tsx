@@ -2,33 +2,50 @@ import { useAuth } from '@/app/AuthProvider'
 import { trpc } from '@/app/trpc'
 import { formatPrice } from '@/app/utils/price'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 export function ItemsList() {
 	const { hasPermission } = useAuth()
 	const navigate = useNavigate()
 	const [searchInput, setSearchInput] = useState('')
-	const [debouncedSearch, setDebouncedSearch] = useState('')
 	const [status, setStatus] = useState<0 | 1 | undefined>(1) // Default to active
+	const [displayedCount, setDisplayedCount] = useState(20) // How many items to show
 
-	// Debounce search input
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			setDebouncedSearch(searchInput)
-		}, 300) // 300ms delay
-
-		return () => clearTimeout(timer)
-	}, [searchInput])
-
-	const { data, isLoading, error } = trpc.items.list.useQuery({
-		page: 1,
-		search: debouncedSearch || undefined,
+	// Load ALL items for the current status filter
+	const { data, isLoading, error } = trpc.items.listAll.useQuery({
 		status,
 	})
 
+	// Client-side filtering using useMemo - instant search, no re-renders
+	const filteredItems = useMemo(() => {
+		if (!data?.items) return []
+
+		if (!searchInput.trim()) {
+			return data.items
+		}
+
+		const searchTerm = searchInput.toLowerCase().trim()
+		return data.items.filter((item) =>
+			item.item_name.toLowerCase().includes(searchTerm),
+		)
+	}, [data?.items, searchInput])
+
+	// Items to display (with pagination)
+	const displayedItems = useMemo(() => {
+		return filteredItems.slice(0, displayedCount)
+	}, [filteredItems, displayedCount])
+
+	const handleLoadMore = () => {
+		setDisplayedCount((prev) => prev + 20)
+	}
+
+	const hasMoreToLoad = displayedCount < filteredItems.length
+
 	if (isLoading) return <div>Loading items...</div>
 	if (error) return <div>Error: {error.message}</div>
-	if (!data) return <div>No data available</div>
+
+	const totalItems = data?.totalItems || 0
+	const filteredCount = filteredItems.length
 
 	return (
 		<div className="component-wrapper">
@@ -58,7 +75,11 @@ export function ItemsList() {
 						onChange={(e) => setSearchInput(e.target.value)}
 					/>
 					<div className="display-flex">
-						<span className="light-text">Total Items: {data.totalItems}</span>
+						<span className="light-text">
+							{searchInput
+								? `${filteredCount} of ${totalItems} items`
+								: `Total Items: ${totalItems}`}
+						</span>
 						<select
 							className="custom-select select-short"
 							value={status === undefined ? 'all' : status}
@@ -67,6 +88,7 @@ export function ItemsList() {
 								setStatus(
 									value === 'all' ? undefined : (Number(value) as 0 | 1),
 								)
+								setDisplayedCount(20) // Reset display count when filter changes
 							}}
 						>
 							<option value={1}>Active</option>
@@ -80,10 +102,12 @@ export function ItemsList() {
 				<div className="list-scroll-container">
 					{/* Items List */}
 					<div className="list-container">
-						{data.items.length === 0 ? (
-							<div className="list-empty">No items found</div>
+						{displayedItems.length === 0 ? (
+							<div className="list-empty">
+								{searchInput ? 'No items match your search' : 'No items found'}
+							</div>
 						) : (
-							data.items.map((item) => (
+							displayedItems.map((item) => (
 								<div key={item.id} className="list-item">
 									{/* Left side - Item info */}
 									<div className="list-item-content">
@@ -120,6 +144,27 @@ export function ItemsList() {
 									</div>
 								</div>
 							))
+						)}
+
+						{/* Load More button */}
+						{hasMoreToLoad && (
+							<div className="list-item">
+								<div className="list-item-content">
+									<div
+										className="list-item-info"
+										style={{ textAlign: 'center', width: '100%' }}
+									>
+										<button
+											type="button"
+											onClick={handleLoadMore}
+											className="button-blue"
+											style={{ margin: '0 auto' }}
+										>
+											Load More ({displayedCount} of {filteredCount} shown)
+										</button>
+									</div>
+								</div>
+							</div>
 						)}
 					</div>
 				</div>

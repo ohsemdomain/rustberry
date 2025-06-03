@@ -8,12 +8,7 @@ import {
 	addPriceDisplay,
 	addPriceDisplayToList,
 } from '@/server/trpc/utils/price'
-import {
-	ID_PREFIX,
-	type Item,
-	ItemCategory,
-	ItemStatus,
-} from '@/shared/items'
+import { ID_PREFIX, type Item, ItemCategory, ItemStatus } from '@/shared/items'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 
@@ -37,8 +32,13 @@ const updateItemSchema = z.object({
 
 const listItemsSchema = z.object({
 	page: z.number().int().min(1).default(1),
+	limit: z.number().int().min(1).max(100).default(20), // Default 20 items per page
 	status: z.nativeEnum(ItemStatus).optional(),
 	search: z.string().optional(),
+})
+
+const listAllItemsSchema = z.object({
+	status: z.nativeEnum(ItemStatus).optional(),
 })
 
 export const itemsRouter = router({
@@ -99,8 +99,8 @@ export const itemsRouter = router({
 	list: permissionProcedure('items', 'read')
 		.input(listItemsSchema)
 		.query(async ({ input, ctx }) => {
-			const { status, search } = input
-			const displayLimit = 100 // Always show max 100 items
+			const { page, limit, status, search } = input
+			const offset = (page - 1) * limit
 
 			let query = 'SELECT * FROM items WHERE 1=1'
 			const params: unknown[] = []
@@ -117,9 +117,9 @@ export const itemsRouter = router({
 				params.push(`%${search}%`)
 			}
 
-			// Order by created_at and limit to 100
-			query += ' ORDER BY created_at DESC LIMIT ?'
-			params.push(displayLimit)
+			// Order by created_at and apply pagination
+			query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?'
+			params.push(limit, offset)
 
 			try {
 				// Get items (max 100)
@@ -150,19 +150,61 @@ export const itemsRouter = router({
 
 				const totalItems = totalCountResult[0]?.count || 0
 
+				const totalPages = Math.ceil(totalItems / limit)
+
 				return {
 					items: addPriceDisplayToList(results),
 					totalItems, // Total count respecting current filters
-					totalPages: 1, // Keep for backward compatibility
-					currentPage: 1, // Keep for backward compatibility
-					hasNext: false, // No pagination
-					hasPrev: false, // No pagination
+					totalPages,
+					currentPage: page,
+					hasNext: page < totalPages,
+					hasPrev: page > 1,
 				}
 			} catch (error) {
 				console.error('Failed to list items:', error)
 				throw new TRPCError({
 					code: 'INTERNAL_SERVER_ERROR',
 					message: 'Failed to list items',
+				})
+			}
+		}),
+
+	// List ALL items for client-side filtering
+	listAll: permissionProcedure('items', 'read')
+		.input(listAllItemsSchema)
+		.query(async ({ input, ctx }) => {
+			const { status } = input
+
+			let query = 'SELECT * FROM items WHERE 1=1'
+			const params: unknown[] = []
+
+			// Filter by status only (no search, no pagination)
+			if (status !== undefined) {
+				query += ' AND item_status = ?'
+				params.push(status)
+			}
+
+			// Order by created_at (newest first)
+			query += ' ORDER BY created_at DESC'
+
+			try {
+				// Get ALL items for the current status filter
+				const { results } = await ctx.env.DB.prepare(query)
+					.bind(...params)
+					.all<Item>()
+
+				// Get total count (same as results length since we're getting all)
+				const totalItems = results.length
+
+				return {
+					items: addPriceDisplayToList(results),
+					totalItems,
+				}
+			} catch (error) {
+				console.error('Failed to list all items:', error)
+				throw new TRPCError({
+					code: 'INTERNAL_SERVER_ERROR',
+					message: 'Failed to list all items',
 				})
 			}
 		}),
