@@ -31,7 +31,7 @@ export function displayToCents(display: string): number {
  * @returns Formatted price with currency
  */
 export function formatPrice(cents: number): string {
-	return `RM${centsToDisplay(cents)}`
+	return `RM ${centsToDisplay(cents)}`
 }
 
 /**

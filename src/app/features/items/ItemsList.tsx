@@ -65,165 +65,98 @@ export function ItemsList() {
 					</div>
 				</div>
 
-				{/* Items Table */}
-				<table>
-					<thead>
-						<tr style={{ backgroundColor: '#f5f5f5' }}>
-							<th
-								style={{
-									padding: '0.75rem',
-									border: '1px solid #ddd',
-									textAlign: 'left',
-								}}
-							>
-								ID
-							</th>
-							<th
-								style={{
-									padding: '0.75rem',
-									border: '1px solid #ddd',
-									textAlign: 'left',
-								}}
-							>
-								Name
-							</th>
-							<th
-								style={{
-									padding: '0.75rem',
-									border: '1px solid #ddd',
-									textAlign: 'left',
-								}}
-							>
-								Category
-							</th>
-							<th
-								style={{
-									padding: '0.75rem',
-									border: '1px solid #ddd',
-									textAlign: 'left',
-								}}
-							>
-								Price
-							</th>
-							<th
-								style={{
-									padding: '0.75rem',
-									border: '1px solid #ddd',
-									textAlign: 'left',
-								}}
-							>
-								Actions
-							</th>
-						</tr>
-					</thead>
-					<tbody>
+				{/* Scrollable list container */}
+				<div className="list-scroll-container">
+					{/* Items List */}
+					<div className="list-container">
 						{data.items.length === 0 ? (
-							<tr>
-								<td
-									colSpan={5}
-									style={{
-										padding: '1rem',
-										textAlign: 'center',
-										border: '1px solid #ddd',
-									}}
-								>
-									No items found
-								</td>
-							</tr>
+							<div className="list-empty">No items found</div>
 						) : (
 							data.items.map((item) => (
-								<tr key={item.id}>
-									<td style={{ padding: '0.75rem', border: '1px solid #ddd' }}>
-										{item.id}
-									</td>
-									<td style={{ padding: '0.75rem', border: '1px solid #ddd' }}>
-										{item.item_name}
-									</td>
-									<td style={{ padding: '0.75rem', border: '1px solid #ddd' }}>
-										{item.item_category === 1
-											? 'Packaging'
-											: item.item_category === 2
-												? 'Label'
-												: 'Other'}
-									</td>
-									<td style={{ padding: '0.75rem', border: '1px solid #ddd' }}>
-										{formatPrice(item.item_price_cents)}
-									</td>
-									<td style={{ padding: '0.75rem', border: '1px solid #ddd' }}>
-										<Link
-											to="/items/$itemId"
-											params={{ itemId: item.id }}
-											style={{
-												marginRight: '0.5rem',
-												color: '#007bff',
-												textDecoration: 'none',
-											}}
-										>
+								<div key={item.id} className="list-item">
+									{/* Left side - Item info */}
+									<div className="list-item-content">
+										<div className="list-item-info">
+											<div className="list-item-title">{item.item_name}</div>
+											<div className="list-item-meta">
+												{item.id} •{' '}
+												{item.item_category === 1
+													? 'Packaging'
+													: item.item_category === 2
+														? 'Label'
+														: 'Other'}{' '}
+												• {formatPrice(item.item_price_cents)}
+											</div>
+										</div>
+									</div>
+
+									{/* Right side - Actions only */}
+									<div className="list-item-links">
+										<Link to="/items/$itemId" params={{ itemId: item.id }}>
 											Show
 										</Link>
 										{hasPermission('items', 'update-any') && (
-											<Link
-												to="/items/$itemId/edit"
-												params={{ itemId: item.id }}
-												style={{
-													color: '#007bff',
-													textDecoration: 'none',
-												}}
-											>
-												Edit
-											</Link>
+											<>
+												<span className="list-item-separator">|</span>
+												<Link
+													to="/items/$itemId/edit"
+													params={{ itemId: item.id }}
+												>
+													Edit
+												</Link>
+											</>
 										)}
-									</td>
-								</tr>
+									</div>
+								</div>
 							))
 						)}
-					</tbody>
-				</table>
-
-				{/* Pagination */}
-				{data.totalPages > 1 && (
-					<div
-						style={{
-							marginTop: '1rem',
-							display: 'flex',
-							justifyContent: 'center',
-							alignItems: 'center',
-							gap: '0.5rem',
-						}}
-					>
-						<button
-							type="button"
-							onClick={() => setPage(page - 1)}
-							disabled={!data.hasPrev}
-							style={{
-								padding: '0.5rem 1rem',
-								border: '1px solid #ccc',
-								backgroundColor: data.hasPrev ? 'white' : '#f5f5f5',
-								cursor: data.hasPrev ? 'pointer' : 'not-allowed',
-							}}
-						>
-							Previous
-						</button>
-
-						<span>
-							Page {data.currentPage} of {data.totalPages}
-						</span>
-
-						<button
-							type="button"
-							onClick={() => setPage(page + 1)}
-							disabled={!data.hasNext}
-							style={{
-								padding: '0.5rem 1rem',
-								border: '1px solid #ccc',
-								backgroundColor: data.hasNext ? 'white' : '#f5f5f5',
-								cursor: data.hasNext ? 'pointer' : 'not-allowed',
-							}}
-						>
-							Next
-						</button>
 					</div>
-				)}
+
+					{/* Pagination */}
+					{data.totalPages > 1 && (
+						<div
+							style={{
+								marginTop: '1rem',
+								display: 'flex',
+								justifyContent: 'center',
+								alignItems: 'center',
+								gap: '0.5rem',
+							}}
+						>
+							<button
+								type="button"
+								onClick={() => setPage(page - 1)}
+								disabled={!data.hasPrev}
+								style={{
+									padding: '0.5rem 1rem',
+									border: '1px solid #ccc',
+									backgroundColor: data.hasPrev ? 'white' : '#f5f5f5',
+									cursor: data.hasPrev ? 'pointer' : 'not-allowed',
+								}}
+							>
+								Previous
+							</button>
+
+							<span>
+								Page {data.currentPage} of {data.totalPages}
+							</span>
+
+							<button
+								type="button"
+								onClick={() => setPage(page + 1)}
+								disabled={!data.hasNext}
+								style={{
+									padding: '0.5rem 1rem',
+									border: '1px solid #ccc',
+									backgroundColor: data.hasNext ? 'white' : '#f5f5f5',
+									cursor: data.hasNext ? 'pointer' : 'not-allowed',
+								}}
+							>
+								Next
+							</button>
+						</div>
+					)}
+				</div>
 			</div>
 		</div>
 	)
