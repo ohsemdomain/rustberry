@@ -10,7 +10,6 @@ import {
 } from '@/server/trpc/utils/price'
 import {
 	ID_PREFIX,
-	ITEMS_PER_PAGE,
 	type Item,
 	ItemCategory,
 	ItemStatus,
@@ -128,16 +127,32 @@ export const itemsRouter = router({
 					.bind(...params)
 					.all<Item>()
 
-				// Get TOTAL count of ALL items (regardless of search/filter)
+				// Get count respecting current filters
+				let countQuery = 'SELECT COUNT(*) as count FROM items WHERE 1=1'
+				const countParams: unknown[] = []
+
+				// Apply same filters as main query
+				if (status !== undefined) {
+					countQuery += ' AND item_status = ?'
+					countParams.push(status)
+				}
+
+				if (search) {
+					countQuery += ' AND item_name LIKE ?'
+					countParams.push(`%${search}%`)
+				}
+
 				const { results: totalCountResult } = await ctx.env.DB.prepare(
-					'SELECT COUNT(*) as count FROM items',
-				).all<{ count: number }>()
+					countQuery,
+				)
+					.bind(...countParams)
+					.all<{ count: number }>()
 
 				const totalItems = totalCountResult[0]?.count || 0
 
 				return {
 					items: addPriceDisplayToList(results),
-					totalItems, // This is the total of ALL items in database
+					totalItems, // Total count respecting current filters
 					totalPages: 1, // Keep for backward compatibility
 					currentPage: 1, // Keep for backward compatibility
 					hasNext: false, // No pagination
