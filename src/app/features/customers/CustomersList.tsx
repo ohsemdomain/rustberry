@@ -22,7 +22,7 @@ export function CustomersList() {
 
 	return (
 		<div style={{ padding: '1rem', position: 'relative' }}>
-			<LoadingOverlay isLoading={isFetching} message="Loading customers..." />
+			<LoadingOverlay isLoading={isFetching} />
 			<div
 				style={{
 					display: 'flex',
