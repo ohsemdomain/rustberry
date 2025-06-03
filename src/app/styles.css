@@ -225,6 +225,7 @@ Content Below Top Header
 }
 
 .fetch-container {
+	flex: 1;
 	position: relative;
 	overflow-y: auto;
 

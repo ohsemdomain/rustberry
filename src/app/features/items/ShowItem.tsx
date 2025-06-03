@@ -63,7 +63,7 @@ export function ShowItem({ itemId }: ShowItemProps) {
 
 			<div className="content-body">
 				<div className="fetch-container">
-					<LoadingOverlay isLoading={isLoading} message="Loading item..." />
+					<LoadingOverlay isLoading={isLoading} />
 					{item && (
 						<div className="show-container-1">
 							<div className="show-container-item-1">

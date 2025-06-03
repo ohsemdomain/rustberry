@@ -100,10 +100,7 @@ export function ItemForm({ itemId }: ItemFormProps) {
 
 			<div className="content-body">
 				<div className="fetch-container">
-					<LoadingOverlay
-						isLoading={isEditMode && isLoading}
-						message="Loading form..."
-					/>
+					<LoadingOverlay isLoading={isEditMode && isLoading} />
 					<div className="form-container">
 						<form onSubmit={handleSubmit}>
 							<div className="form-row">
@@ -196,13 +193,7 @@ export function ItemForm({ itemId }: ItemFormProps) {
 									type="submit"
 									disabled={isPending}
 								>
-									{isPending
-										? isEditMode
-											? 'Updating...'
-											: 'Creating...'
-										: isEditMode
-											? 'Update Item'
-											: 'Create Item'}
+									{isEditMode ? 'Update Item' : 'Create Item'}
 								</button>
 
 								<button

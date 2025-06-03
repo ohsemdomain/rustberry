@@ -1083,13 +1083,7 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 							cursor: isPending ? 'not-allowed' : 'pointer',
 						}}
 					>
-						{isPending
-							? isEditMode
-								? 'Updating...'
-								: 'Creating...'
-							: isEditMode
-								? 'Update Customer'
-								: 'Create Customer'}
+						{isEditMode ? 'Update Customer' : 'Create Customer'}
 					</button>
 
 					<button

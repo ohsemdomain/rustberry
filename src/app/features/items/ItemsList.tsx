@@ -116,7 +116,6 @@ export function ItemsList() {
 					{(isLoading || isFetching) && (
 						<LoadingOverlay
 							isLoading={true}
-							message={isLoading ? 'Loading items...' : 'Updating...'}
 						/>
 					)}
 					<div className="list-scroll-container">
