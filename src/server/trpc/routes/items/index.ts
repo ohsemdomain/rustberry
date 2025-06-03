@@ -18,7 +18,6 @@ const createItemSchema = z.object({
 	item_category: z.nativeEnum(ItemCategory),
 	item_price_cents: z.number().int().min(0),
 	item_description: z.string().optional(),
-	item_status: z.nativeEnum(ItemStatus).optional().default(ItemStatus.ACTIVE),
 })
 
 const updateItemSchema = z.object({
@@ -28,13 +27,6 @@ const updateItemSchema = z.object({
 	item_price_cents: z.number().int().min(0).optional(),
 	item_description: z.string().nullable().optional(),
 	item_status: z.nativeEnum(ItemStatus).optional(),
-})
-
-const listItemsSchema = z.object({
-	page: z.number().int().min(1).default(1),
-	limit: z.number().int().min(1).max(100).default(20), // Default 20 items per page
-	status: z.nativeEnum(ItemStatus).optional(),
-	search: z.string().optional(),
 })
 
 const listAllItemsSchema = z.object({
@@ -56,7 +48,7 @@ export const itemsRouter = router({
 				item_category: input.item_category,
 				item_price_cents: input.item_price_cents,
 				item_description: input.item_description || null,
-				item_status: input.item_status || ItemStatus.ACTIVE,
+				item_status: ItemStatus.ACTIVE, // Always active by default
 				created_at: now,
 				updated_at: now,
 				created_by: ctx.user.id,
@@ -91,80 +83,6 @@ export const itemsRouter = router({
 				throw new TRPCError({
 					code: 'INTERNAL_SERVER_ERROR',
 					message: 'Failed to create item',
-				})
-			}
-		}),
-
-	// List items
-	list: permissionProcedure('items', 'read')
-		.input(listItemsSchema)
-		.query(async ({ input, ctx }) => {
-			const { page, limit, status, search } = input
-			const offset = (page - 1) * limit
-
-			let query = 'SELECT * FROM items WHERE 1=1'
-			const params: unknown[] = []
-
-			// Filter by status
-			if (status !== undefined) {
-				query += ' AND item_status = ?'
-				params.push(status)
-			}
-
-			// Search by name (searches ALL items)
-			if (search) {
-				query += ' AND item_name LIKE ?'
-				params.push(`%${search}%`)
-			}
-
-			// Order by created_at and apply pagination
-			query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?'
-			params.push(limit, offset)
-
-			try {
-				// Get items (max 100)
-				const { results } = await ctx.env.DB.prepare(query)
-					.bind(...params)
-					.all<Item>()
-
-				// Get count respecting current filters
-				let countQuery = 'SELECT COUNT(*) as count FROM items WHERE 1=1'
-				const countParams: unknown[] = []
-
-				// Apply same filters as main query
-				if (status !== undefined) {
-					countQuery += ' AND item_status = ?'
-					countParams.push(status)
-				}
-
-				if (search) {
-					countQuery += ' AND item_name LIKE ?'
-					countParams.push(`%${search}%`)
-				}
-
-				const { results: totalCountResult } = await ctx.env.DB.prepare(
-					countQuery,
-				)
-					.bind(...countParams)
-					.all<{ count: number }>()
-
-				const totalItems = totalCountResult[0]?.count || 0
-
-				const totalPages = Math.ceil(totalItems / limit)
-
-				return {
-					items: addPriceDisplayToList(results),
-					totalItems, // Total count respecting current filters
-					totalPages,
-					currentPage: page,
-					hasNext: page < totalPages,
-					hasPrev: page > 1,
-				}
-			} catch (error) {
-				console.error('Failed to list items:', error)
-				throw new TRPCError({
-					code: 'INTERNAL_SERVER_ERROR',
-					message: 'Failed to list items',
 				})
 			}
 		}),
@@ -325,59 +243,6 @@ export const itemsRouter = router({
 				throw new TRPCError({
 					code: 'INTERNAL_SERVER_ERROR',
 					message: 'Failed to update item',
-				})
-			}
-		}),
-
-	// Delete item (soft delete)
-	delete: permissionProcedure('items', 'delete-any')
-		.input(z.string())
-		.mutation(async ({ input: id, ctx }) => {
-			// First, get the existing item
-			const { results } = await ctx.env.DB.prepare(
-				'SELECT * FROM items WHERE id = ?',
-			)
-				.bind(id)
-				.all<Item>()
-
-			const existingItem = results[0]
-			if (!existingItem) {
-				throw new TRPCError({
-					code: 'NOT_FOUND',
-					message: 'Item not found',
-				})
-			}
-
-			// Check ownership-based permissions
-			const canDelete =
-				hasPermission(ctx.user, 'items', 'delete-any') ||
-				hasPermission(ctx.user, 'items', 'delete-own', existingItem)
-
-			if (!canDelete) {
-				throw new TRPCError({
-					code: 'FORBIDDEN',
-					message: 'You do not have permission to delete this item',
-				})
-			}
-
-			try {
-				// Soft delete by setting status to inactive
-				await ctx.env.DB.prepare(
-					`UPDATE items SET 
-						item_status = ?, 
-						updated_at = ?, 
-						updated_by = ? 
-					WHERE id = ?`,
-				)
-					.bind(ItemStatus.INACTIVE, Date.now(), ctx.user.id, id)
-					.run()
-
-				return { success: true }
-			} catch (error) {
-				console.error('Failed to delete item:', error)
-				throw new TRPCError({
-					code: 'INTERNAL_SERVER_ERROR',
-					message: 'Failed to delete item',
 				})
 			}
 		}),

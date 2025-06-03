@@ -1,4 +1,5 @@
 import { useAuth } from '@/app/AuthProvider'
+import { LoadingOverlay } from '@/app/components/LoadingOverlay'
 import { trpc } from '@/app/trpc'
 import { formatPrice } from '@/app/utils/price'
 import { Link, useNavigate } from '@tanstack/react-router'
@@ -12,7 +13,7 @@ export function ItemsList() {
 	const [displayedCount, setDisplayedCount] = useState(20) // How many items to show
 
 	// Load ALL items for the current status filter
-	const { data, isLoading, error } = trpc.items.listAll.useQuery({
+	const { data, isLoading, error, isFetching } = trpc.items.listAll.useQuery({
 		status,
 	})
 
@@ -41,14 +42,70 @@ export function ItemsList() {
 
 	const hasMoreToLoad = displayedCount < filteredItems.length
 
-	if (isLoading) return <div>Loading items...</div>
-	if (error) return <div>Error: {error.message}</div>
+	// Show error without layout
+	if (error) {
+		return (
+			<div className="component-wrapper">
+				<div className="content-header">
+					<h1>Items</h1>
+				</div>
+				<div className="content-body">
+					<div style={{ padding: '2rem', textAlign: 'center' }}>
+						Error: {error.message}
+					</div>
+				</div>
+			</div>
+		)
+	}
+
+	// Show initial loading only for first load
+	if (isLoading) {
+		return (
+			<div className="component-wrapper">
+				<LoadingOverlay isLoading={true} message="Loading items..." />
+				<div className="content-header">
+					<h1>Items</h1>
+					<div>
+						{hasPermission('items', 'create') && (
+							<button className="button-blue" type="button" disabled>
+								Create Item
+							</button>
+						)}
+					</div>
+				</div>
+				<div className="content-body">
+					<div className="content-actions">
+						<input
+							className="search-input"
+							type="text"
+							placeholder="Search items..."
+							disabled
+						/>
+						<div className="display-flex">
+							<span className="light-text">Total Items: 0</span>
+							<select className="custom-select select-short" disabled>
+								<option value={1}>Active</option>
+								<option value={0}>Inactive</option>
+								<option value="all">All</option>
+							</select>
+						</div>
+					</div>
+					<div className="list-scroll-container">
+						<div className="list-container">
+							{/* Empty skeleton during initial load */}
+						</div>
+					</div>
+				</div>
+			</div>
+		)
+	}
 
 	const totalItems = data?.totalItems || 0
 	const filteredCount = filteredItems.length
 
 	return (
 		<div className="component-wrapper">
+			<LoadingOverlay isLoading={isFetching} message="Updating..." />
 			<div className="content-header">
 				<h1>Items</h1>
 				<div>

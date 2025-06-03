@@ -1,5 +1,6 @@
 import { useAuth } from '@/app/AuthProvider'
 import { trpc } from '@/app/trpc'
+import { formatDateTime } from '@/app/utils/date'
 import { Link, useNavigate } from '@tanstack/react-router'
 
 interface ShowCustomerProps {
@@ -431,7 +432,7 @@ export function ShowCustomer({ customerId }: ShowCustomerProps) {
 								Created At
 							</div>
 							<div style={{ fontSize: '0.9rem', color: '#666' }}>
-								{new Date(customer.created_at).toLocaleString()}
+								{formatDateTime(customer.created_at)}
 							</div>
 						</div>
 						<div>
@@ -447,7 +448,7 @@ export function ShowCustomer({ customerId }: ShowCustomerProps) {
 								Last Updated
 							</div>
 							<div style={{ fontSize: '0.9rem', color: '#666' }}>
-								{new Date(customer.updated_at).toLocaleString()}
+								{formatDateTime(customer.updated_at)}
 							</div>
 						</div>
 					</div>

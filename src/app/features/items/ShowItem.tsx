@@ -1,5 +1,6 @@
 import { useAuth } from '@/app/AuthProvider'
 import { trpc } from '@/app/trpc'
+import { formatDateTime } from '@/app/utils/date'
 import { formatPrice } from '@/app/utils/price'
 import { Link, useNavigate } from '@tanstack/react-router'
 
@@ -86,12 +87,16 @@ export function ShowItem({ itemId }: ShowItemProps) {
 						</div>
 						<div className="light-text">
 							<p>
-								<strong>Created:</strong>{' '}
-								{new Date(item.created_at).toLocaleString()}
+								<strong>Created:</strong> {formatDateTime(item.created_at)}
 							</p>
 							<p>
-								<strong>Updated:</strong>{' '}
-								{new Date(item.updated_at).toLocaleString()}
+								<strong>Created by:</strong> {item.created_by}
+							</p>
+							<p>
+								<strong>Updated:</strong> {formatDateTime(item.updated_at)}
+							</p>
+							<p>
+								<strong>Updated by:</strong> {item.updated_by}
 							</p>
 						</div>
 					</div>

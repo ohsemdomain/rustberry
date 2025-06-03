@@ -20,7 +20,7 @@ export function ItemForm({ itemId }: ItemFormProps) {
 		item_category: ItemCategory.PACKAGING,
 		item_price_display: '',
 		item_description: '',
-		item_status: ItemStatus.ACTIVE,
+		item_status: ItemStatus.ACTIVE, // Only used in edit mode
 	})
 
 	// Fetch existing item if in edit mode
@@ -80,7 +80,6 @@ export function ItemForm({ itemId }: ItemFormProps) {
 				item_category: formData.item_category,
 				item_price_cents,
 				item_description: formData.item_description || undefined,
-				item_status: formData.item_status,
 			})
 		}
 	}
@@ -167,23 +166,26 @@ export function ItemForm({ itemId }: ItemFormProps) {
 							/>
 						</div>
 
-						<div className="form-row">
-							<label htmlFor="item_status">Status</label>
-							<select
-								className="custom-select"
-								id="item_status"
-								value={formData.item_status}
-								onChange={(e) =>
-									setFormData((prev) => ({
-										...prev,
-										item_status: Number(e.target.value) as ItemStatus,
-									}))
-								}
-							>
-								<option value={ItemStatus.ACTIVE}>Active</option>
-								<option value={ItemStatus.INACTIVE}>Inactive</option>
-							</select>
-						</div>
+						{/* Status field only shown in edit mode */}
+						{isEditMode && (
+							<div className="form-row">
+								<label htmlFor="item_status">Status</label>
+								<select
+									className="custom-select"
+									id="item_status"
+									value={formData.item_status}
+									onChange={(e) =>
+										setFormData((prev) => ({
+											...prev,
+											item_status: Number(e.target.value) as ItemStatus,
+										}))
+									}
+								>
+									<option value={ItemStatus.ACTIVE}>Active</option>
+									<option value={ItemStatus.INACTIVE}>Inactive</option>
+								</select>
+							</div>
+						)}
 
 						<div className="form-actions">
 							<button

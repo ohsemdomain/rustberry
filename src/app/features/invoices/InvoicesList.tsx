@@ -1,5 +1,6 @@
 import { useAuth } from '@/app/AuthProvider'
 import { trpc } from '@/app/trpc'
+import { formatDateOnly } from '@/app/utils/date'
 import { formatPrice } from '@/app/utils/price'
 import { InvoiceStatus } from '@/shared/invoice'
 import { Link } from '@tanstack/react-router'
@@ -215,7 +216,7 @@ export function InvoicesList() {
 									{invoice.customer_name}
 								</td>
 								<td style={{ padding: '0.75rem', border: '1px solid #ddd' }}>
-									{new Date(invoice.invoice_date).toLocaleDateString()}
+									{formatDateOnly(invoice.invoice_date)}
 								</td>
 								<td style={{ padding: '0.75rem', border: '1px solid #ddd' }}>
 									{formatPrice(invoice.total_cents)}

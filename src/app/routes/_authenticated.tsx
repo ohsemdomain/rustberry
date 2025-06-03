@@ -9,7 +9,7 @@ function AuthenticatedLayout() {
 	const { user, isLoading } = useAuth()
 
 	if (isLoading) {
-		return <div>Loading...</div>
+		return null // Silent auth check
 	}
 
 	if (!user) {

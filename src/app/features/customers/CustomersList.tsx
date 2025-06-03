@@ -1,4 +1,5 @@
 import { useAuth } from '@/app/AuthProvider'
+import { LoadingOverlay } from '@/app/components/LoadingOverlay'
 import { trpc } from '@/app/trpc'
 import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
@@ -9,7 +10,7 @@ export function CustomersList() {
 	const [status, setStatus] = useState<0 | 1 | undefined>(1) // Default to active
 	const [page, setPage] = useState(1)
 
-	const { data, isLoading, error } = trpc.customers.list.useQuery({
+	const { data, isLoading, error, isFetching } = trpc.customers.list.useQuery({
 		page,
 		search: search || undefined,
 		status,
@@ -20,7 +21,8 @@ export function CustomersList() {
 	if (!data) return <div>No data available</div>
 
 	return (
-		<div style={{ padding: '1rem' }}>
+		<div style={{ padding: '1rem', position: 'relative' }}>
+			<LoadingOverlay isLoading={isFetching} message="Loading customers..." />
 			<div
 				style={{
 					display: 'flex',
