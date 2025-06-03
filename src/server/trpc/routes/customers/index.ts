@@ -37,6 +37,10 @@ const listCustomersSchema = z.object({
 	search: z.string().optional(),
 })
 
+const listAllCustomersSchema = z.object({
+	status: z.literal(0).or(z.literal(1)).optional(),
+})
+
 const createContactSchema = z.object({
 	customer_id: z.string(),
 	phone_number: z.string().min(1),
@@ -195,6 +199,48 @@ export const customersRouter = router({
 				throw new TRPCError({
 					code: 'INTERNAL_SERVER_ERROR',
 					message: 'Failed to list customers',
+				})
+			}
+		}),
+
+	// List ALL customers for client-side filtering
+	listAll: permissionProcedure('customers', 'read')
+		.input(listAllCustomersSchema)
+		.query(async ({ input, ctx }) => {
+			const { status } = input
+
+			let query = 'SELECT * FROM customers WHERE 1=1'
+			const params: unknown[] = []
+
+			// Filter by status only (no search, no pagination)
+			if (status !== undefined) {
+				query += ' AND status = ?'
+				params.push(status)
+			}
+
+			// Order by latest activity (newest updates or creates first)
+			// In SQLite/D1, we use CASE to get the maximum of two values
+			query +=
+				' ORDER BY CASE WHEN updated_at > created_at THEN updated_at ELSE created_at END DESC'
+
+			try {
+				// Get ALL customers for the current status filter
+				const { results } = await ctx.env.DB.prepare(query)
+					.bind(...params)
+					.all<Customer>()
+
+				// Get total count (same as results length since we're getting all)
+				const totalCustomers = results.length
+
+				return {
+					customers: results,
+					totalCustomers,
+				}
+			} catch (error) {
+				console.error('Failed to list all customers:', error)
+				throw new TRPCError({
+					code: 'INTERNAL_SERVER_ERROR',
+					message: 'Failed to list all customers',
 				})
 			}
 		}),

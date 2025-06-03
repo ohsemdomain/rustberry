@@ -17,6 +17,7 @@ interface PhoneContact {
 export function CustomerForm({ customerId }: CustomerFormProps) {
 	const isEditMode = !!customerId
 	const navigate = useNavigate()
+	const utils = trpc.useUtils()
 	const [formData, setFormData] = useState({
 		customer_name: '',
 		customer_email: '',
@@ -140,6 +141,8 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 					})
 				}
 
+				// Invalidate customers list to show the new customer
+				await utils.customers.listAll.invalidate()
 				navigate({ to: '/customers' })
 			} catch (error) {
 				console.error('Error creating customer with addresses:', error)
@@ -152,7 +155,9 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 	})
 
 	const updateMutation = trpc.customers.update.useMutation({
-		onSuccess: () => {
+		onSuccess: async () => {
+			// Invalidate customers list to show the updated customer at top
+			await utils.customers.listAll.invalidate()
 			navigate({ to: '/customers' })
 		},
 		onError: (error) => {

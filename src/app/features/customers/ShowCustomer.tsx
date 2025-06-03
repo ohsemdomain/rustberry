@@ -42,7 +42,7 @@ export function ShowCustomer({ customerId }: ShowCustomerProps) {
 							Edit Customer
 						</Link>
 					)}
-					<button type='button' onClick={() => navigate({ to: '/customers' })}>
+					<button type="button" onClick={() => navigate({ to: '/customers' })}>
 						Back to Customers
 					</button>
 				</div>
