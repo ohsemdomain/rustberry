@@ -1,3 +1,4 @@
+import { LoadingOverlay } from '@/app/components/LoadingOverlay'
 import { trpc } from '@/app/trpc'
 import {
 	centsToDisplay,
@@ -89,9 +90,6 @@ export function ItemForm({ itemId }: ItemFormProps) {
 		setFormData((prev) => ({ ...prev, item_price_display: sanitized }))
 	}
 
-	if (isEditMode && isLoading)
-		return <div style={{ padding: '1rem' }}>Loading...</div>
-
 	const isPending = createMutation.isPending || updateMutation.isPending
 
 	return (
@@ -102,6 +100,10 @@ export function ItemForm({ itemId }: ItemFormProps) {
 
 			<div className="content-body">
 				<div className="fetch-container">
+					<LoadingOverlay
+						isLoading={isEditMode && isLoading}
+						message="Loading form..."
+					/>
 					<div className="form-container">
 						<form onSubmit={handleSubmit}>
 							<div className="form-row">

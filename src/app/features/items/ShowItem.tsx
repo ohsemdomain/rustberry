@@ -1,4 +1,5 @@
 import { useAuth } from '@/app/AuthProvider'
+import { LoadingOverlay } from '@/app/components/LoadingOverlay'
 import { trpc } from '@/app/trpc'
 import { formatDateTime } from '@/app/utils/date'
 import { formatPrice } from '@/app/utils/price'
@@ -13,9 +14,8 @@ export function ShowItem({ itemId }: ShowItemProps) {
 	const navigate = useNavigate()
 	const { data: item, isLoading, error } = trpc.items.getById.useQuery(itemId)
 
-	if (isLoading) return <div>Loading...</div>
 	if (error) return <div>Error: {error.message}</div>
-	if (!item) return <div>Item not found</div>
+	if (!isLoading && !item) return <div>Item not found</div>
 
 	const getCategoryName = (category: number) => {
 		switch (category) {
@@ -43,7 +43,7 @@ export function ShowItem({ itemId }: ShowItemProps) {
 						<Link to="/items">← Back</Link>
 					</div>
 					<div>
-						{hasPermission('items', 'update-any') && (
+						{hasPermission('items', 'update-any') && item && (
 							<button
 								className="button-gray"
 								type="button"
@@ -63,46 +63,49 @@ export function ShowItem({ itemId }: ShowItemProps) {
 
 			<div className="content-body">
 				<div className="fetch-container">
-					<div className="show-container-1">
-						<div className="show-container-item-1">
-							<div>
-								<p>
-									<strong>ID:</strong> {item.id}
-								</p>
-								<p>
-									<strong>Name:</strong> {item.item_name}
-								</p>
-								<p>
-									<strong>Category:</strong>{' '}
-									{getCategoryName(item.item_category)}
-								</p>
-								<p>
-									<strong>Price:</strong> {formatPrice(item.item_price_cents)}
-								</p>
-								<p>
-									<strong>Description:</strong>{' '}
-									{item.item_description || 'No description provided'}
-								</p>
-								<p>
-									<strong>Status:</strong> {getStatusName(item.item_status)}
-								</p>
-							</div>
-							<div className="light-text">
-								<p>
-									<strong>Created:</strong> {formatDateTime(item.created_at)}
-								</p>
-								<p>
-									<strong>Created by:</strong> {item.created_by}
-								</p>
-								<p>
-									<strong>Updated:</strong> {formatDateTime(item.updated_at)}
-								</p>
-								<p>
-									<strong>Updated by:</strong> {item.updated_by}
-								</p>
+					<LoadingOverlay isLoading={isLoading} message="Loading item..." />
+					{item && (
+						<div className="show-container-1">
+							<div className="show-container-item-1">
+								<div>
+									<p>
+										<strong>ID:</strong> {item.id}
+									</p>
+									<p>
+										<strong>Name:</strong> {item.item_name}
+									</p>
+									<p>
+										<strong>Category:</strong>{' '}
+										{getCategoryName(item.item_category)}
+									</p>
+									<p>
+										<strong>Price:</strong> {formatPrice(item.item_price_cents)}
+									</p>
+									<p>
+										<strong>Description:</strong>{' '}
+										{item.item_description || 'No description provided'}
+									</p>
+									<p>
+										<strong>Status:</strong> {getStatusName(item.item_status)}
+									</p>
+								</div>
+								<div className="light-text">
+									<p>
+										<strong>Created:</strong> {formatDateTime(item.created_at)}
+									</p>
+									<p>
+										<strong>Created by:</strong> {item.created_by}
+									</p>
+									<p>
+										<strong>Updated:</strong> {formatDateTime(item.updated_at)}
+									</p>
+									<p>
+										<strong>Updated by:</strong> {item.updated_by}
+									</p>
+								</div>
 							</div>
 						</div>
-					</div>
+					)}
 				</div>
 			</div>
 		</div>

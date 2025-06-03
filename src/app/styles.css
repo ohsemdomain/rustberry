@@ -225,6 +225,7 @@ Content Below Top Header
 }
 
 .fetch-container {
+	position: relative;
 	overflow-y: auto;
 
 	&::-webkit-scrollbar {
@@ -369,13 +370,4 @@ Content Below Top Header
 	100% {
 		transform: rotate(360deg);
 	}
-}
-
-/* Make containers with overlay positioned relative */
-.component-wrapper {
-	position: relative;
-}
-
-.content-body {
-	position: relative;
 }

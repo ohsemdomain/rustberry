@@ -58,54 +58,11 @@ export function ItemsList() {
 		)
 	}
 
-	// Show initial loading only for first load
-	if (isLoading) {
-		return (
-			<div className="component-wrapper">
-				<LoadingOverlay isLoading={true} message="Loading items..." />
-				<div className="content-header">
-					<h1>Items</h1>
-					<div>
-						{hasPermission('items', 'create') && (
-							<button className="button-blue" type="button" disabled>
-								Create Item
-							</button>
-						)}
-					</div>
-				</div>
-				<div className="content-body">
-					<div className="content-actions">
-						<input
-							className="search-input"
-							type="text"
-							placeholder="Search items..."
-							disabled
-						/>
-						<div className="display-flex">
-							<span className="light-text">Total Items: 0</span>
-							<select className="custom-select select-short" disabled>
-								<option value={1}>Active</option>
-								<option value={0}>Inactive</option>
-								<option value="all">All</option>
-							</select>
-						</div>
-					</div>
-					<div className="list-scroll-container">
-						<div className="list-container">
-							{/* Empty skeleton during initial load */}
-						</div>
-					</div>
-				</div>
-			</div>
-		)
-	}
-
 	const totalItems = data?.totalItems || 0
 	const filteredCount = filteredItems.length
 
 	return (
 		<div className="component-wrapper">
-			<LoadingOverlay isLoading={isFetching} message="Updating..." />
 			<div className="content-header">
 				<h1>Items</h1>
 				<div>
@@ -156,10 +113,16 @@ export function ItemsList() {
 				</div>
 
 				<div className="fetch-container">
+					{(isLoading || isFetching) && (
+						<LoadingOverlay
+							isLoading={true}
+							message={isLoading ? 'Loading items...' : 'Updating...'}
+						/>
+					)}
 					<div className="list-scroll-container">
 						{/* Items List */}
 						<div className="list-container">
-							{displayedItems.length === 0 ? (
+							{displayedItems.length === 0 && !isLoading ? (
 								<div className="list-empty">
 									{searchInput
 										? 'No items match your search'
