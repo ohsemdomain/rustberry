@@ -177,7 +177,7 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 			const payload = {
 				customer_name: formData.customer_name,
 				customer_email: formData.customer_email || null,
-				status: formData.status,
+				status: 1 as 1, // Always active for new customers
 				contacts: formData.phone_number
 					? [
 							{
@@ -278,18 +278,20 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 								/>
 							</div>
 
-							<div className="form-group">
-								<label htmlFor="status">Status</label>
-								<select
-									id="status"
-									name="status"
-									value={formData.status}
-									onChange={handleChange}
-								>
-									<option value={1}>Active</option>
-									<option value={0}>Inactive</option>
-								</select>
-							</div>
+							{isEditMode && (
+								<div className="form-group">
+									<label htmlFor="status">Status</label>
+									<select
+										id="status"
+										name="status"
+										value={formData.status}
+										onChange={handleChange}
+									>
+										<option value={1}>Active</option>
+										<option value={0}>Inactive</option>
+									</select>
+								</div>
+							)}
 						</div>
 					</fieldset>
 
