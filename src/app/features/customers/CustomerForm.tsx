@@ -231,7 +231,11 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 		setFormData((prev) => ({
 			...prev,
 			[name]:
-				type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
+				type === 'checkbox' 
+					? (e.target as HTMLInputElement).checked 
+					: name === 'status' 
+					? Number(value) as 0 | 1
+					: value,
 		}))
 	}
 
