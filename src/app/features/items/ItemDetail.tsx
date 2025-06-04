@@ -1,4 +1,3 @@
-//src/app/features/items/ItemDetail.tsx
 import { useAuth } from '@/app/AuthProvider'
 import { LoadingOverlay } from '@/app/components/LoadingOverlay'
 import { trpc } from '@/app/trpc'
@@ -15,8 +14,9 @@ export function ItemDetail({ itemId }: ItemDetailProps) {
 	const navigate = useNavigate()
 	const { data: item, isLoading, error } = trpc.items.getById.useQuery(itemId)
 
-	if (error) return <div>Error: {error.message}</div>
-	if (!isLoading && !item) return <div>Item not found</div>
+	if (error) return <div className="list-empty">Error: {error.message}</div>
+	if (!isLoading && !item)
+		return <div className="list-empty">Item not found</div>
 
 	const getCategoryName = (category: number) => {
 		switch (category) {
@@ -31,34 +31,34 @@ export function ItemDetail({ itemId }: ItemDetailProps) {
 		}
 	}
 
-	const getStatusName = (status: number) => {
-		return status === 1 ? 'Active' : 'Inactive'
+	const getStatusBadge = (status: number) => {
+		return status === 1 ? (
+			<span className="badge-success">Active</span>
+		) : (
+			<span className="badge-inactive">Inactive</span>
+		)
 	}
 
 	return (
 		<div>
 			<div className="content-header">
 				<h1>Item Details</h1>
-				<div className="display-flex">
-					<div className="display-flex">
-						<Link to="/items">← Back</Link>
-					</div>
-					<div>
-						{hasPermission('items', 'update-any') && item && (
-							<button
-								className="button-gray"
-								type="button"
-								onClick={() =>
-									navigate({
-										to: '/items/$itemId/edit',
-										params: { itemId: item.id },
-									})
-								}
-							>
-								Edit Item
-							</button>
-						)}
-					</div>
+				<div className="button-group">
+					<Link to="/items">← Back</Link>
+					{hasPermission('items', 'update-any') && item && (
+						<button
+							className="button-gray"
+							type="button"
+							onClick={() =>
+								navigate({
+									to: '/items/$itemId/edit',
+									params: { itemId: item.id },
+								})
+							}
+						>
+							Edit Item
+						</button>
+					)}
 				</div>
 			</div>
 
@@ -67,46 +67,53 @@ export function ItemDetail({ itemId }: ItemDetailProps) {
 					<LoadingOverlay isLoading={isLoading} />
 					{item && (
 						<div className="detail-content">
-							<div>
-								<p>
-									<strong>ID:</strong> {item.id}
-								</p>
-								<p>
-									<strong>Name:</strong> {item.item_name}
-								</p>
-								<p>
-									<strong>Category:</strong>{' '}
-									{getCategoryName(item.item_category)}
-								</p>
-								<p>
-									<strong>Price:</strong> {formatPrice(item.item_price_cents)}
-								</p>
-								<p>
-									<strong>Description:</strong>{' '}
-									{item.item_description ? (
-										<span style={{ whiteSpace: 'pre-wrap' }}>
-											{item.item_description}
-										</span>
-									) : (
-										'No description provided'
-									)}
-								</p>
-								<p>
-									<strong>Status:</strong> {getStatusName(item.item_status)}
-								</p>
+							<div className="info-section">
+								<h2>Item Information</h2>
+								<div className="info-grid">
+									<div>
+										<p>
+											<strong>ID:</strong> {item.id}
+										</p>
+										<p>
+											<strong>Name:</strong> {item.item_name}
+										</p>
+										<p>
+											<strong>Category:</strong>{' '}
+											{getCategoryName(item.item_category)}
+										</p>
+									</div>
+									<div>
+										<p>
+											<strong>Price:</strong>{' '}
+											{formatPrice(item.item_price_cents)}
+										</p>
+										<p>
+											<strong>Status:</strong>{' '}
+											{getStatusBadge(item.item_status)}
+										</p>
+									</div>
+								</div>
 							</div>
-							<div className="light-text">
+
+							{item.item_description && (
+								<div className="info-section">
+									<h2>Description</h2>
+									<div className="card">
+										<p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>
+											{item.item_description}
+										</p>
+									</div>
+								</div>
+							)}
+
+							<div className="info-section light-text">
 								<p>
-									<strong>Created:</strong> {formatDateTime(item.created_at)}
+									<strong>Created:</strong> {formatDateTime(item.created_at)} by{' '}
+									{item.created_by}
 								</p>
 								<p>
-									<strong>Created by:</strong> {item.created_by}
-								</p>
-								<p>
-									<strong>Updated:</strong> {formatDateTime(item.updated_at)}
-								</p>
-								<p>
-									<strong>Updated by:</strong> {item.updated_by}
+									<strong>Last Updated:</strong>{' '}
+									{formatDateTime(item.updated_at)} by {item.updated_by}
 								</p>
 							</div>
 						</div>
