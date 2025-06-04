@@ -58,8 +58,9 @@ export const relationshipsRouter = router({
 			const contact: CustomerContact = {
 				id,
 				customer_id: input.customer_id,
-				phone_number: input.phone_number,
-				phone_label: input.phone_label || null,
+				contact_phone: input.contact_phone,
+				contact_name: input.contact_name,
+				contact_email: input.contact_email || null,
 				is_primary: input.is_primary || 0,
 				created_at: now,
 			}
@@ -67,14 +68,15 @@ export const relationshipsRouter = router({
 			try {
 				await ctx.env.DB.prepare(
 					`INSERT INTO customer_contacts (
-						id, customer_id, phone_number, phone_label, is_primary, created_at
-					) VALUES (?, ?, ?, ?, ?, ?)`,
+						id, customer_id, contact_phone, contact_name, contact_email, is_primary, created_at
+					) VALUES (?, ?, ?, ?, ?, ?, ?)`,
 				)
 					.bind(
 						contact.id,
 						contact.customer_id,
-						contact.phone_number,
-						contact.phone_label,
+						contact.contact_phone,
+						contact.contact_name,
+						contact.contact_email,
 						contact.is_primary,
 						contact.created_at,
 					)
@@ -123,13 +125,17 @@ export const relationshipsRouter = router({
 			const updateFields: string[] = []
 			const updateValues: unknown[] = []
 
-			if (updates.phone_number !== undefined) {
-				updateFields.push('phone_number = ?')
-				updateValues.push(updates.phone_number)
+			if (updates.contact_phone !== undefined) {
+				updateFields.push('contact_phone = ?')
+				updateValues.push(updates.contact_phone)
 			}
-			if (updates.phone_label !== undefined) {
-				updateFields.push('phone_label = ?')
-				updateValues.push(updates.phone_label)
+			if (updates.contact_name !== undefined) {
+				updateFields.push('contact_name = ?')
+				updateValues.push(updates.contact_name)
+			}
+			if (updates.contact_email !== undefined) {
+				updateFields.push('contact_email = ?')
+				updateValues.push(updates.contact_email)
 			}
 			if (updates.is_primary !== undefined) {
 				updateFields.push('is_primary = ?')

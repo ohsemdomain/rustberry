@@ -7,12 +7,11 @@ interface CustomerFormProps {
 }
 
 interface FormData {
-	customer_name: string
-	customer_email: string
+	contact_company_name: string
+	contact_phone: string
+	contact_name: string
+	contact_email: string
 	status: 1 | 0
-	// Contact fields
-	phone_number: string
-	phone_label: string
 	// Billing address fields
 	billing_address_label: string
 	billing_address_line1: string
@@ -42,12 +41,12 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 	const navigate = useNavigate()
 
 	const [formData, setFormData] = useState<FormData>({
-		customer_name: '',
-		customer_email: '',
+		contact_company_name: '',
+		contact_email: '',
 		status: 1,
 		// Contact
-		phone_number: '',
-		phone_label: '',
+		contact_phone: '',
+		contact_name: '',
 		// Billing
 		billing_address_label: 'Main Office',
 		billing_address_line1: '',
@@ -84,20 +83,12 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 			// Load customer basic info
 			setFormData((prev) => ({
 				...prev,
-				customer_name: customer.customer_name,
-				customer_email: customer.customer_email || '',
+				contact_company_name: customer.contact_company_name,
+				contact_email: customer.contact_email || '',
+				contact_phone: customer.contact_phone || '',
+				contact_name: customer.contact_name || '',
 				status: customer.status,
 			}))
-
-			// Load primary contact if exists
-			const primaryContact = customer.contacts?.find((c) => c.is_primary === 1)
-			if (primaryContact) {
-				setFormData((prev) => ({
-					...prev,
-					phone_number: primaryContact.phone_number,
-					phone_label: primaryContact.phone_label || '',
-				}))
-			}
 
 			// Load default billing address if exists
 			const billingAddress = customer.addresses?.find(
@@ -168,25 +159,20 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 			// In edit mode, only update customer basic info
 			updateMutation.mutate({
 				id: customerId,
-				customer_name: formData.customer_name,
-				customer_email: formData.customer_email || null,
+				contact_company_name: formData.contact_company_name,
+				contact_email: formData.contact_email || null,
+				contact_phone: formData.contact_phone,
+				contact_name: formData.contact_name,
 				status: formData.status,
 			})
 		} else {
 			// In create mode, create customer with all details
 			const payload = {
-				customer_name: formData.customer_name,
-				customer_email: formData.customer_email || null,
+				contact_company_name: formData.contact_company_name,
+				contact_email: formData.contact_email || null,
+				contact_phone: formData.contact_phone,
+				contact_name: formData.contact_name,
 				status: 1 as 1, // Always active for new customers
-				contacts: formData.phone_number
-					? [
-							{
-								phone_number: formData.phone_number,
-								phone_label: formData.phone_label || null,
-								is_primary: 1 as const,
-							},
-						]
-					: undefined,
 				billing_address: formData.billing_address_line1
 					? {
 							address_type: 'billing' as const,
@@ -251,34 +237,58 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 				<form onSubmit={handleSubmit}>
 					{error && <div className="error-message">{error}</div>}
 
-					{/* Customer Information */}
+					{/* Company Information */}
 					<fieldset>
-						<legend>Customer Information</legend>
+						<legend>Company Information</legend>
 						<div className="form-grid">
 							<div className="form-group">
-								<label htmlFor="customer_name">
-									Customer Name <span className="required">*</span>
+								<label htmlFor="contact_company_name">
+									Company Name <span className="required">*</span>
 								</label>
 								<input
-									id="customer_name"
-									name="customer_name"
+									id="contact_company_name"
+									name="contact_company_name"
 									type="text"
-									value={formData.customer_name}
+									value={formData.contact_company_name}
 									onChange={handleChange}
 									required
-									placeholder="Enter customer name"
+									placeholder="Enter company name"
 								/>
 							</div>
 
 							<div className="form-group">
-								<label htmlFor="customer_email">Email</label>
+								<label htmlFor="contact_email">Primary Email</label>
 								<input
-									id="customer_email"
-									name="customer_email"
+									id="contact_email"
+									name="contact_email"
 									type="email"
-									value={formData.customer_email}
+									value={formData.contact_email}
 									onChange={handleChange}
-									placeholder="customer@example.com"
+									placeholder="contact@company.com"
+								/>
+							</div>
+
+							<div className="form-group">
+								<label htmlFor="contact_phone">Primary Phone</label>
+								<input
+									id="contact_phone"
+									name="contact_phone"
+									type="tel"
+									value={formData.contact_phone}
+									onChange={handleChange}
+									placeholder="+1234567890"
+								/>
+							</div>
+
+							<div className="form-group">
+								<label htmlFor="contact_name">Primary Contact Name</label>
+								<input
+									id="contact_name"
+									name="contact_name"
+									type="text"
+									value={formData.contact_name}
+									onChange={handleChange}
+									placeholder="John Smith"
 								/>
 							</div>
 
@@ -301,39 +311,6 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 
 					{!isEditMode && (
 						<>
-							{/* Contact Information */}
-							<fieldset>
-								<legend>Primary Contact</legend>
-								<div className="form-grid">
-									<div className="form-group">
-										<label htmlFor="phone_number">
-											Phone Number <span className="required">*</span>
-										</label>
-										<input
-											id="phone_number"
-											name="phone_number"
-											type="tel"
-											value={formData.phone_number}
-											onChange={handleChange}
-											required
-											placeholder="+1234567890"
-										/>
-									</div>
-
-									<div className="form-group">
-										<label htmlFor="phone_label">Phone Label</label>
-										<input
-											id="phone_label"
-											name="phone_label"
-											type="text"
-											value={formData.phone_label}
-											onChange={handleChange}
-											placeholder="Mobile, Office, etc."
-										/>
-									</div>
-								</div>
-							</fieldset>
-
 							{/* Billing Address */}
 							<fieldset>
 								<legend>Billing Address</legend>

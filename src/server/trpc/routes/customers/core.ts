@@ -33,8 +33,10 @@ export const coreRouter = router({
 
 			const customer: Customer = {
 				id,
-				customer_name: input.customer_name,
-				customer_email: input.customer_email || null,
+				contact_company_name: input.contact_company_name,
+				contact_email: input.contact_email || null,
+				contact_phone: input.contact_phone,
+				contact_name: input.contact_name,
 				status: input.status || 1,
 				created_at: now,
 				updated_at: now,
@@ -45,14 +47,16 @@ export const coreRouter = router({
 			try {
 				await ctx.env.DB.prepare(
 					`INSERT INTO customers (
-						id, customer_name, customer_email, status,
+						id, contact_company_name, contact_email, contact_phone, contact_name, status,
 						created_at, updated_at, created_by, updated_by
-					) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+					) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 				)
 					.bind(
 						customer.id,
-						customer.customer_name,
-						customer.customer_email,
+						customer.contact_company_name,
+						customer.contact_email,
+						customer.contact_phone,
+						customer.contact_name,
 						customer.status,
 						customer.created_at,
 						customer.updated_at,
@@ -84,8 +88,10 @@ export const coreRouter = router({
 
 			const customer: Customer = {
 				id: customerId,
-				customer_name: input.customer_name,
-				customer_email: input.customer_email || null,
+				contact_company_name: input.contact_company_name,
+				contact_email: input.contact_email || null,
+				contact_phone: input.contact_phone,
+				contact_name: input.contact_name,
 				status: input.status || 1,
 				created_at: now,
 				updated_at: now,
@@ -97,14 +103,16 @@ export const coreRouter = router({
 				// Start by creating the customer
 				await ctx.env.DB.prepare(
 					`INSERT INTO customers (
-						id, customer_name, customer_email, status,
+						id, contact_company_name, contact_email, contact_phone, contact_name, status,
 						created_at, updated_at, created_by, updated_by
-					) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+					) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 				)
 					.bind(
 						customer.id,
-						customer.customer_name,
-						customer.customer_email,
+						customer.contact_company_name,
+						customer.contact_email,
+						customer.contact_phone,
+						customer.contact_name,
 						customer.status,
 						customer.created_at,
 						customer.updated_at,
@@ -137,14 +145,15 @@ export const coreRouter = router({
 
 						await ctx.env.DB.prepare(
 							`INSERT INTO customer_contacts (
-								id, customer_id, phone_number, phone_label, is_primary, created_at
-							) VALUES (?, ?, ?, ?, ?, ?)`,
+								id, customer_id, contact_phone, contact_name, contact_email, is_primary, created_at
+							) VALUES (?, ?, ?, ?, ?, ?, ?)`,
 						)
 							.bind(
 								contactId,
 								customerId,
-								contact.phone_number,
-								contact.phone_label || null,
+								contact.contact_phone,
+								contact.contact_name || null,
+								contact.contact_email || null,
 								contact.is_primary || 0,
 								now,
 							)
@@ -260,9 +269,9 @@ export const coreRouter = router({
 				params.push(status)
 			}
 
-			// Search by name
+			// Search by company name
 			if (search) {
-				query += ' AND customer_name LIKE ?'
+				query += ' AND contact_company_name LIKE ?'
 				params.push(`%${search}%`)
 			}
 
@@ -286,7 +295,7 @@ export const coreRouter = router({
 				}
 
 				if (search) {
-					countQuery += ' AND customer_name LIKE ?'
+					countQuery += ' AND contact_company_name LIKE ?'
 					countParams.push(`%${search}%`)
 				}
 
@@ -366,8 +375,8 @@ export const coreRouter = router({
 					`SELECT DISTINCT c.* 
 					FROM customers c
 					INNER JOIN customer_contacts cc ON c.id = cc.customer_id
-					WHERE cc.phone_number LIKE ?
-					ORDER BY c.customer_name`,
+					WHERE cc.contact_phone LIKE ?
+					ORDER BY c.contact_company_name`,
 				)
 					.bind(`%${phoneNumber}%`)
 					.all<Customer>()
@@ -468,13 +477,21 @@ export const coreRouter = router({
 			const updateValues: unknown[] = []
 
 			// Build dynamic update query
-			if (updates.customer_name !== undefined) {
-				updateFields.push('customer_name = ?')
-				updateValues.push(updates.customer_name)
+			if (updates.contact_company_name !== undefined) {
+				updateFields.push('contact_company_name = ?')
+				updateValues.push(updates.contact_company_name)
 			}
-			if (updates.customer_email !== undefined) {
-				updateFields.push('customer_email = ?')
-				updateValues.push(updates.customer_email)
+			if (updates.contact_email !== undefined) {
+				updateFields.push('contact_email = ?')
+				updateValues.push(updates.contact_email)
+			}
+			if (updates.contact_phone !== undefined) {
+				updateFields.push('contact_phone = ?')
+				updateValues.push(updates.contact_phone)
+			}
+			if (updates.contact_name !== undefined) {
+				updateFields.push('contact_name = ?')
+				updateValues.push(updates.contact_name)
 			}
 			if (updates.status !== undefined) {
 				updateFields.push('status = ?')

@@ -5,20 +5,25 @@ export const CUSTOMERS_PER_PAGE = 20
 
 // Customer schemas
 export const createCustomerSchema = z.object({
-	customer_name: z.string().min(1).max(255),
-	customer_email: z.string().email().nullable().optional(),
+	contact_company_name: z.string().min(1).max(255),
+	contact_phone: z.string().min(1),
+	contact_name: z.string().min(1),
+	contact_email: z.string().email().nullable().optional(),
 	status: z.literal(0).or(z.literal(1)).optional().default(1),
 })
 
 export const createCustomerWithDetailsSchema = z.object({
-	customer_name: z.string().min(1).max(255),
-	customer_email: z.string().email().nullable().optional(),
+	contact_company_name: z.string().min(1).max(255),
+	contact_phone: z.string().min(1),
+	contact_name: z.string().min(1),
+	contact_email: z.string().email().nullable().optional(),
 	status: z.literal(0).or(z.literal(1)).optional().default(1),
 	contacts: z
 		.array(
 			z.object({
-				phone_number: z.string().min(1),
-				phone_label: z.string().nullable().optional(),
+				contact_phone: z.string().min(1),
+				contact_name: z.string().min(1),
+				contact_email: z.string().email().nullable().optional(),
 				is_primary: z.literal(0).or(z.literal(1)).optional().default(0),
 			}),
 		)
@@ -53,8 +58,10 @@ export const createCustomerWithDetailsSchema = z.object({
 
 export const updateCustomerSchema = z.object({
 	id: z.string(),
-	customer_name: z.string().min(1).max(255).optional(),
-	customer_email: z.string().email().nullable().optional(),
+	contact_company_name: z.string().min(1).max(255).optional(),
+	contact_phone: z.string().min(1).optional(),
+	contact_name: z.string().min(1).optional(),
+	contact_email: z.string().email().nullable().optional(),
 	status: z.literal(0).or(z.literal(1)).optional(),
 })
 
@@ -71,15 +78,17 @@ export const listAllCustomersSchema = z.object({
 // Contact schemas
 export const createContactSchema = z.object({
 	customer_id: z.string(),
-	phone_number: z.string().min(1),
-	phone_label: z.string().nullable().optional(),
+	contact_phone: z.string().min(1),
+	contact_name: z.string().min(1),
+	contact_email: z.string().email().nullable().optional(),
 	is_primary: z.literal(0).or(z.literal(1)).optional().default(0),
 })
 
 export const updateContactSchema = z.object({
 	id: z.string(),
-	phone_number: z.string().min(1).optional(),
-	phone_label: z.string().nullable().optional(),
+	contact_phone: z.string().min(1).optional(),
+	contact_name: z.string().min(1).optional(),
+	contact_email: z.string().email().nullable().optional(),
 	is_primary: z.literal(0).or(z.literal(1)).optional(),
 })
 

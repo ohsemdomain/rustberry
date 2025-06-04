@@ -19,7 +19,7 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 	// Contact management state
 	const [showAddContact, setShowAddContact] = useState(false)
 	const [editingContact, setEditingContact] = useState<CustomerContact | null>(null)
-	const [newContact, setNewContact] = useState({ phone_number: '', phone_label: '' })
+	const [newContact, setNewContact] = useState({ contact_phone: '', contact_name: '', contact_email: '' })
 	const [isUpdating, setIsUpdating] = useState<string | null>(null)
 
 	const {
@@ -33,7 +33,7 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 		onSuccess: () => {
 			utils.customers.getById.invalidate(customerId)
 			setShowAddContact(false)
-			setNewContact({ phone_number: '', phone_label: '' })
+			setNewContact({ contact_phone: '', contact_name: '', contact_email: '' })
 		},
 	})
 
@@ -52,11 +52,12 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 
 	// Contact handlers
 	const handleAddContact = () => {
-		if (!newContact.phone_number) return
+		if (!newContact.contact_phone || !newContact.contact_name) return
 		createContactMutation.mutate({
 			customer_id: customerId,
-			phone_number: newContact.phone_number,
-			phone_label: newContact.phone_label || null,
+			contact_phone: newContact.contact_phone,
+			contact_name: newContact.contact_name,
+			contact_email: newContact.contact_email || null,
 			is_primary: 0,
 		})
 	}
@@ -69,8 +70,9 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 		if (!editingContact) return
 		updateContactMutation.mutate({
 			id: editingContact.id,
-			phone_number: editingContact.phone_number,
-			phone_label: editingContact.phone_label || null,
+			contact_phone: editingContact.contact_phone,
+			contact_name: editingContact.contact_name,
+			contact_email: editingContact.contact_email || null,
 		})
 	}
 
@@ -155,42 +157,31 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 						<div className="detail-content">
 							{/* Basic Information */}
 							<div className="info-section">
-								<h2>Basic Information</h2>
+								<h2>Company Information</h2>
 								<div className="info-grid">
 									<div>
 										<p>
 											<strong>Customer ID:</strong> {customer.id}
 										</p>
 										<p>
-											<strong>Name:</strong> {customer.customer_name}
+											<strong>Company Name:</strong> {customer.contact_company_name || (
+												<span className="no-data">No company name provided</span>
+											)}
 										</p>
 										<p>
-											<strong>Primary Contact:</strong> {(() => {
-												const primaryContact = customer.contacts?.find(
-													(c) => c.is_primary === 1,
-												)
-												return primaryContact ? (
-													<span className="contact-info">
-														{primaryContact.phone_number}
-														{primaryContact.phone_label && (
-															<span className="phone-label">
-																{' '}
-																({primaryContact.phone_label})
-															</span>
-														)}
-													</span>
-												) : (
-													<span className="no-data">
-														No primary contact set
-													</span>
-												)
-											})()}
+											<strong>Primary Contact Phone:</strong> {customer.contact_phone || (
+												<span className="no-data">No phone provided</span>
+											)}
 										</p>
 									</div>
 									<div>
 										<p>
-											<strong>Email:</strong>{' '}
-											{customer.customer_email || (
+											<strong>Primary Contact Name:</strong> {customer.contact_name || (
+												<span className="no-data">No contact name provided</span>
+											)}
+										</p>
+										<p>
+											<strong>Primary Contact Email:</strong> {customer.contact_email || (
 												<span className="no-data">No email provided</span>
 											)}
 										</p>
@@ -296,10 +287,10 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 								})()}
 							</div>
 
-							{/* Contacts Management */}
+							{/* Additional Contacts Management */}
 							<div className="info-section">
 								<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-									<h2>Contacts</h2>
+									<h2>Additional Contacts</h2>
 									{hasPermission('customers', 'update-any') && (
 										<button
 											className="button-primary"
@@ -308,7 +299,7 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 											style={{ fontSize: '0.875rem', padding: '0.5rem 0.75rem' }}
 										>
 											<Plus size={16} style={{ marginRight: '0.25rem' }} />
-											Add Contact
+											Add Additional Contact
 										</button>
 									)}
 								</div>
@@ -319,15 +310,15 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 											<div key={contact.id} className="card" style={{ padding: '1rem' }}>
 												{editingContact?.id === contact.id ? (
 													// Edit mode
-													<div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+													<div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
 														<Phone size={16} style={{ color: '#6b7280' }} />
 														<input
 															type="text"
-															value={editingContact.phone_number}
+															value={editingContact.contact_phone}
 															onChange={(e) =>
 																setEditingContact({
 																	...editingContact,
-																	phone_number: e.target.value,
+																	contact_phone: e.target.value,
 																})
 															}
 															placeholder="Phone number"
@@ -335,15 +326,27 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 														/>
 														<input
 															type="text"
-															value={editingContact.phone_label || ''}
+															value={editingContact.contact_name || ''}
 															onChange={(e) =>
 																setEditingContact({
 																	...editingContact,
-																	phone_label: e.target.value,
+																	contact_name: e.target.value,
 																})
 															}
-															placeholder="Label (optional)"
+															placeholder="Name (optional)"
 															style={{ flex: 1, minWidth: '120px' }}
+														/>
+														<input
+															type="email"
+															value={editingContact.contact_email || ''}
+															onChange={(e) =>
+																setEditingContact({
+																	...editingContact,
+																	contact_email: e.target.value,
+																})
+															}
+															placeholder="Email (optional)"
+															style={{ flex: 1, minWidth: '150px' }}
 														/>
 														<button
 															className="button-success"
@@ -369,7 +372,7 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 															<Phone size={16} style={{ color: '#6b7280' }} />
 															<div>
 																<p style={{ margin: 0, fontWeight: '500' }}>
-																	{contact.phone_number}
+																	{contact.contact_phone}
 																	{contact.is_primary === 1 && (
 																		<span 
 																			className="badge-success" 
@@ -379,9 +382,14 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 																		</span>
 																	)}
 																</p>
-																{contact.phone_label && (
+																{contact.contact_name && (
 																	<p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>
-																		{contact.phone_label}
+																		{contact.contact_name}
+																	</p>
+																)}
+																{contact.contact_email && (
+																	<p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>
+																		{contact.contact_email}
 																	</p>
 																)}
 															</div>
@@ -423,38 +431,47 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 										))}
 									</div>
 								) : (
-									<p className="no-data">No contacts found</p>
+									<p className="no-data">No additional contacts found</p>
 								)}
 
 								{/* Add new contact form */}
 								{showAddContact && (
 									<div className="card" style={{ padding: '1rem', marginTop: '1rem', backgroundColor: '#f9fafb' }}>
-										<h3 style={{ margin: '0 0 1rem 0', fontSize: '1rem' }}>Add New Contact</h3>
-										<div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+										<h3 style={{ margin: '0 0 1rem 0', fontSize: '1rem' }}>Add New Additional Contact</h3>
+										<div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
 											<Phone size={16} style={{ color: '#6b7280' }} />
 											<input
 												type="text"
-												value={newContact.phone_number}
+												value={newContact.contact_phone}
 												onChange={(e) =>
-													setNewContact({ ...newContact, phone_number: e.target.value })
+													setNewContact({ ...newContact, contact_phone: e.target.value })
 												}
 												placeholder="Phone number *"
 												style={{ flex: 1, minWidth: '150px' }}
 											/>
 											<input
 												type="text"
-												value={newContact.phone_label}
+												value={newContact.contact_name}
 												onChange={(e) =>
-													setNewContact({ ...newContact, phone_label: e.target.value })
+													setNewContact({ ...newContact, contact_name: e.target.value })
 												}
-												placeholder="Label (optional)"
+												placeholder="Name (optional)"
 												style={{ flex: 1, minWidth: '120px' }}
+											/>
+											<input
+												type="email"
+												value={newContact.contact_email}
+												onChange={(e) =>
+													setNewContact({ ...newContact, contact_email: e.target.value })
+												}
+												placeholder="Email (optional)"
+												style={{ flex: 1, minWidth: '150px' }}
 											/>
 											<button
 												className="button-success"
 												type="button"
 												onClick={handleAddContact}
-												disabled={!newContact.phone_number}
+												disabled={!newContact.contact_phone}
 												style={{ fontSize: '0.75rem', padding: '0.375rem 0.5rem' }}
 											>
 												Add
@@ -464,7 +481,7 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 												type="button"
 												onClick={() => {
 													setShowAddContact(false)
-													setNewContact({ phone_number: '', phone_label: '' })
+													setNewContact({ contact_phone: '', contact_name: '', contact_email: '' })
 												}}
 												style={{ fontSize: '0.75rem', padding: '0.375rem 0.5rem' }}
 											>

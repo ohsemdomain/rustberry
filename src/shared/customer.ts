@@ -2,8 +2,10 @@
 
 export interface Customer {
 	id: string
-	customer_name: string
-	customer_email: string | null
+	contact_company_name: string
+	contact_phone: string
+	contact_name: string
+	contact_email: string | null
 	status: 0 | 1
 	created_at: number
 	updated_at: number
@@ -32,8 +34,9 @@ export interface CustomerAddress {
 export interface CustomerContact {
 	id: string
 	customer_id: string
-	phone_number: string
-	phone_label: string | null
+	contact_phone: string
+	contact_name: string
+	contact_email: string | null
 	is_primary: 0 | 1
 	created_at: number
 }

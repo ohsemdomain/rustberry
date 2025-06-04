@@ -28,8 +28,8 @@ export function CustomersList() {
 		const searchTerm = searchInput.toLowerCase().trim()
 		return data.customers.filter(
 			(customer) =>
-				customer.customer_name.toLowerCase().includes(searchTerm) ||
-				(customer.customer_email?.toLowerCase().includes(searchTerm) ?? false),
+				customer.contact_company_name.toLowerCase().includes(searchTerm) ||
+				(customer.contact_email?.toLowerCase().includes(searchTerm) ?? false),
 		)
 	}, [data?.customers, searchInput])
 
@@ -85,7 +85,7 @@ export function CustomersList() {
 					<input
 						className="search-input"
 						type="text"
-						placeholder="Search customers..."
+						placeholder="Search by company name or email..."
 						value={searchInput}
 						onChange={(e) => setSearchInput(e.target.value)}
 					/>
@@ -128,10 +128,10 @@ export function CustomersList() {
 								<div className="list-item-content">
 									<div className="list-item-info">
 										<div className="list-item-title">
-											{customer.customer_name}
+											{customer.contact_company_name}
 										</div>
 										<div className="list-item-meta">
-											{customer.id} • {customer.customer_email || 'No email'} •{' '}
+											{customer.id} • {customer.contact_email || 'No email'} •{' '}
 											<span
 												className={
 													customer.status === 1 ? 'text-green' : 'text-red'
