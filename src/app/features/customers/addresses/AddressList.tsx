@@ -207,11 +207,26 @@ export function AddressList({ customerId }: AddressListProps) {
 										</p>
 									)}
 									<div className="address-card-lines">
-										{formatAddress(currentDefaultAddress).map((line, index) => (
-											<p key={index} className="address-card-line">
-												{line}
-											</p>
-										))}
+										<p className="address-card-line">
+											{[
+												currentDefaultAddress.address_line1,
+												currentDefaultAddress.address_line2,
+												currentDefaultAddress.address_line3,
+												currentDefaultAddress.address_line4,
+											]
+												.filter(Boolean)
+												.join(' ')}
+										</p>
+										<p className="address-card-line">
+											{[
+												currentDefaultAddress.city,
+												currentDefaultAddress.state,
+												currentDefaultAddress.country,
+												currentDefaultAddress.postcode,
+											]
+												.filter(Boolean)
+												.join(' • ')}
+										</p>
 									</div>
 									<div className="address-card-actions">
 										<Link
@@ -273,11 +288,32 @@ export function AddressList({ customerId }: AddressListProps) {
 													`${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Address`}
 											</div>
 											<div className="list-item-meta">
-												{formatAddress(address)
-													.slice(0, 3)
-													.map((line, index) => (
-														<div key={index}>{line}</div>
-													))}
+												<div>{address.address_line1}</div>
+												{[
+													address.address_line2,
+													address.address_line3,
+													address.address_line4,
+												].filter(Boolean).length > 0 && (
+													<div>
+														{[
+															address.address_line2,
+															address.address_line3,
+															address.address_line4,
+														]
+															.filter(Boolean)
+															.join(' ')}
+													</div>
+												)}
+												<div>
+													{[
+														address.city,
+														address.state,
+														address.country,
+														address.postcode,
+													]
+														.filter(Boolean)
+														.join(' • ')}
+												</div>
 											</div>
 										</div>
 									</div>
