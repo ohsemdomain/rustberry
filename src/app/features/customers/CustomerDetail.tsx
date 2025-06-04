@@ -89,11 +89,35 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 										<p>
 											<strong>Name:</strong> {customer.customer_name}
 										</p>
+										<p>
+											<strong>Primary Contact:</strong> {(() => {
+												const primaryContact = customer.contacts?.find(
+													(c) => c.is_primary === 1,
+												)
+												return primaryContact ? (
+													<span className="contact-info">
+														{primaryContact.phone_number}
+														{primaryContact.phone_label && (
+															<span className="phone-label">
+																{' '}
+																({primaryContact.phone_label})
+															</span>
+														)}
+													</span>
+												) : (
+													<span className="no-data">
+														No primary contact set
+													</span>
+												)
+											})()}
+										</p>
 									</div>
 									<div>
 										<p>
 											<strong>Email:</strong>{' '}
-											{customer.customer_email || 'No email provided'}
+											{customer.customer_email || (
+												<span className="no-data">No email provided</span>
+											)}
 										</p>
 										<p>
 											<strong>Status:</strong>{' '}
@@ -109,30 +133,6 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 										</p>
 									</div>
 								</div>
-							</div>
-
-							{/* Primary Contact Card */}
-							<div className="info-section">
-								<h2>Primary Contact</h2>
-								{(() => {
-									const primaryContact = customer.contacts?.find(
-										(c) => c.is_primary === 1,
-									)
-									return primaryContact ? (
-										<div className="card">
-											<p className="contact-number">
-												{primaryContact.phone_number}
-											</p>
-											{primaryContact.phone_label && (
-												<p className="contact-label">
-													{primaryContact.phone_label}
-												</p>
-											)}
-										</div>
-									) : (
-										<p className="no-data">No primary contact set</p>
-									)
-								})()}
 							</div>
 
 							{/* Default Billing Address Card */}

@@ -674,3 +674,185 @@ table {
 	font-weight: 600;
 	color: #374151;
 }
+
+/* Customer Detail Styles */
+.info-section {
+	margin-bottom: 2rem;
+}
+
+.info-section h2 {
+	font-size: 16px;
+	font-weight: 600;
+	color: #374151;
+	margin: 0 0 1rem 0;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.info-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 2rem;
+}
+
+.info-grid p {
+	margin: 0 0 0.75rem 0;
+	color: #4b5563;
+	line-height: 1.5;
+}
+
+.info-grid strong {
+	color: #374151;
+	font-weight: 500;
+	display: inline-block;
+	min-width: 120px;
+}
+
+/* Remove card styles for primary contact since it's now in the grid */
+/* Keep card styles only for address sections */
+.card {
+	background-color: #f9fafb;
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+	padding: 1.5rem;
+	transition: all 0.2s ease;
+}
+
+.card:hover {
+	border-color: #d1d5db;
+	background-color: #f3f4f6;
+}
+
+.address-label {
+	font-size: 14px;
+	font-weight: 500;
+	color: #6b7280;
+	margin: 0 0 0.75rem 0;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.card p {
+	margin: 0 0 0.25rem 0;
+	color: #374151;
+	line-height: 1.5;
+}
+
+.card p:last-child {
+	margin-bottom: 0;
+}
+
+.no-data {
+	color: #9ca3af;
+	font-style: italic;
+	margin: 0;
+}
+
+/* Status Badge */
+.badge-success,
+.badge-inactive {
+	display: inline-block;
+	padding: 0.25rem 0.75rem;
+	border-radius: 4px;
+	font-size: 12px;
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.badge-success {
+	background-color: #d1fae5;
+	color: #065f46;
+}
+
+.badge-inactive {
+	background-color: #fee2e2;
+	color: #991b1b;
+}
+
+/* Button Group */
+.button-group {
+	display: flex;
+	gap: 0.75rem;
+	align-items: center;
+}
+
+.button-secondary {
+	background-color: #f3f4f6;
+	color: #374151;
+	border: 1px solid #e5e7eb;
+}
+
+.button-secondary:hover,
+.button-secondary:focus-visible,
+.button-secondary:active {
+	background-color: #e5e7eb;
+	border-color: #d1d5db;
+}
+
+/* Metadata Section Enhancement */
+.info-section.light-text {
+	border-top: 1px solid #e5e7eb;
+	padding-top: 1.5rem;
+	margin-top: 3rem;
+}
+
+.info-section.light-text p {
+	margin: 0 0 0.5rem 0;
+	font-size: 13px;
+}
+
+.info-section.light-text strong {
+	font-weight: 500;
+	color: #6b7280;
+}
+
+/* Back Link Enhancement */
+.content-header a {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: #6b7280;
+	font-weight: 500;
+	padding: 0.5rem 0;
+}
+
+.content-header a:hover {
+	color: #3155b9;
+}
+
+/* Detail Content Layout */
+.detail-content {
+	max-width: 1000px;
+	margin: 0 auto;
+	display: block;
+}
+
+/* Primary contact info styling when shown inline */
+.contact-info {
+	color: #4b5563;
+}
+
+.contact-info .phone-label {
+	color: #6b7280;
+	font-size: 13px;
+	font-style: normal;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+	.info-grid {
+		grid-template-columns: 1fr;
+		gap: 1rem;
+	}
+
+	.button-group {
+		flex-wrap: wrap;
+	}
+
+	.button-group button {
+		flex: 1;
+		min-width: 0;
+	}
+}
