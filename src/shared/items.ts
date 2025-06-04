@@ -1,3 +1,4 @@
+//src/shared/items.ts
 // Items-related types and constants
 
 export enum ItemCategory {

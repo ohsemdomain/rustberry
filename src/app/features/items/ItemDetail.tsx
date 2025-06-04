@@ -1,3 +1,4 @@
+//src/app/features/items/ItemDetail.tsx
 import { useAuth } from '@/app/AuthProvider'
 import { LoadingOverlay } from '@/app/components/LoadingOverlay'
 import { trpc } from '@/app/trpc'
@@ -82,7 +83,13 @@ export function ItemDetail({ itemId }: ItemDetailProps) {
 								</p>
 								<p>
 									<strong>Description:</strong>{' '}
-									{item.item_description || 'No description provided'}
+									{item.item_description ? (
+										<span style={{ whiteSpace: 'pre-wrap' }}>
+											{item.item_description}
+										</span>
+									) : (
+										'No description provided'
+									)}
 								</p>
 								<p>
 									<strong>Status:</strong> {getStatusName(item.item_status)}
