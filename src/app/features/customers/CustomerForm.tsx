@@ -1,3 +1,4 @@
+import { LoadingOverlay } from '@/app/components/LoadingOverlay'
 import { trpc } from '@/app/trpc'
 import { useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
@@ -233,23 +234,20 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 	const isLoading = createMutation.isPending || updateMutation.isPending
 
 	return (
-		<div>
+		<>
 			<div className="content-header">
 				<h1>{isEditMode ? 'Edit Customer' : 'Create Customer'}</h1>
 			</div>
 
 			<div className="content-body">
-				<form onSubmit={handleSubmit}>
-					{error && <div className="error-message">{error}</div>}
+				<div className="scroll-container">
+					<LoadingOverlay isLoading={isEditMode && !customer} />
+					<div className="form-container">
+						<form onSubmit={handleSubmit}>
+							{error && <div className="error-message">{error}</div>}
 
-					{/* Company Information */}
-					<fieldset>
-						<legend>Company Information</legend>
-						<div className="form-grid">
-							<div className="form-group">
-								<label htmlFor="contact_company_name">
-									Company Name <span className="required">*</span>
-								</label>
+							<div className="form-row">
+								<label htmlFor="contact_company_name">Company Name *</label>
 								<input
 									id="contact_company_name"
 									name="contact_company_name"
@@ -257,62 +255,53 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 									value={formData.contact_company_name}
 									onChange={handleChange}
 									required
-									placeholder="Enter company name"
 								/>
 							</div>
 
-							<div className="form-group">
-								<label htmlFor="contact_email">
-									Primary Email{' '}
-									{isEditMode && <small>(Manage in Contacts section)</small>}
-								</label>
-								<input
-									id="contact_email"
-									name="contact_email"
-									type="email"
-									value={formData.contact_email}
-									onChange={handleChange}
-									placeholder="contact@company.com"
-									readOnly={isEditMode}
-								/>
-							</div>
+							{!isEditMode && (
+								<>
+									<div className="form-row">
+										<label htmlFor="contact_phone">Primary Phone *</label>
+										<input
+											id="contact_phone"
+											name="contact_phone"
+											type="tel"
+											value={formData.contact_phone}
+											onChange={handleChange}
+											required
+										/>
+									</div>
 
-							<div className="form-group">
-								<label htmlFor="contact_phone">
-									Primary Phone{' '}
-									{isEditMode && <small>(Manage in Contacts section)</small>}
-								</label>
-								<input
-									id="contact_phone"
-									name="contact_phone"
-									type="tel"
-									value={formData.contact_phone}
-									onChange={handleChange}
-									placeholder="+1234567890"
-									readOnly={isEditMode}
-								/>
-							</div>
+									<div className="form-row">
+										<label htmlFor="contact_name">Primary Contact Name *</label>
+										<input
+											id="contact_name"
+											name="contact_name"
+											type="text"
+											value={formData.contact_name}
+											onChange={handleChange}
+											required
+										/>
+									</div>
 
-							<div className="form-group">
-								<label htmlFor="contact_name">
-									Primary Contact Name{' '}
-									{isEditMode && <small>(Manage in Contacts section)</small>}
-								</label>
-								<input
-									id="contact_name"
-									name="contact_name"
-									type="text"
-									value={formData.contact_name}
-									onChange={handleChange}
-									placeholder="John Smith"
-									readOnly={isEditMode}
-								/>
-							</div>
+									<div className="form-row">
+										<label htmlFor="contact_email">Primary Email</label>
+										<input
+											id="contact_email"
+											name="contact_email"
+											type="email"
+											value={formData.contact_email}
+											onChange={handleChange}
+										/>
+									</div>
+								</>
+							)}
 
 							{isEditMode && (
-								<div className="form-group">
+								<div className="form-row">
 									<label htmlFor="status">Status</label>
 									<select
+										className="custom-select"
 										id="status"
 										name="status"
 										value={formData.status}
@@ -323,16 +312,13 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 									</select>
 								</div>
 							)}
-						</div>
-					</fieldset>
 
-					{!isEditMode && (
-						<>
-							{/* Billing Address */}
-							<fieldset>
-								<legend>Billing Address</legend>
-								<div className="form-grid">
-									<div className="form-group">
+							{!isEditMode && (
+								<>
+									{/* Billing Address Section */}
+									<h3>Billing Address</h3>
+
+									<div className="form-row">
 										<label htmlFor="billing_address_label">Address Label</label>
 										<input
 											id="billing_address_label"
@@ -340,13 +326,12 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 											type="text"
 											value={formData.billing_address_label}
 											onChange={handleChange}
-											placeholder="Main Office"
 										/>
 									</div>
 
-									<div className="form-group full-width">
+									<div className="form-row">
 										<label htmlFor="billing_address_line1">
-											Address Line 1 <span className="required">*</span>
+											Address Line 1 *
 										</label>
 										<input
 											id="billing_address_line1"
@@ -355,11 +340,10 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 											value={formData.billing_address_line1}
 											onChange={handleChange}
 											required
-											placeholder="123 Main Street"
 										/>
 									</div>
 
-									<div className="form-group full-width">
+									<div className="form-row">
 										<label htmlFor="billing_address_line2">
 											Address Line 2
 										</label>
@@ -369,11 +353,10 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 											type="text"
 											value={formData.billing_address_line2}
 											onChange={handleChange}
-											placeholder="Suite 100"
 										/>
 									</div>
 
-									<div className="form-group">
+									<div className="form-row">
 										<label htmlFor="billing_city">City</label>
 										<input
 											id="billing_city"
@@ -381,11 +364,10 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 											type="text"
 											value={formData.billing_city}
 											onChange={handleChange}
-											placeholder="New York"
 										/>
 									</div>
 
-									<div className="form-group">
+									<div className="form-row">
 										<label htmlFor="billing_state">State/Province</label>
 										<input
 											id="billing_state"
@@ -393,11 +375,10 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 											type="text"
 											value={formData.billing_state}
 											onChange={handleChange}
-											placeholder="NY"
 										/>
 									</div>
 
-									<div className="form-group">
+									<div className="form-row">
 										<label htmlFor="billing_postcode">Postal Code</label>
 										<input
 											id="billing_postcode"
@@ -405,11 +386,10 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 											type="text"
 											value={formData.billing_postcode}
 											onChange={handleChange}
-											placeholder="10001"
 										/>
 									</div>
 
-									<div className="form-group">
+									<div className="form-row">
 										<label htmlFor="billing_country">Country</label>
 										<input
 											id="billing_country"
@@ -417,150 +397,135 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 											type="text"
 											value={formData.billing_country}
 											onChange={handleChange}
-											placeholder="United States"
 										/>
 									</div>
-								</div>
-							</fieldset>
 
-							{/* Shipping Address Toggle */}
-							<fieldset>
-								<div className="form-group">
-									<label className="checkbox-label">
-										<input
-											type="checkbox"
-											name="sameAsShipping"
-											checked={formData.sameAsShipping}
-											onChange={handleChange}
-										/>
-										Shipping address same as billing address
-									</label>
-								</div>
-							</fieldset>
-
-							{/* Shipping Address */}
-							{!formData.sameAsShipping && (
-								<fieldset>
-									<legend>Shipping Address</legend>
-									<div className="form-grid">
-										<div className="form-group">
-											<label htmlFor="shipping_address_label">
-												Address Label
-											</label>
+									{/* Shipping Address Toggle */}
+									<div className="form-row">
+										<label className="checkbox-label">
 											<input
-												id="shipping_address_label"
-												name="shipping_address_label"
-												type="text"
-												value={formData.shipping_address_label}
+												type="checkbox"
+												name="sameAsShipping"
+												checked={formData.sameAsShipping}
 												onChange={handleChange}
-												placeholder="Warehouse"
 											/>
-										</div>
-
-										<div className="form-group full-width">
-											<label htmlFor="shipping_address_line1">
-												Address Line 1
-											</label>
-											<input
-												id="shipping_address_line1"
-												name="shipping_address_line1"
-												type="text"
-												value={formData.shipping_address_line1}
-												onChange={handleChange}
-												placeholder="456 Industrial Ave"
-											/>
-										</div>
-
-										<div className="form-group full-width">
-											<label htmlFor="shipping_address_line2">
-												Address Line 2
-											</label>
-											<input
-												id="shipping_address_line2"
-												name="shipping_address_line2"
-												type="text"
-												value={formData.shipping_address_line2}
-												onChange={handleChange}
-												placeholder="Building B"
-											/>
-										</div>
-
-										<div className="form-group">
-											<label htmlFor="shipping_city">City</label>
-											<input
-												id="shipping_city"
-												name="shipping_city"
-												type="text"
-												value={formData.shipping_city}
-												onChange={handleChange}
-												placeholder="Brooklyn"
-											/>
-										</div>
-
-										<div className="form-group">
-											<label htmlFor="shipping_state">State/Province</label>
-											<input
-												id="shipping_state"
-												name="shipping_state"
-												type="text"
-												value={formData.shipping_state}
-												onChange={handleChange}
-												placeholder="NY"
-											/>
-										</div>
-
-										<div className="form-group">
-											<label htmlFor="shipping_postcode">Postal Code</label>
-											<input
-												id="shipping_postcode"
-												name="shipping_postcode"
-												type="text"
-												value={formData.shipping_postcode}
-												onChange={handleChange}
-												placeholder="11201"
-											/>
-										</div>
-
-										<div className="form-group">
-											<label htmlFor="shipping_country">Country</label>
-											<input
-												id="shipping_country"
-												name="shipping_country"
-												type="text"
-												value={formData.shipping_country}
-												onChange={handleChange}
-												placeholder="United States"
-											/>
-										</div>
+											Shipping address same as billing address
+										</label>
 									</div>
-								</fieldset>
+
+									{/* Shipping Address */}
+									{!formData.sameAsShipping && (
+										<>
+											<h3>Shipping Address</h3>
+
+											<div className="form-row">
+												<label htmlFor="shipping_address_label">
+													Address Label
+												</label>
+												<input
+													id="shipping_address_label"
+													name="shipping_address_label"
+													type="text"
+													value={formData.shipping_address_label}
+													onChange={handleChange}
+												/>
+											</div>
+
+											<div className="form-row">
+												<label htmlFor="shipping_address_line1">
+													Address Line 1
+												</label>
+												<input
+													id="shipping_address_line1"
+													name="shipping_address_line1"
+													type="text"
+													value={formData.shipping_address_line1}
+													onChange={handleChange}
+												/>
+											</div>
+
+											<div className="form-row">
+												<label htmlFor="shipping_address_line2">
+													Address Line 2
+												</label>
+												<input
+													id="shipping_address_line2"
+													name="shipping_address_line2"
+													type="text"
+													value={formData.shipping_address_line2}
+													onChange={handleChange}
+												/>
+											</div>
+
+											<div className="form-row">
+												<label htmlFor="shipping_city">City</label>
+												<input
+													id="shipping_city"
+													name="shipping_city"
+													type="text"
+													value={formData.shipping_city}
+													onChange={handleChange}
+												/>
+											</div>
+
+											<div className="form-row">
+												<label htmlFor="shipping_state">State/Province</label>
+												<input
+													id="shipping_state"
+													name="shipping_state"
+													type="text"
+													value={formData.shipping_state}
+													onChange={handleChange}
+												/>
+											</div>
+
+											<div className="form-row">
+												<label htmlFor="shipping_postcode">Postal Code</label>
+												<input
+													id="shipping_postcode"
+													name="shipping_postcode"
+													type="text"
+													value={formData.shipping_postcode}
+													onChange={handleChange}
+												/>
+											</div>
+
+											<div className="form-row">
+												<label htmlFor="shipping_country">Country</label>
+												<input
+													id="shipping_country"
+													name="shipping_country"
+													type="text"
+													value={formData.shipping_country}
+													onChange={handleChange}
+												/>
+											</div>
+										</>
+									)}
+								</>
 							)}
-						</>
-					)}
 
-					{/* Form Actions */}
-					<div className="form-actions">
-						<button
-							type="button"
-							onClick={() => navigate({ to: '/customers' })}
-							className="button-secondary"
-						>
-							Cancel
-						</button>
-						<button
-							type="submit"
-							disabled={isLoading}
-							className="button-primary"
-						>
-							{isLoading
-								? 'Saving...'
-								: isEditMode
-									? 'Update Customer'
-									: 'Create Customer'}
-						</button>
+							<div className="form-actions">
+								<button
+									className="button-blue"
+									type="submit"
+									disabled={isLoading}
+								>
+									{isEditMode ? 'Update Customer' : 'Create Customer'}
+								</button>
+
+								<button
+									className="button-gray"
+									type="button"
+									onClick={() => navigate({ to: '/customers' })}
+								>
+									Cancel
+								</button>
+							</div>
+						</form>
 					</div>
-				</form>
+				</div>
 			</div>
-		</div>
+		</>
 	)
 }

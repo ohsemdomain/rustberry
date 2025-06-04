@@ -2,9 +2,9 @@
 import { useAuth } from '@/app/AuthProvider'
 import { LoadingOverlay } from '@/app/components/LoadingOverlay'
 import { trpc } from '@/app/trpc'
+import type { Customer, CustomerContact } from '@/shared/customer'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useMemo, useState } from 'react'
-import type { Customer, CustomerContact } from '@/shared/customer'
 
 // Type for customer with contacts included
 type CustomerWithContacts = Customer & {
