@@ -84,11 +84,19 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 			setFormData((prev) => ({
 				...prev,
 				contact_company_name: customer.contact_company_name,
-				contact_email: customer.contact_email || '',
-				contact_phone: customer.contact_phone || '',
-				contact_name: customer.contact_name || '',
 				status: customer.status,
 			}))
+
+			// Load primary contact info for editing
+			const primaryContact = customer.contacts?.find((c) => c.is_primary === 1)
+			if (primaryContact) {
+				setFormData((prev) => ({
+					...prev,
+					contact_email: primaryContact.contact_email || '',
+					contact_phone: primaryContact.contact_phone || '',
+					contact_name: primaryContact.contact_name || '',
+				}))
+			}
 
 			// Load default billing address if exists
 			const billingAddress = customer.addresses?.find(
@@ -156,13 +164,10 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 		setError(null)
 
 		if (isEditMode) {
-			// In edit mode, only update customer basic info
+			// In edit mode, only update customer basic info (contact info managed separately)
 			updateMutation.mutate({
 				id: customerId,
 				contact_company_name: formData.contact_company_name,
-				contact_email: formData.contact_email || null,
-				contact_phone: formData.contact_phone,
-				contact_name: formData.contact_name,
 				status: formData.status,
 			})
 		} else {
@@ -172,7 +177,7 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 				contact_email: formData.contact_email || null,
 				contact_phone: formData.contact_phone,
 				contact_name: formData.contact_name,
-				status: 1 as 1, // Always active for new customers
+				status: 1 as const, // Always active for new customers
 				billing_address: formData.billing_address_line1
 					? {
 							address_type: 'billing' as const,
@@ -217,11 +222,11 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 		setFormData((prev) => ({
 			...prev,
 			[name]:
-				type === 'checkbox' 
-					? (e.target as HTMLInputElement).checked 
-					: name === 'status' 
-					? Number(value) as 0 | 1
-					: value,
+				type === 'checkbox'
+					? (e.target as HTMLInputElement).checked
+					: name === 'status'
+						? (Number(value) as 0 | 1)
+						: value,
 		}))
 	}
 
@@ -257,7 +262,10 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 							</div>
 
 							<div className="form-group">
-								<label htmlFor="contact_email">Primary Email</label>
+								<label htmlFor="contact_email">
+									Primary Email{' '}
+									{isEditMode && <small>(Manage in Contacts section)</small>}
+								</label>
 								<input
 									id="contact_email"
 									name="contact_email"
@@ -265,11 +273,15 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 									value={formData.contact_email}
 									onChange={handleChange}
 									placeholder="contact@company.com"
+									readOnly={isEditMode}
 								/>
 							</div>
 
 							<div className="form-group">
-								<label htmlFor="contact_phone">Primary Phone</label>
+								<label htmlFor="contact_phone">
+									Primary Phone{' '}
+									{isEditMode && <small>(Manage in Contacts section)</small>}
+								</label>
 								<input
 									id="contact_phone"
 									name="contact_phone"
@@ -277,11 +289,15 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 									value={formData.contact_phone}
 									onChange={handleChange}
 									placeholder="+1234567890"
+									readOnly={isEditMode}
 								/>
 							</div>
 
 							<div className="form-group">
-								<label htmlFor="contact_name">Primary Contact Name</label>
+								<label htmlFor="contact_name">
+									Primary Contact Name{' '}
+									{isEditMode && <small>(Manage in Contacts section)</small>}
+								</label>
 								<input
 									id="contact_name"
 									name="contact_name"
@@ -289,6 +305,7 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 									value={formData.contact_name}
 									onChange={handleChange}
 									placeholder="John Smith"
+									readOnly={isEditMode}
 								/>
 							</div>
 

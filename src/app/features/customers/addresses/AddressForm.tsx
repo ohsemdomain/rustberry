@@ -21,10 +21,7 @@ interface FormData {
 	is_default: 0 | 1
 }
 
-export function AddressForm({
-	customerId,
-	addressId,
-}: AddressFormProps) {
+export function AddressForm({ customerId, addressId }: AddressFormProps) {
 	const isEditMode = !!addressId
 	const navigate = useNavigate()
 	const utils = trpc.useUtils()

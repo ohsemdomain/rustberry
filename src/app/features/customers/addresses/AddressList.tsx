@@ -3,7 +3,7 @@ import { LoadingOverlay } from '@/app/components/LoadingOverlay'
 import { trpc } from '@/app/trpc'
 import type { CustomerAddress } from '@/shared/customer'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { MapPin, Plus, Package, FileText } from 'lucide-react'
+import { FileText, MapPin, Package, Plus } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 interface AddressListProps {
@@ -136,7 +136,6 @@ export function AddressList({ customerId }: AddressListProps) {
 	const isProcessing = isUpdating !== null
 	const currentDefaultAddress =
 		activeTab === 'billing' ? defaultBillingAddress : defaultShippingAddress
-
 
 	return (
 		<div>

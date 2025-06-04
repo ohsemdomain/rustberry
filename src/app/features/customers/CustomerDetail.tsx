@@ -15,11 +15,17 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 	const { hasPermission } = useAuth()
 	const navigate = useNavigate()
 	const utils = trpc.useUtils()
-	
+
 	// Contact management state
 	const [showAddContact, setShowAddContact] = useState(false)
-	const [editingContact, setEditingContact] = useState<CustomerContact | null>(null)
-	const [newContact, setNewContact] = useState({ contact_phone: '', contact_name: '', contact_email: '' })
+	const [editingContact, setEditingContact] = useState<CustomerContact | null>(
+		null,
+	)
+	const [newContact, setNewContact] = useState({
+		contact_phone: '',
+		contact_name: '',
+		contact_email: '',
+	})
 	const [isUpdating, setIsUpdating] = useState<string | null>(null)
 
 	const {
@@ -79,7 +85,7 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 	const handleSetPrimary = async (contact: CustomerContact) => {
 		if (contact.is_primary === 1) return
 		setIsUpdating(contact.id)
-		
+
 		try {
 			// First, unset current primary
 			const currentPrimary = customer?.contacts?.find((c) => c.is_primary === 1)
@@ -164,27 +170,32 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 											<strong>Customer ID:</strong> {customer.id}
 										</p>
 										<p>
-											<strong>Company Name:</strong> {customer.contact_company_name || (
-												<span className="no-data">No company name provided</span>
+											<strong>Company Name:</strong>{' '}
+											{customer.contact_company_name || (
+												<span className="no-data">
+													No company name provided
+												</span>
 											)}
 										</p>
 										<p>
-											<strong>Primary Contact Phone:</strong> {customer.contact_phone || (
-												<span className="no-data">No phone provided</span>
-											)}
+											<strong>Primary Contact:</strong> {(() => {
+												const primaryContact = customer.contacts?.find(
+													(c) => c.is_primary === 1,
+												)
+												return primaryContact ? (
+													<span>
+														{primaryContact.contact_name} -{' '}
+														{primaryContact.contact_phone}
+													</span>
+												) : (
+													<span className="no-data">
+														No primary contact set
+													</span>
+												)
+											})()}
 										</p>
 									</div>
 									<div>
-										<p>
-											<strong>Primary Contact Name:</strong> {customer.contact_name || (
-												<span className="no-data">No contact name provided</span>
-											)}
-										</p>
-										<p>
-											<strong>Primary Contact Email:</strong> {customer.contact_email || (
-												<span className="no-data">No email provided</span>
-											)}
-										</p>
 										<p>
 											<strong>Status:</strong>{' '}
 											<span
@@ -289,14 +300,24 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 
 							{/* Additional Contacts Management */}
 							<div className="info-section">
-								<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+								<div
+									style={{
+										display: 'flex',
+										justifyContent: 'space-between',
+										alignItems: 'center',
+										marginBottom: '1rem',
+									}}
+								>
 									<h2>Additional Contacts</h2>
 									{hasPermission('customers', 'update-any') && (
 										<button
 											className="button-primary"
 											type="button"
 											onClick={() => setShowAddContact(true)}
-											style={{ fontSize: '0.875rem', padding: '0.5rem 0.75rem' }}
+											style={{
+												fontSize: '0.875rem',
+												padding: '0.5rem 0.75rem',
+											}}
 										>
 											<Plus size={16} style={{ marginRight: '0.25rem' }} />
 											Add Additional Contact
@@ -305,12 +326,29 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 								</div>
 
 								{customer.contacts && customer.contacts.length > 0 ? (
-									<div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+									<div
+										style={{
+											display: 'flex',
+											flexDirection: 'column',
+											gap: '0.75rem',
+										}}
+									>
 										{customer.contacts.map((contact) => (
-											<div key={contact.id} className="card" style={{ padding: '1rem' }}>
+											<div
+												key={contact.id}
+												className="card"
+												style={{ padding: '1rem' }}
+											>
 												{editingContact?.id === contact.id ? (
 													// Edit mode
-													<div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+													<div
+														style={{
+															display: 'flex',
+															alignItems: 'center',
+															gap: '0.75rem',
+															flexWrap: 'wrap',
+														}}
+													>
 														<Phone size={16} style={{ color: '#6b7280' }} />
 														<input
 															type="text"
@@ -352,7 +390,10 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 															className="button-success"
 															type="button"
 															onClick={handleUpdateContact}
-															style={{ fontSize: '0.75rem', padding: '0.375rem 0.5rem' }}
+															style={{
+																fontSize: '0.75rem',
+																padding: '0.375rem 0.5rem',
+															}}
 														>
 															Save
 														</button>
@@ -360,35 +401,65 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 															className="button-gray"
 															type="button"
 															onClick={() => setEditingContact(null)}
-															style={{ fontSize: '0.75rem', padding: '0.375rem 0.5rem' }}
+															style={{
+																fontSize: '0.75rem',
+																padding: '0.375rem 0.5rem',
+															}}
 														>
 															<X size={14} />
 														</button>
 													</div>
 												) : (
 													// Display mode
-													<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-														<div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+													<div
+														style={{
+															display: 'flex',
+															alignItems: 'center',
+															justifyContent: 'space-between',
+														}}
+													>
+														<div
+															style={{
+																display: 'flex',
+																alignItems: 'center',
+																gap: '0.75rem',
+															}}
+														>
 															<Phone size={16} style={{ color: '#6b7280' }} />
 															<div>
 																<p style={{ margin: 0, fontWeight: '500' }}>
 																	{contact.contact_phone}
 																	{contact.is_primary === 1 && (
-																		<span 
-																			className="badge-success" 
-																			style={{ marginLeft: '0.5rem', fontSize: '0.75rem' }}
+																		<span
+																			className="badge-success"
+																			style={{
+																				marginLeft: '0.5rem',
+																				fontSize: '0.75rem',
+																			}}
 																		>
 																			Primary
 																		</span>
 																	)}
 																</p>
 																{contact.contact_name && (
-																	<p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>
+																	<p
+																		style={{
+																			margin: 0,
+																			fontSize: '0.875rem',
+																			color: '#6b7280',
+																		}}
+																	>
 																		{contact.contact_name}
 																	</p>
 																)}
 																{contact.contact_email && (
-																	<p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>
+																	<p
+																		style={{
+																			margin: 0,
+																			fontSize: '0.875rem',
+																			color: '#6b7280',
+																		}}
+																	>
 																		{contact.contact_email}
 																	</p>
 																)}
@@ -402,7 +473,10 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 																		type="button"
 																		onClick={() => handleSetPrimary(contact)}
 																		disabled={isUpdating === contact.id}
-																		style={{ fontSize: '0.75rem', padding: '0.375rem 0.5rem' }}
+																		style={{
+																			fontSize: '0.75rem',
+																			padding: '0.375rem 0.5rem',
+																		}}
 																	>
 																		Set Primary
 																	</button>
@@ -411,15 +485,23 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 																	className="button-gray"
 																	type="button"
 																	onClick={() => handleEditContact(contact)}
-																	style={{ fontSize: '0.75rem', padding: '0.375rem 0.5rem' }}
+																	style={{
+																		fontSize: '0.75rem',
+																		padding: '0.375rem 0.5rem',
+																	}}
 																>
 																	<Edit2 size={14} />
 																</button>
 																<button
 																	className="button-danger"
 																	type="button"
-																	onClick={() => handleDeleteContact(contact.id)}
-																	style={{ fontSize: '0.75rem', padding: '0.375rem 0.5rem' }}
+																	onClick={() =>
+																		handleDeleteContact(contact.id)
+																	}
+																	style={{
+																		fontSize: '0.75rem',
+																		padding: '0.375rem 0.5rem',
+																	}}
 																>
 																	<Trash2 size={14} />
 																</button>
@@ -436,15 +518,34 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 
 								{/* Add new contact form */}
 								{showAddContact && (
-									<div className="card" style={{ padding: '1rem', marginTop: '1rem', backgroundColor: '#f9fafb' }}>
-										<h3 style={{ margin: '0 0 1rem 0', fontSize: '1rem' }}>Add New Additional Contact</h3>
-										<div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+									<div
+										className="card"
+										style={{
+											padding: '1rem',
+											marginTop: '1rem',
+											backgroundColor: '#f9fafb',
+										}}
+									>
+										<h3 style={{ margin: '0 0 1rem 0', fontSize: '1rem' }}>
+											Add New Additional Contact
+										</h3>
+										<div
+											style={{
+												display: 'flex',
+												alignItems: 'center',
+												gap: '0.75rem',
+												flexWrap: 'wrap',
+											}}
+										>
 											<Phone size={16} style={{ color: '#6b7280' }} />
 											<input
 												type="text"
 												value={newContact.contact_phone}
 												onChange={(e) =>
-													setNewContact({ ...newContact, contact_phone: e.target.value })
+													setNewContact({
+														...newContact,
+														contact_phone: e.target.value,
+													})
 												}
 												placeholder="Phone number *"
 												style={{ flex: 1, minWidth: '150px' }}
@@ -453,7 +554,10 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 												type="text"
 												value={newContact.contact_name}
 												onChange={(e) =>
-													setNewContact({ ...newContact, contact_name: e.target.value })
+													setNewContact({
+														...newContact,
+														contact_name: e.target.value,
+													})
 												}
 												placeholder="Name (optional)"
 												style={{ flex: 1, minWidth: '120px' }}
@@ -462,7 +566,10 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 												type="email"
 												value={newContact.contact_email}
 												onChange={(e) =>
-													setNewContact({ ...newContact, contact_email: e.target.value })
+													setNewContact({
+														...newContact,
+														contact_email: e.target.value,
+													})
 												}
 												placeholder="Email (optional)"
 												style={{ flex: 1, minWidth: '150px' }}
@@ -472,7 +579,10 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 												type="button"
 												onClick={handleAddContact}
 												disabled={!newContact.contact_phone}
-												style={{ fontSize: '0.75rem', padding: '0.375rem 0.5rem' }}
+												style={{
+													fontSize: '0.75rem',
+													padding: '0.375rem 0.5rem',
+												}}
 											>
 												Add
 											</button>
@@ -481,9 +591,16 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 												type="button"
 												onClick={() => {
 													setShowAddContact(false)
-													setNewContact({ contact_phone: '', contact_name: '', contact_email: '' })
+													setNewContact({
+														contact_phone: '',
+														contact_name: '',
+														contact_email: '',
+													})
 												}}
-												style={{ fontSize: '0.75rem', padding: '0.375rem 0.5rem' }}
+												style={{
+													fontSize: '0.75rem',
+													padding: '0.375rem 0.5rem',
+												}}
 											>
 												<X size={14} />
 											</button>

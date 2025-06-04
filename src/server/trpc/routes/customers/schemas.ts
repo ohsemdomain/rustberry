@@ -6,18 +6,20 @@ export const CUSTOMERS_PER_PAGE = 20
 // Customer schemas
 export const createCustomerSchema = z.object({
 	contact_company_name: z.string().min(1).max(255),
+	status: z.literal(0).or(z.literal(1)).optional().default(1),
+	// Contact details now handled via primary contact creation
 	contact_phone: z.string().min(1),
 	contact_name: z.string().min(1),
 	contact_email: z.string().email().nullable().optional(),
-	status: z.literal(0).or(z.literal(1)).optional().default(1),
 })
 
 export const createCustomerWithDetailsSchema = z.object({
 	contact_company_name: z.string().min(1).max(255),
+	status: z.literal(0).or(z.literal(1)).optional().default(1),
+	// Primary contact details (will be created as primary contact)
 	contact_phone: z.string().min(1),
 	contact_name: z.string().min(1),
 	contact_email: z.string().email().nullable().optional(),
-	status: z.literal(0).or(z.literal(1)).optional().default(1),
 	contacts: z
 		.array(
 			z.object({
@@ -59,9 +61,6 @@ export const createCustomerWithDetailsSchema = z.object({
 export const updateCustomerSchema = z.object({
 	id: z.string(),
 	contact_company_name: z.string().min(1).max(255).optional(),
-	contact_phone: z.string().min(1).optional(),
-	contact_name: z.string().min(1).optional(),
-	contact_email: z.string().email().nullable().optional(),
 	status: z.literal(0).or(z.literal(1)).optional(),
 })
 

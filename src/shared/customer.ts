@@ -3,9 +3,6 @@
 export interface Customer {
 	id: string
 	contact_company_name: string
-	contact_phone: string
-	contact_name: string
-	contact_email: string | null
 	status: 0 | 1
 	created_at: number
 	updated_at: number

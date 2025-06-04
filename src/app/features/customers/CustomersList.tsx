@@ -4,6 +4,12 @@ import { LoadingOverlay } from '@/app/components/LoadingOverlay'
 import { trpc } from '@/app/trpc'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useMemo, useState } from 'react'
+import type { Customer, CustomerContact } from '@/shared/customer'
+
+// Type for customer with contacts included
+type CustomerWithContacts = Customer & {
+	contacts?: CustomerContact[]
+}
 
 export function CustomersList() {
 	const { hasPermission } = useAuth()
@@ -26,11 +32,21 @@ export function CustomersList() {
 		}
 
 		const searchTerm = searchInput.toLowerCase().trim()
-		return data.customers.filter(
-			(customer) =>
-				customer.contact_company_name.toLowerCase().includes(searchTerm) ||
-				(customer.contact_email?.toLowerCase().includes(searchTerm) ?? false),
-		)
+		return data.customers.filter((customer: CustomerWithContacts) => {
+			// Search by company name
+			if (customer.contact_company_name.toLowerCase().includes(searchTerm)) {
+				return true
+			}
+
+			// Search by any contact phone number
+			if (customer.contacts && customer.contacts.length > 0) {
+				return customer.contacts.some((contact) =>
+					contact.contact_phone.toLowerCase().includes(searchTerm),
+				)
+			}
+
+			return false
+		})
 	}, [data?.customers, searchInput])
 
 	// Customers to display (with pagination)
@@ -85,7 +101,7 @@ export function CustomersList() {
 					<input
 						className="search-input"
 						type="text"
-						placeholder="Search by company name or email..."
+						placeholder="Search by company name or phone number..."
 						value={searchInput}
 						onChange={(e) => setSearchInput(e.target.value)}
 					/>
@@ -131,7 +147,7 @@ export function CustomersList() {
 											{customer.contact_company_name}
 										</div>
 										<div className="list-item-meta">
-											{customer.id} • {customer.contact_email || 'No email'} •{' '}
+											{customer.id} • Contact info in customer details •{' '}
 											<span
 												className={
 													customer.status === 1 ? 'text-green' : 'text-red'

@@ -34,9 +34,6 @@ export const coreRouter = router({
 			const customer: Customer = {
 				id,
 				contact_company_name: input.contact_company_name,
-				contact_email: input.contact_email || null,
-				contact_phone: input.contact_phone,
-				contact_name: input.contact_name,
 				status: input.status || 1,
 				created_at: now,
 				updated_at: now,
@@ -45,23 +42,43 @@ export const coreRouter = router({
 			}
 
 			try {
+				// Create customer record
 				await ctx.env.DB.prepare(
 					`INSERT INTO customers (
-						id, contact_company_name, contact_email, contact_phone, contact_name, status,
+						id, contact_company_name, status,
 						created_at, updated_at, created_by, updated_by
-					) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+					) VALUES (?, ?, ?, ?, ?, ?, ?)`,
 				)
 					.bind(
 						customer.id,
 						customer.contact_company_name,
-						customer.contact_email,
-						customer.contact_phone,
-						customer.contact_name,
 						customer.status,
 						customer.created_at,
 						customer.updated_at,
 						customer.created_by,
 						customer.updated_by,
+					)
+					.run()
+
+				// Create primary contact
+				const contactId = await generateUniqueId(
+					ctx.env,
+					CONTACT_ID_PREFIX,
+					'customer_contact',
+				)
+				await ctx.env.DB.prepare(
+					`INSERT INTO customer_contacts (
+						id, customer_id, contact_phone, contact_name, contact_email, is_primary, created_at
+					) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+				)
+					.bind(
+						contactId,
+						customer.id,
+						input.contact_phone,
+						input.contact_name,
+						input.contact_email || null,
+						1, // is_primary
+						now,
 					)
 					.run()
 
@@ -89,9 +106,6 @@ export const coreRouter = router({
 			const customer: Customer = {
 				id: customerId,
 				contact_company_name: input.contact_company_name,
-				contact_email: input.contact_email || null,
-				contact_phone: input.contact_phone,
-				contact_name: input.contact_name,
 				status: input.status || 1,
 				created_at: now,
 				updated_at: now,
@@ -103,16 +117,13 @@ export const coreRouter = router({
 				// Start by creating the customer
 				await ctx.env.DB.prepare(
 					`INSERT INTO customers (
-						id, contact_company_name, contact_email, contact_phone, contact_name, status,
+						id, contact_company_name, status,
 						created_at, updated_at, created_by, updated_by
-					) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+					) VALUES (?, ?, ?, ?, ?, ?, ?)`,
 				)
 					.bind(
 						customer.id,
 						customer.contact_company_name,
-						customer.contact_email,
-						customer.contact_phone,
-						customer.contact_name,
 						customer.status,
 						customer.created_at,
 						customer.updated_at,
@@ -121,21 +132,31 @@ export const coreRouter = router({
 					)
 					.run()
 
-				// Add contacts if provided
-				if (input.contacts && input.contacts.length > 0) {
-					// Ensure only one primary contact
-					let hasPrimary = false
-					for (const contact of input.contacts) {
-						if (contact.is_primary === 1) {
-							if (hasPrimary) {
-								contact.is_primary = 0
-							} else {
-								hasPrimary = true
-							}
-						}
-					}
+				// Create primary contact from the main contact fields
+				const primaryContactId = await generateUniqueId(
+					ctx.env,
+					CONTACT_ID_PREFIX,
+					'customer_contact',
+				)
+				await ctx.env.DB.prepare(
+					`INSERT INTO customer_contacts (
+						id, customer_id, contact_phone, contact_name, contact_email, is_primary, created_at
+					) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+				)
+					.bind(
+						primaryContactId,
+						customerId,
+						input.contact_phone,
+						input.contact_name,
+						input.contact_email || null,
+						1, // is_primary
+						now,
+					)
+					.run()
 
-					// Insert all contacts
+				// Add additional contacts if provided (they will be secondary contacts)
+				if (input.contacts && input.contacts.length > 0) {
+					// Insert all additional contacts (all will be secondary since primary is already created)
 					for (const contact of input.contacts) {
 						const contactId = await generateUniqueId(
 							ctx.env,
@@ -154,7 +175,7 @@ export const coreRouter = router({
 								contact.contact_phone,
 								contact.contact_name || null,
 								contact.contact_email || null,
-								contact.is_primary || 0,
+								0, // All additional contacts are secondary
 								now,
 							)
 							.run()
@@ -349,11 +370,43 @@ export const coreRouter = router({
 					.bind(...params)
 					.all<Customer>()
 
+				// Get all contacts for these customers
+				const customerIds = results.map((c) => c.id)
+				const customersWithContacts = []
+
+				// Batch fetch contacts for all customers
+				if (customerIds.length > 0) {
+					const placeholders = customerIds.map(() => '?').join(',')
+					const { results: allContacts } = await ctx.env.DB.prepare(
+						`SELECT * FROM customer_contacts WHERE customer_id IN (${placeholders})`,
+					)
+						.bind(...customerIds)
+						.all<CustomerContact>()
+
+					// Group contacts by customer
+					const contactsByCustomer = new Map<string, CustomerContact[]>()
+					for (const contact of allContacts) {
+						if (!contactsByCustomer.has(contact.customer_id)) {
+							contactsByCustomer.set(contact.customer_id, [])
+						}
+						contactsByCustomer.get(contact.customer_id)!.push(contact)
+					}
+
+					// Attach contacts to customers
+					for (const customer of results) {
+						customersWithContacts.push({
+							...customer,
+							contacts: contactsByCustomer.get(customer.id) || [],
+						})
+					}
+				}
+
 				// Get total count (same as results length since we're getting all)
 				const totalCustomers = results.length
 
 				return {
-					customers: results,
+					customers:
+						customersWithContacts.length > 0 ? customersWithContacts : results,
 					totalCustomers,
 				}
 			} catch (error) {
@@ -476,22 +529,10 @@ export const coreRouter = router({
 			const updateFields: string[] = []
 			const updateValues: unknown[] = []
 
-			// Build dynamic update query
+			// Build dynamic update query (only for customer table fields)
 			if (updates.contact_company_name !== undefined) {
 				updateFields.push('contact_company_name = ?')
 				updateValues.push(updates.contact_company_name)
-			}
-			if (updates.contact_email !== undefined) {
-				updateFields.push('contact_email = ?')
-				updateValues.push(updates.contact_email)
-			}
-			if (updates.contact_phone !== undefined) {
-				updateFields.push('contact_phone = ?')
-				updateValues.push(updates.contact_phone)
-			}
-			if (updates.contact_name !== undefined) {
-				updateFields.push('contact_name = ?')
-				updateValues.push(updates.contact_name)
 			}
 			if (updates.status !== undefined) {
 				updateFields.push('status = ?')
