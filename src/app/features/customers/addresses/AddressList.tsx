@@ -3,7 +3,8 @@ import { LoadingOverlay } from '@/app/components/LoadingOverlay'
 import { trpc } from '@/app/trpc'
 import type { CustomerAddress } from '@/shared/customer'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
+import { MapPin, Plus, Package, FileText } from 'lucide-react'
+import { useMemo, useState } from 'react'
 
 interface AddressListProps {
 	customerId: string
@@ -13,14 +14,51 @@ export function AddressList({ customerId }: AddressListProps) {
 	const { hasPermission } = useAuth()
 	const navigate = useNavigate()
 	const utils = trpc.useUtils()
+	const [activeTab, setActiveTab] = useState<'billing' | 'shipping'>('billing')
+	const [displayedCount, setDisplayedCount] = useState(20)
 
 	// Get customer data to display name
-	const { data: customer } = trpc.customers.getById.useQuery(customerId)
+	const {
+		data: customer,
+		isLoading,
+		error,
+	} = trpc.customers.getById.useQuery(customerId)
 
 	// Get addresses - we already have them from the customer query
 	const addresses = customer?.addresses || []
 
 	const [isUpdating, setIsUpdating] = useState<string | null>(null)
+
+	// Find default addresses
+	const defaultBillingAddress = useMemo(() => {
+		return addresses.find(
+			(a) => a.address_type === 'billing' && a.is_default === 1,
+		)
+	}, [addresses])
+
+	const defaultShippingAddress = useMemo(() => {
+		return addresses.find(
+			(a) => a.address_type === 'shipping' && a.is_default === 1,
+		)
+	}, [addresses])
+
+	// Non-default addresses for the list
+	const nonDefaultAddresses = useMemo(() => {
+		return addresses.filter(
+			(a) => a.address_type === activeTab && a.is_default !== 1,
+		)
+	}, [addresses, activeTab])
+
+	// Addresses to display (with pagination)
+	const displayedAddresses = useMemo(() => {
+		return nonDefaultAddresses.slice(0, displayedCount)
+	}, [nonDefaultAddresses, displayedCount])
+
+	const handleLoadMore = () => {
+		setDisplayedCount((prev) => prev + 20)
+	}
+
+	const hasMoreToLoad = displayedCount < nonDefaultAddresses.length
 
 	// Mutations
 	const updateAddressMutation = trpc.customers.updateAddress.useMutation({
@@ -72,193 +110,256 @@ export function AddressList({ customerId }: AddressListProps) {
 		}
 	}
 
-	const isLoading = !customer
-	const isProcessing = isUpdating !== null
+	const handleAddAddress = () => {
+		navigate({
+			to: '/customers/$customerId/addresses/create',
+			params: { customerId },
+		})
+	}
 
-	// Group addresses by type
-	const billingAddresses = addresses.filter((a) => a.address_type === 'billing')
-	const shippingAddresses = addresses.filter(
-		(a) => a.address_type === 'shipping',
-	)
+	// Show error without layout
+	if (error) {
+		return (
+			<div className="component-wrapper">
+				<div className="content-header">
+					<h1>Manage Addresses</h1>
+				</div>
+				<div className="content-body">
+					<div style={{ padding: '2rem', textAlign: 'center' }}>
+						Error: {error.message}
+					</div>
+				</div>
+			</div>
+		)
+	}
+
+	const isProcessing = isUpdating !== null
+	const currentDefaultAddress =
+		activeTab === 'billing' ? defaultBillingAddress : defaultShippingAddress
+
+	const formatAddress = (address: CustomerAddress) => {
+		const parts = [
+			address.address_line1,
+			address.address_line2,
+			address.address_line3,
+			address.address_line4,
+			[address.city, address.state, address.postcode]
+				.filter(Boolean)
+				.join(', '),
+			address.country,
+		].filter(Boolean)
+		return parts
+	}
 
 	return (
 		<div>
 			<div className="content-header">
 				<h1>Manage Addresses</h1>
-				<div className="display-flex">
-					<div className="display-flex">
-						<Link to="/customers/$customerId" params={{ customerId }}>
-							← Back to {customer?.customer_name || 'Customer'}
-						</Link>
-					</div>
-					<div>
-						{hasPermission('customers', 'update-any') && (
-							<button
-								className="button-primary"
-								type="button"
-								onClick={() =>
-									navigate({
-										to: '/customers/$customerId/addresses/create',
-										params: { customerId },
-									})
-								}
-							>
-								Add Address
-							</button>
-						)}
-					</div>
+				<div>
+					<Link to="/customers/$customerId" params={{ customerId }}>
+						← Back to customer detail
+					</Link>
 				</div>
 			</div>
 
 			<div className="content-body">
+				{/* Tabs */}
+				<div className="address-tabs">
+					<button
+						className={`address-tab ${activeTab === 'billing' ? 'active' : ''}`}
+						onClick={() => {
+							setActiveTab('billing')
+							setDisplayedCount(20)
+						}}
+						type="button"
+					>
+						<FileText size={16} />
+						Billing Addresses
+					</button>
+					<button
+						className={`address-tab ${activeTab === 'shipping' ? 'active' : ''}`}
+						onClick={() => {
+							setActiveTab('shipping')
+							setDisplayedCount(20)
+						}}
+						type="button"
+					>
+						<Package size={16} />
+						Shipping Addresses
+					</button>
+				</div>
+
+				<div className="address-cards-section">
+					{/* Default Address Card */}
+					<div className="address-card primary-card">
+						<div className="address-card-icon">
+							<MapPin size={24} />
+						</div>
+						<div className="address-card-content">
+							<h3 className="address-card-title">
+								Default {activeTab} Address
+							</h3>
+							{currentDefaultAddress ? (
+								<>
+									{currentDefaultAddress.address_label && (
+										<p className="address-card-label">
+											{currentDefaultAddress.address_label}
+										</p>
+									)}
+									<div className="address-card-lines">
+										{formatAddress(currentDefaultAddress).map((line, index) => (
+											<p key={index} className="address-card-line">
+												{line}
+											</p>
+										))}
+									</div>
+									<div className="address-card-actions">
+										<Link
+											to="/customers/$customerId/addresses/$addressId/edit"
+											params={{
+												customerId,
+												addressId: currentDefaultAddress.id,
+											}}
+											className="address-card-link"
+										>
+											Edit
+										</Link>
+									</div>
+								</>
+							) : (
+								<p className="address-card-empty">
+									No default {activeTab} address set
+								</p>
+							)}
+						</div>
+					</div>
+
+					{/* Add Address Card */}
+					{hasPermission('customers', 'update-any') && (
+						<button
+							className="address-card add-address-card"
+							onClick={handleAddAddress}
+							type="button"
+						>
+							<div className="add-address-icon">
+								<Plus size={32} />
+							</div>
+							<p className="add-address-text">Add New Address</p>
+						</button>
+					)}
+				</div>
+
 				<div className="scroll-container">
-					<LoadingOverlay isLoading={isLoading || isProcessing} />
+					{(isLoading || isProcessing) && <LoadingOverlay isLoading={true} />}
+					{nonDefaultAddresses.length === 0 && !isLoading ? (
+						<div className="list-empty">
+							No additional {activeTab} addresses found
+						</div>
+					) : (
+						<>
+							<div className="address-list-header">
+								<h3>
+									Other {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}{' '}
+									Addresses
+								</h3>
+							</div>
+							{displayedAddresses.map((address) => (
+								<div key={address.id} className="list-item">
+									{/* Left side - Address info */}
+									<div className="list-item-content">
+										<div className="list-item-info">
+											<div className="list-item-title">
+												{address.address_label ||
+													`${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Address`}
+											</div>
+											<div className="list-item-meta">
+												{formatAddress(address)
+													.slice(0, 3)
+													.map((line, index) => (
+														<div key={index}>{line}</div>
+													))}
+											</div>
+										</div>
+									</div>
 
-					{/* Billing Addresses */}
-					<div className="address-section">
-						<h2>Billing Addresses</h2>
-						{billingAddresses.length === 0 ? (
-							<p className="no-data">No billing addresses found</p>
-						) : (
-							<div className="address-grid">
-								{billingAddresses.map((address) => (
-									<div key={address.id} className="address-card">
-										<div className="address-header">
-											<h3>{address.address_label || 'Billing Address'}</h3>
-											{address.is_default === 1 && (
-												<span className="badge-primary">Default</span>
-											)}
-										</div>
-										<div className="address-body">
-											<p>{address.address_line1}</p>
-											{address.address_line2 && <p>{address.address_line2}</p>}
-											{address.address_line3 && <p>{address.address_line3}</p>}
-											{address.address_line4 && <p>{address.address_line4}</p>}
-											<p>
-												{[address.city, address.state, address.postcode]
-													.filter(Boolean)
-													.join(', ')}
-											</p>
-											{address.country && <p>{address.country}</p>}
-										</div>
-										<div className="address-actions">
-											<button
-												className="button-small"
-												type="button"
-												onClick={() =>
-													navigate({
-														to: '/customers/$customerId/addresses/$addressId/edit',
-														params: { customerId, addressId: address.id },
-													})
-												}
-												disabled={isUpdating === address.id}
-											>
-												Edit
-											</button>
-											{address.is_default !== 1 && (
+									{/* Right side - Actions */}
+									<div className="list-item-links">
+										<Link
+											to="/customers/$customerId/addresses/$addressId/edit"
+											params={{
+												customerId,
+												addressId: address.id,
+											}}
+										>
+											Edit
+										</Link>
+										{hasPermission('customers', 'update-any') && (
+											<>
+												<span className="list-item-separator">|</span>
 												<button
-													className="button-small"
 													type="button"
 													onClick={() => handleSetDefault(address)}
 													disabled={isUpdating === address.id}
+													style={{
+														background: 'none',
+														border: 'none',
+														color: '#3b82f6',
+														cursor: 'pointer',
+														padding: 0,
+														font: 'inherit',
+													}}
 												>
 													Set Default
 												</button>
-											)}
-											<button
-												className="button-small button-danger"
-												type="button"
-												onClick={() => handleDelete(address.id)}
-												disabled={
-													isUpdating === address.id || address.is_default === 1
-												}
-												title={
-													address.is_default === 1
-														? 'Cannot delete default address'
-														: ''
-												}
-											>
-												Delete
-											</button>
-										</div>
-									</div>
-								))}
-							</div>
-						)}
-					</div>
-
-					{/* Shipping Addresses */}
-					<div className="address-section">
-						<h2>Shipping Addresses</h2>
-						{shippingAddresses.length === 0 ? (
-							<p className="no-data">No shipping addresses found</p>
-						) : (
-							<div className="address-grid">
-								{shippingAddresses.map((address) => (
-									<div key={address.id} className="address-card">
-										<div className="address-header">
-											<h3>{address.address_label || 'Shipping Address'}</h3>
-											{address.is_default === 1 && (
-												<span className="badge-primary">Default</span>
-											)}
-										</div>
-										<div className="address-body">
-											<p>{address.address_line1}</p>
-											{address.address_line2 && <p>{address.address_line2}</p>}
-											{address.address_line3 && <p>{address.address_line3}</p>}
-											{address.address_line4 && <p>{address.address_line4}</p>}
-											<p>
-												{[address.city, address.state, address.postcode]
-													.filter(Boolean)
-													.join(', ')}
-											</p>
-											{address.country && <p>{address.country}</p>}
-										</div>
-										<div className="address-actions">
-											<button
-												className="button-small"
-												type="button"
-												onClick={() =>
-													navigate({
-														to: '/customers/$customerId/addresses/$addressId/edit',
-														params: { customerId, addressId: address.id },
-													})
-												}
-												disabled={isUpdating === address.id}
-											>
-												Edit
-											</button>
-											{address.is_default !== 1 && (
+											</>
+										)}
+										{hasPermission('customers', 'update-any') && (
+											<>
+												<span className="list-item-separator">|</span>
 												<button
-													className="button-small"
 													type="button"
-													onClick={() => handleSetDefault(address)}
+													onClick={() => handleDelete(address.id)}
 													disabled={isUpdating === address.id}
+													style={{
+														background: 'none',
+														border: 'none',
+														color: '#ef4444',
+														cursor: 'pointer',
+														padding: 0,
+														font: 'inherit',
+													}}
 												>
-													Set Default
+													Delete
 												</button>
-											)}
-											<button
-												className="button-small button-danger"
-												type="button"
-												onClick={() => handleDelete(address.id)}
-												disabled={
-													isUpdating === address.id || address.is_default === 1
-												}
-												title={
-													address.is_default === 1
-														? 'Cannot delete default address'
-														: ''
-												}
-											>
-												Delete
-											</button>
-										</div>
+											</>
+										)}
 									</div>
-								))}
+								</div>
+							))}
+						</>
+					)}
+
+					{/* Load More button */}
+					{hasMoreToLoad && (
+						<div className="list-item">
+							<div className="list-item-content">
+								<div
+									className="list-item-info"
+									style={{ textAlign: 'center', width: '100%' }}
+								>
+									<button
+										type="button"
+										onClick={handleLoadMore}
+										className="button-blue"
+										style={{ margin: '0 auto' }}
+									>
+										Load More ({displayedCount} of {nonDefaultAddresses.length}{' '}
+										shown)
+									</button>
+								</div>
 							</div>
-						)}
-					</div>
+						</div>
+					)}
 				</div>
 			</div>
 		</div>

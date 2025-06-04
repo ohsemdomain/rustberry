@@ -2,6 +2,7 @@
 import { useAuth } from '@/app/AuthProvider'
 import { LoadingOverlay } from '@/app/components/LoadingOverlay'
 import { trpc } from '@/app/trpc'
+import { formatDate } from '@/app/utils/date'
 import type { CustomerContact } from '@/shared/customer'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Plus, User } from 'lucide-react'
@@ -148,11 +149,9 @@ export function ContactList({ customerId }: ContactListProps) {
 									<p className="contact-card-phone">
 										{primaryContact.phone_number}
 									</p>
-									{primaryContact.phone_label && (
-										<p className="contact-card-label">
-											{primaryContact.phone_label}
-										</p>
-									)}
+									<p className="contact-card-label">
+										{formatDate(primaryContact.created_at)} • {primaryContact.phone_label || 'No label'}
+									</p>
 									<div className="contact-card-actions">
 										<Link
 											to="/customers/$customerId/contacts/$contactId/edit"
@@ -205,7 +204,7 @@ export function ContactList({ customerId }: ContactListProps) {
 												{contact.phone_number}
 											</div>
 											<div className="list-item-meta">
-												{contact.phone_label || 'No label'}
+												{formatDate(contact.created_at)} • {contact.phone_label || 'No label'}
 											</div>
 										</div>
 									</div>
