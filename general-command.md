@@ -6,13 +6,13 @@ To empty all data from your D1 tables while preserving the table structure, run 
 
 ```bash
 # Empty all tables
-bunx wrangler d1 execute rustyberry --local --command="DELETE FROM invoice_items;"
-bunx wrangler d1 execute rustyberry --local --command="DELETE FROM invoices;"
-bunx wrangler d1 execute rustyberry --local --command="DELETE FROM customer_contacts;"
-bunx wrangler d1 execute rustyberry --local --command="DELETE FROM customer_addresses;"
-bunx wrangler d1 execute rustyberry --local --command="DELETE FROM customers;"
-bunx wrangler d1 execute rustyberry --local --command="DELETE FROM users;"
-bunx wrangler d1 execute rustyberry --local --command="DELETE FROM items;"
+bunx wrangler d1 execute rustyberry-d1 --local --command="DELETE FROM invoice_items;"
+bunx wrangler d1 execute rustyberry-d1 --local --command="DELETE FROM invoices;"
+bunx wrangler d1 execute rustyberry-d1 --local --command="DELETE FROM customer_contacts;"
+bunx wrangler d1 execute rustyberry-d1 --local --command="DELETE FROM customer_addresses;"
+bunx wrangler d1 execute rustyberry-d1 --local --command="DELETE FROM customers;"
+bunx wrangler d1 execute rustyberry-d1 --local --command="DELETE FROM users;"
+bunx wrangler d1 execute rustyberry-d1 --local --command="DELETE FROM items;"
 ```
 
 ## Single Command to Empty All Tables
@@ -20,13 +20,12 @@ bunx wrangler d1 execute rustyberry --local --command="DELETE FROM items;"
 You can also run all DELETE commands in a single execution:
 
 ```bash
-bunx wrangler d1 execute rustyberry --local --command="
+bunx wrangler d1 execute rustyberry-d1 --local --command="
 DELETE FROM invoice_items;
 DELETE FROM invoices;
 DELETE FROM customer_contacts;
 DELETE FROM customer_addresses;
 DELETE FROM customers;
-DELETE FROM users;
 DELETE FROM items;
 "
 ```
@@ -37,13 +36,7 @@ To view data in specific tables:
 
 ```bash
 # View all customers
-bunx wrangler d1 execute rustyberry --local --command="SELECT * FROM customers;"
-
-# View all items
-bunx wrangler d1 execute rustyberry --local --command="SELECT * FROM items;"
-
-# View all users
-bunx wrangler d1 execute rustyberry --local --command="SELECT * FROM users;"
+bunx wrangler d1 execute rustyberry-d1 --local --command="SELECT * FROM customers;"
 ```
 
 ## Count Records
@@ -51,7 +44,7 @@ bunx wrangler d1 execute rustyberry --local --command="SELECT * FROM users;"
 To check how many records are in each table:
 
 ```bash
-bunx wrangler d1 execute rustyberry --local --command="
+bunx wrangler d1 execute rustyberry-d1 --local --command="
 SELECT 'items' as table_name, COUNT(*) as count FROM items
 UNION ALL
 SELECT 'users', COUNT(*) FROM users
@@ -77,7 +70,7 @@ To completely reset your local database:
 rm -rf .wrangler/state/v3/d1/
 
 # Re-run migrations
-bunx wrangler d1 migrations apply rustyberry --local
+bunx wrangler d1 migrations apply rustyberry-d1 --local
 ```
 
 ## Create New Users
@@ -103,7 +96,7 @@ passwordHash: 'HASH_STRING_HERE'
 Use the generated hash to create a new user. Replace the values as needed:
 
 ```bash
-bunx wrangler d1 execute rustyberry --local --command="
+bunx wrangler d1 execute rustyberry-d1 --local --command="
 INSERT INTO users (id, email, name, password_hash, role) 
 VALUES ('user-3', 'newuser@company.com', 'New User Name', 'PASTE_HASH_HERE', 'sales');
 "
@@ -126,7 +119,7 @@ bun run src/server/auth/hash-password.ts salespass123
 bun run src/server/auth/hash-password.ts hrpass456
 
 # Then insert users
-bunx wrangler d1 execute rustyberry --local --command="
+bunx wrangler d1 execute rustyberry-d1 --local --command="
 INSERT INTO users (id, email, name, password_hash, role) VALUES 
 ('user-sales-1', 'sales@company.com', 'Sales Manager', 'SALES_HASH_HERE', 'sales'),
 ('user-hr-1', 'hr@company.com', 'HR Manager', 'HR_HASH_HERE', 'hr');
@@ -136,7 +129,7 @@ INSERT INTO users (id, email, name, password_hash, role) VALUES
 ### View All Users
 
 ```bash
-bunx wrangler d1 execute rustyberry --local --command="
+bunx wrangler d1 execute rustyberry-d1 --local --command="
 SELECT id, email, name, role, datetime(created_at, 'unixepoch') as created_date 
 FROM users 
 ORDER BY created_at DESC;
@@ -153,5 +146,5 @@ The migration includes two default users:
 
 - The `--local` flag ensures these commands only affect your local D1 database
 - Remove `--local` to run commands against your remote D1 database (be careful!)
-- The database name `rustyberry` should match the name in your `wrangler.toml`
+- The database name `rustyberry-d1` should match the name in your `wrangler.toml`
 - Never commit plain text passwords to your repository
