@@ -31,11 +31,8 @@ import { Route as AuthenticatedCustomersCustomerIdImport } from './routes/_authe
 import { Route as AuthenticatedItemsItemIdEditImport } from './routes/_authenticated/items/$itemId.edit'
 import { Route as AuthenticatedInvoicesInvoiceIdEditImport } from './routes/_authenticated/invoices/$invoiceId.edit'
 import { Route as AuthenticatedCustomersCustomerIdEditImport } from './routes/_authenticated/customers/$customerId.edit'
-import { Route as AuthenticatedCustomersCustomerIdContactsIndexImport } from './routes/_authenticated/customers/$customerId/contacts/index'
 import { Route as AuthenticatedCustomersCustomerIdAddressesIndexImport } from './routes/_authenticated/customers/$customerId/addresses/index'
-import { Route as AuthenticatedCustomersCustomerIdContactsCreateImport } from './routes/_authenticated/customers/$customerId/contacts/create'
 import { Route as AuthenticatedCustomersCustomerIdAddressesCreateImport } from './routes/_authenticated/customers/$customerId/addresses/create'
-import { Route as AuthenticatedCustomersCustomerIdContactsContactIdEditImport } from './routes/_authenticated/customers/$customerId/contacts/$contactId.edit'
 import { Route as AuthenticatedCustomersCustomerIdAddressesAddressIdEditImport } from './routes/_authenticated/customers/$customerId/addresses/$addressId.edit'
 
 // Create/Update Routes
@@ -168,13 +165,6 @@ const AuthenticatedCustomersCustomerIdEditRoute =
     getParentRoute: () => AuthenticatedCustomersCustomerIdRoute,
   } as any)
 
-const AuthenticatedCustomersCustomerIdContactsIndexRoute =
-  AuthenticatedCustomersCustomerIdContactsIndexImport.update({
-    id: '/contacts/',
-    path: '/contacts/',
-    getParentRoute: () => AuthenticatedCustomersCustomerIdRoute,
-  } as any)
-
 const AuthenticatedCustomersCustomerIdAddressesIndexRoute =
   AuthenticatedCustomersCustomerIdAddressesIndexImport.update({
     id: '/addresses/',
@@ -182,24 +172,10 @@ const AuthenticatedCustomersCustomerIdAddressesIndexRoute =
     getParentRoute: () => AuthenticatedCustomersCustomerIdRoute,
   } as any)
 
-const AuthenticatedCustomersCustomerIdContactsCreateRoute =
-  AuthenticatedCustomersCustomerIdContactsCreateImport.update({
-    id: '/contacts/create',
-    path: '/contacts/create',
-    getParentRoute: () => AuthenticatedCustomersCustomerIdRoute,
-  } as any)
-
 const AuthenticatedCustomersCustomerIdAddressesCreateRoute =
   AuthenticatedCustomersCustomerIdAddressesCreateImport.update({
     id: '/addresses/create',
     path: '/addresses/create',
-    getParentRoute: () => AuthenticatedCustomersCustomerIdRoute,
-  } as any)
-
-const AuthenticatedCustomersCustomerIdContactsContactIdEditRoute =
-  AuthenticatedCustomersCustomerIdContactsContactIdEditImport.update({
-    id: '/contacts/$contactId/edit',
-    path: '/contacts/$contactId/edit',
     getParentRoute: () => AuthenticatedCustomersCustomerIdRoute,
   } as any)
 
@@ -361,13 +337,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCustomersCustomerIdAddressesCreateImport
       parentRoute: typeof AuthenticatedCustomersCustomerIdImport
     }
-    '/_authenticated/customers/$customerId/contacts/create': {
-      id: '/_authenticated/customers/$customerId/contacts/create'
-      path: '/contacts/create'
-      fullPath: '/customers/$customerId/contacts/create'
-      preLoaderRoute: typeof AuthenticatedCustomersCustomerIdContactsCreateImport
-      parentRoute: typeof AuthenticatedCustomersCustomerIdImport
-    }
     '/_authenticated/customers/$customerId/addresses/': {
       id: '/_authenticated/customers/$customerId/addresses/'
       path: '/addresses'
@@ -375,25 +344,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCustomersCustomerIdAddressesIndexImport
       parentRoute: typeof AuthenticatedCustomersCustomerIdImport
     }
-    '/_authenticated/customers/$customerId/contacts/': {
-      id: '/_authenticated/customers/$customerId/contacts/'
-      path: '/contacts'
-      fullPath: '/customers/$customerId/contacts'
-      preLoaderRoute: typeof AuthenticatedCustomersCustomerIdContactsIndexImport
-      parentRoute: typeof AuthenticatedCustomersCustomerIdImport
-    }
     '/_authenticated/customers/$customerId/addresses/$addressId/edit': {
       id: '/_authenticated/customers/$customerId/addresses/$addressId/edit'
       path: '/addresses/$addressId/edit'
       fullPath: '/customers/$customerId/addresses/$addressId/edit'
       preLoaderRoute: typeof AuthenticatedCustomersCustomerIdAddressesAddressIdEditImport
-      parentRoute: typeof AuthenticatedCustomersCustomerIdImport
-    }
-    '/_authenticated/customers/$customerId/contacts/$contactId/edit': {
-      id: '/_authenticated/customers/$customerId/contacts/$contactId/edit'
-      path: '/contacts/$contactId/edit'
-      fullPath: '/customers/$customerId/contacts/$contactId/edit'
-      preLoaderRoute: typeof AuthenticatedCustomersCustomerIdContactsContactIdEditImport
       parentRoute: typeof AuthenticatedCustomersCustomerIdImport
     }
   }
@@ -404,11 +359,8 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedCustomersCustomerIdRouteChildren {
   AuthenticatedCustomersCustomerIdEditRoute: typeof AuthenticatedCustomersCustomerIdEditRoute
   AuthenticatedCustomersCustomerIdAddressesCreateRoute: typeof AuthenticatedCustomersCustomerIdAddressesCreateRoute
-  AuthenticatedCustomersCustomerIdContactsCreateRoute: typeof AuthenticatedCustomersCustomerIdContactsCreateRoute
   AuthenticatedCustomersCustomerIdAddressesIndexRoute: typeof AuthenticatedCustomersCustomerIdAddressesIndexRoute
-  AuthenticatedCustomersCustomerIdContactsIndexRoute: typeof AuthenticatedCustomersCustomerIdContactsIndexRoute
   AuthenticatedCustomersCustomerIdAddressesAddressIdEditRoute: typeof AuthenticatedCustomersCustomerIdAddressesAddressIdEditRoute
-  AuthenticatedCustomersCustomerIdContactsContactIdEditRoute: typeof AuthenticatedCustomersCustomerIdContactsContactIdEditRoute
 }
 
 const AuthenticatedCustomersCustomerIdRouteChildren: AuthenticatedCustomersCustomerIdRouteChildren =
@@ -417,16 +369,10 @@ const AuthenticatedCustomersCustomerIdRouteChildren: AuthenticatedCustomersCusto
       AuthenticatedCustomersCustomerIdEditRoute,
     AuthenticatedCustomersCustomerIdAddressesCreateRoute:
       AuthenticatedCustomersCustomerIdAddressesCreateRoute,
-    AuthenticatedCustomersCustomerIdContactsCreateRoute:
-      AuthenticatedCustomersCustomerIdContactsCreateRoute,
     AuthenticatedCustomersCustomerIdAddressesIndexRoute:
       AuthenticatedCustomersCustomerIdAddressesIndexRoute,
-    AuthenticatedCustomersCustomerIdContactsIndexRoute:
-      AuthenticatedCustomersCustomerIdContactsIndexRoute,
     AuthenticatedCustomersCustomerIdAddressesAddressIdEditRoute:
       AuthenticatedCustomersCustomerIdAddressesAddressIdEditRoute,
-    AuthenticatedCustomersCustomerIdContactsContactIdEditRoute:
-      AuthenticatedCustomersCustomerIdContactsContactIdEditRoute,
   }
 
 const AuthenticatedCustomersCustomerIdRouteWithChildren =
@@ -535,11 +481,8 @@ export interface FileRoutesByFullPath {
   '/invoices/$invoiceId/edit': typeof AuthenticatedInvoicesInvoiceIdEditRoute
   '/items/$itemId/edit': typeof AuthenticatedItemsItemIdEditRoute
   '/customers/$customerId/addresses/create': typeof AuthenticatedCustomersCustomerIdAddressesCreateRoute
-  '/customers/$customerId/contacts/create': typeof AuthenticatedCustomersCustomerIdContactsCreateRoute
   '/customers/$customerId/addresses': typeof AuthenticatedCustomersCustomerIdAddressesIndexRoute
-  '/customers/$customerId/contacts': typeof AuthenticatedCustomersCustomerIdContactsIndexRoute
   '/customers/$customerId/addresses/$addressId/edit': typeof AuthenticatedCustomersCustomerIdAddressesAddressIdEditRoute
-  '/customers/$customerId/contacts/$contactId/edit': typeof AuthenticatedCustomersCustomerIdContactsContactIdEditRoute
 }
 
 export interface FileRoutesByTo {
@@ -563,11 +506,8 @@ export interface FileRoutesByTo {
   '/invoices/$invoiceId/edit': typeof AuthenticatedInvoicesInvoiceIdEditRoute
   '/items/$itemId/edit': typeof AuthenticatedItemsItemIdEditRoute
   '/customers/$customerId/addresses/create': typeof AuthenticatedCustomersCustomerIdAddressesCreateRoute
-  '/customers/$customerId/contacts/create': typeof AuthenticatedCustomersCustomerIdContactsCreateRoute
   '/customers/$customerId/addresses': typeof AuthenticatedCustomersCustomerIdAddressesIndexRoute
-  '/customers/$customerId/contacts': typeof AuthenticatedCustomersCustomerIdContactsIndexRoute
   '/customers/$customerId/addresses/$addressId/edit': typeof AuthenticatedCustomersCustomerIdAddressesAddressIdEditRoute
-  '/customers/$customerId/contacts/$contactId/edit': typeof AuthenticatedCustomersCustomerIdContactsContactIdEditRoute
 }
 
 export interface FileRoutesById {
@@ -593,11 +533,8 @@ export interface FileRoutesById {
   '/_authenticated/invoices/$invoiceId/edit': typeof AuthenticatedInvoicesInvoiceIdEditRoute
   '/_authenticated/items/$itemId/edit': typeof AuthenticatedItemsItemIdEditRoute
   '/_authenticated/customers/$customerId/addresses/create': typeof AuthenticatedCustomersCustomerIdAddressesCreateRoute
-  '/_authenticated/customers/$customerId/contacts/create': typeof AuthenticatedCustomersCustomerIdContactsCreateRoute
   '/_authenticated/customers/$customerId/addresses/': typeof AuthenticatedCustomersCustomerIdAddressesIndexRoute
-  '/_authenticated/customers/$customerId/contacts/': typeof AuthenticatedCustomersCustomerIdContactsIndexRoute
   '/_authenticated/customers/$customerId/addresses/$addressId/edit': typeof AuthenticatedCustomersCustomerIdAddressesAddressIdEditRoute
-  '/_authenticated/customers/$customerId/contacts/$contactId/edit': typeof AuthenticatedCustomersCustomerIdContactsContactIdEditRoute
 }
 
 export interface FileRouteTypes {
@@ -623,11 +560,8 @@ export interface FileRouteTypes {
     | '/invoices/$invoiceId/edit'
     | '/items/$itemId/edit'
     | '/customers/$customerId/addresses/create'
-    | '/customers/$customerId/contacts/create'
     | '/customers/$customerId/addresses'
-    | '/customers/$customerId/contacts'
     | '/customers/$customerId/addresses/$addressId/edit'
-    | '/customers/$customerId/contacts/$contactId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | ''
@@ -650,11 +584,8 @@ export interface FileRouteTypes {
     | '/invoices/$invoiceId/edit'
     | '/items/$itemId/edit'
     | '/customers/$customerId/addresses/create'
-    | '/customers/$customerId/contacts/create'
     | '/customers/$customerId/addresses'
-    | '/customers/$customerId/contacts'
     | '/customers/$customerId/addresses/$addressId/edit'
-    | '/customers/$customerId/contacts/$contactId/edit'
   id:
     | '__root__'
     | '/_authenticated'
@@ -678,11 +609,8 @@ export interface FileRouteTypes {
     | '/_authenticated/invoices/$invoiceId/edit'
     | '/_authenticated/items/$itemId/edit'
     | '/_authenticated/customers/$customerId/addresses/create'
-    | '/_authenticated/customers/$customerId/contacts/create'
     | '/_authenticated/customers/$customerId/addresses/'
-    | '/_authenticated/customers/$customerId/contacts/'
     | '/_authenticated/customers/$customerId/addresses/$addressId/edit'
-    | '/_authenticated/customers/$customerId/contacts/$contactId/edit'
   fileRoutesById: FileRoutesById
 }
 
@@ -765,11 +693,8 @@ export const routeTree = rootRoute
       "children": [
         "/_authenticated/customers/$customerId/edit",
         "/_authenticated/customers/$customerId/addresses/create",
-        "/_authenticated/customers/$customerId/contacts/create",
         "/_authenticated/customers/$customerId/addresses/",
-        "/_authenticated/customers/$customerId/contacts/",
-        "/_authenticated/customers/$customerId/addresses/$addressId/edit",
-        "/_authenticated/customers/$customerId/contacts/$contactId/edit"
+        "/_authenticated/customers/$customerId/addresses/$addressId/edit"
       ]
     },
     "/_authenticated/customers/create": {
@@ -826,24 +751,12 @@ export const routeTree = rootRoute
       "filePath": "_authenticated/customers/$customerId/addresses/create.tsx",
       "parent": "/_authenticated/customers/$customerId"
     },
-    "/_authenticated/customers/$customerId/contacts/create": {
-      "filePath": "_authenticated/customers/$customerId/contacts/create.tsx",
-      "parent": "/_authenticated/customers/$customerId"
-    },
     "/_authenticated/customers/$customerId/addresses/": {
       "filePath": "_authenticated/customers/$customerId/addresses/index.tsx",
       "parent": "/_authenticated/customers/$customerId"
     },
-    "/_authenticated/customers/$customerId/contacts/": {
-      "filePath": "_authenticated/customers/$customerId/contacts/index.tsx",
-      "parent": "/_authenticated/customers/$customerId"
-    },
     "/_authenticated/customers/$customerId/addresses/$addressId/edit": {
       "filePath": "_authenticated/customers/$customerId/addresses/$addressId.edit.tsx",
-      "parent": "/_authenticated/customers/$customerId"
-    },
-    "/_authenticated/customers/$customerId/contacts/$contactId/edit": {
-      "filePath": "_authenticated/customers/$customerId/contacts/$contactId.edit.tsx",
       "parent": "/_authenticated/customers/$customerId"
     }
   }
