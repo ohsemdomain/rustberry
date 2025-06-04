@@ -137,19 +137,6 @@ export function AddressList({ customerId }: AddressListProps) {
 	const currentDefaultAddress =
 		activeTab === 'billing' ? defaultBillingAddress : defaultShippingAddress
 
-	const formatAddress = (address: CustomerAddress) => {
-		const parts = [
-			address.address_line1,
-			address.address_line2,
-			address.address_line3,
-			address.address_line4,
-			[address.city, address.state, address.postcode]
-				.filter(Boolean)
-				.join(', '),
-			address.country,
-		].filter(Boolean)
-		return parts
-	}
 
 	return (
 		<div>
