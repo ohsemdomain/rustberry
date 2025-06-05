@@ -339,6 +339,7 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 											type="text"
 											value={formData.billing_address_line1}
 											onChange={handleChange}
+											maxLength={35}
 											required
 										/>
 									</div>
@@ -353,6 +354,35 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 											type="text"
 											value={formData.billing_address_line2}
 											onChange={handleChange}
+											maxLength={35}
+										/>
+									</div>
+
+									<div className="form-row">
+										<label htmlFor="billing_address_line3">
+											Address Line 3
+										</label>
+										<input
+											id="billing_address_line3"
+											name="billing_address_line3"
+											type="text"
+											value={formData.billing_address_line3}
+											onChange={handleChange}
+											maxLength={35}
+										/>
+									</div>
+
+									<div className="form-row">
+										<label htmlFor="billing_address_line4">
+											Address Line 4
+										</label>
+										<input
+											id="billing_address_line4"
+											name="billing_address_line4"
+											type="text"
+											value={formData.billing_address_line4}
+											onChange={handleChange}
+											maxLength={35}
 										/>
 									</div>
 
@@ -441,6 +471,7 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 													type="text"
 													value={formData.shipping_address_line1}
 													onChange={handleChange}
+													maxLength={35}
 												/>
 											</div>
 
@@ -454,6 +485,35 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
 													type="text"
 													value={formData.shipping_address_line2}
 													onChange={handleChange}
+													maxLength={35}
+												/>
+											</div>
+
+											<div className="form-row">
+												<label htmlFor="shipping_address_line3">
+													Address Line 3
+												</label>
+												<input
+													id="shipping_address_line3"
+													name="shipping_address_line3"
+													type="text"
+													value={formData.shipping_address_line3}
+													onChange={handleChange}
+													maxLength={35}
+												/>
+											</div>
+
+											<div className="form-row">
+												<label htmlFor="shipping_address_line4">
+													Address Line 4
+												</label>
+												<input
+													id="shipping_address_line4"
+													name="shipping_address_line4"
+													type="text"
+													value={formData.shipping_address_line4}
+													onChange={handleChange}
+													maxLength={35}
 												/>
 											</div>
 
